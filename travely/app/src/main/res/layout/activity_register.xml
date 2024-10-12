@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F5F5F5"
+    android:background="#FFFFFF"
     android:padding="24dp"
     android:gravity="center"
     tools:context=".RegisterActivity">
@@ -19,7 +19,7 @@
         android:src="@drawable/logo"
         android:contentDescription="Logo Travely" />
 
-    <!-- Três pontos coloridos -->
+    <!-- pontos coloridos -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -27,7 +27,6 @@
         android:layout_marginTop="8dp"
         android:gravity="center">
 
-        <!-- Pontos coloridos -->
         <View
             android:layout_width="80dp"
             android:layout_height="20dp"
@@ -43,7 +42,7 @@
         android:hint="Nome"
         android:inputType="textPersonName"
         android:layout_marginTop="24dp"
-        android:background="@drawable/edittext_background"
+        android:backgroundTint="#353535"
         android:padding="12dp"
         android:textColor="#4A4A4A"
         android:textColorHint="#808080" />
@@ -56,7 +55,7 @@
         android:hint="Email"
         android:inputType="textEmailAddress"
         android:layout_marginTop="12dp"
-        android:background="@drawable/edittext_background"
+        android:backgroundTint="#353535"
         android:padding="12dp"
         android:textColor="#4A4A4A"
         android:textColorHint="#808080" />
@@ -69,7 +68,7 @@
         android:hint="Senha"
         android:inputType="textPassword"
         android:layout_marginTop="12dp"
-        android:background="@drawable/edittext_background"
+        android:backgroundTint="#353535"
         android:padding="12dp"
         android:textColor="#4A4A4A"
         android:textColorHint="#808080" />
