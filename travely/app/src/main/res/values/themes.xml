@@ -3,6 +3,7 @@
     <style name="Base.Theme.Travely" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">#9168A0</item>
     </style>
 
     <style name="Theme.Travely" parent="Base.Theme.Travely" />

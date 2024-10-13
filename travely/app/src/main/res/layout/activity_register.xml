@@ -1,132 +1,172 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:layout_marginHorizontal="10dp"
+    android:layout_marginTop="20dp"
     android:background="#FFFFFF"
-    android:padding="24dp"
     android:gravity="center"
+    android:paddingHorizontal="10dp"
     tools:context=".RegisterActivity">
 
-    <!-- Logo do App (Travely) -->
-    <ImageView
-        android:id="@+id/logo"
-        android:layout_marginBottom="32dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:contentDescription="Logo Travely"
-        android:src="@drawable/logo" />
-
-    <!-- pontos coloridos -->
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="8dp"
-        android:gravity="center">
-
-        <View
-            android:layout_width="80dp"
-            android:layout_height="20dp"
-            android:background="@drawable/iconpoints"
-            android:layout_margin="4dp" />
-    </LinearLayout>
-
-    <!-- Campo Nome -->
-    <EditText
-        android:id="@+id/TextNome"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Nome"
-        android:layout_marginTop="32dp"
-        android:layout_marginBottom="16dp"
-        android:inputType="textPersonName"
-        android:background="@drawable/border_gray"
-        android:padding="8dp"
-        android:textColor="#4A4A4A"
-        android:textColorHint="#808080" />
+        android:layout_height="wrap_content">
 
-    <!-- Campo CPF -->
-    <EditText
-        android:id="@+id/TextCpf"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:inputType="number"
-        android:hint="CPF"
-        android:maxLength="11"
-        android:padding="8dp"
-        android:background="@drawable/border_gray"
-        android:textColor="#4A4A4A"
-        android:textColorHint="#808080" />
+        <!-- Logo do App (Travely) -->
+
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="0dp"
+            android:layout_height="150dp"
+            android:layout_marginTop="50dp"
+            android:contentDescription="Logo Travely"
+            android:maxWidth="200dp"
+            android:src="@drawable/logo"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/imgPoints"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:src="@drawable/iconpoints"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/logo" />
+
+        <!-- Campo Nome -->
+        <TextView
+            android:id="@+id/tvName"
+            style="@style/LabelInputs"
+            android:text="Nome"
+            app:layout_constraintEnd_toEndOf="@+id/TextNome"
+            app:layout_constraintStart_toStartOf="@+id/TextNome"
+            app:layout_constraintTop_toBottomOf="@id/imgPoints" />
+
+        <EditText
+            android:id="@+id/TextNome"
+            style="@style/Inputs"
+            android:hint="Digite seu nome"
+            android:inputType="textPersonName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvName" />
+
+        <!-- Campo CPF -->
+
+        <TextView
+            android:id="@+id/tvCpf"
+            style="@style/LabelInputs"
+            android:text="CPF"
+            app:layout_constraintEnd_toEndOf="@+id/TextCpf"
+            app:layout_constraintStart_toStartOf="@+id/TextCpf"
+            app:layout_constraintTop_toBottomOf="@id/TextNome" />
+
+        <EditText
+            android:id="@+id/TextCpf"
+            style="@style/Inputs"
+            android:hint="ex.: 000.000.000-00"
+            android:inputType="number"
+            android:maxLength="11"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvCpf" />
+
+        <!-- Campo Telefone -->
+
+        <TextView
+            android:id="@+id/tvPhone"
+            style="@style/LabelInputs"
+            android:text="Telefone"
+            app:layout_constraintEnd_toEndOf="@+id/TextTelefone"
+            app:layout_constraintStart_toStartOf="@+id/TextTelefone"
+            app:layout_constraintTop_toBottomOf="@id/TextCpf" />
+
+        <EditText
+            android:id="@+id/TextTelefone"
+            style="@style/Inputs"
+            android:hint="ex.: (00) 00000 0000"
+            android:inputType="phone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvPhone" />
+
+        <!-- Campo Email -->
+
+        <TextView
+            android:id="@+id/tvEmail"
+            style="@style/LabelInputs"
+            android:text="Email"
+            app:layout_constraintEnd_toEndOf="@+id/TextEmail"
+            app:layout_constraintStart_toStartOf="@+id/TextEmail"
+            app:layout_constraintTop_toBottomOf="@id/TextTelefone" />
+
+        <EditText
+            android:id="@+id/TextEmail"
+            style="@style/Inputs"
+            android:hint="Email"
+            android:inputType="textEmailAddress"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvEmail" />
+
+        <!-- Campo Senha -->
+
+        <TextView
+            android:id="@+id/tvPassword"
+            style="@style/LabelInputs"
+            android:text="Senha"
+            app:layout_constraintEnd_toEndOf="@+id/TextSenha"
+            app:layout_constraintStart_toStartOf="@+id/TextSenha"
+            app:layout_constraintTop_toBottomOf="@id/TextEmail" />
+
+        <EditText
+            android:id="@+id/TextSenha"
+            style="@style/Inputs"
+            android:hint="Digite sua senha"
+            android:inputType="textPassword"
+            android:padding="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvPassword" />
+
+        <!-- Campo Confirmacao Senha -->
+
+        <TextView
+            android:id="@+id/tvPasswordConfirm"
+            style="@style/LabelInputs"
+            android:text="Confirmação de senha"
+            app:layout_constraintEnd_toEndOf="@+id/TextSenhaConfirmacao"
+            app:layout_constraintStart_toStartOf="@+id/TextSenhaConfirmacao"
+            app:layout_constraintTop_toBottomOf="@id/TextSenha" />
+
+        <EditText
+            android:id="@+id/TextSenhaConfirmacao"
+            style="@style/Inputs"
+            android:hint="Digite sua senha novamente"
+            android:inputType="textPassword"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvPasswordConfirm" />
+
+        <!-- Botão Cadastrar -->
+        <Button
+            android:id="@+id/buttonCadastrar"
+            style="@style/Button"
+            android:layout_marginTop="40dp"
+            android:text="Cadastrar"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/TextSenhaConfirmacao" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>
 
 
-
-    <!-- Campo Telefone -->
-    <EditText
-        android:id="@+id/TextTelefone"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Telefone"
-        android:inputType="textEmailAddress"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/border_gray"
-        android:padding="8dp"
-        android:textColor="#4A4A4A"
-        android:textColorHint="#808080" />
-
-    <!-- Campo Email -->
-    <EditText
-        android:id="@+id/TextEmail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Email"
-        android:inputType="textEmailAddress"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/border_gray"
-        android:padding="8dp"
-        android:textColor="#4A4A4A"
-        android:textColorHint="#808080" />
-
-    <!-- Campo Senha -->
-    <EditText
-        android:id="@+id/TextSenha"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Senha"
-        android:inputType="textPassword"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/border_gray"
-        android:padding="8dp"
-        android:textColor="#4A4A4A"
-        android:textColorHint="#808080" />
-
-    <!-- Campo Confirmacao Senha -->
-    <EditText
-        android:id="@+id/TextSenhaConfirmacao"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Confirmar Senha"
-        android:inputType="textPassword"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/border_gray"
-        android:padding="8dp"
-        android:textColor="#4A4A4A"
-        android:textColorHint="#808080" />
-
-    <!-- Botão Cadastrar -->
-    <Button
-        android:id="@+id/buttonCadastrar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Cadastrar"
-        android:backgroundTint="#8A56AC"
-        android:textColor="#FFFFFF"
-        android:layout_marginTop="24dp"
-        android:padding="8dp"
-        android:textSize="16sp"
-        android:textStyle="bold" />
-
-</LinearLayout>
