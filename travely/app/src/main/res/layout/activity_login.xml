@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="#FFFFFF">
+
+    <!-- Imagem -->
+    <ImageView
+        android:id="@+id/top_image"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:src=" "
+        android:layout_gravity="center"
+        android:scaleType="fitCenter"
+        android:contentDescription="Imagem no topo"/>
+
+    <!-- "Usuário" -->
+    <TextView
+        android:id="@+id/text_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Usuário"
+        android:textColor="#000000"
+        android:textSize="16sp"
+        android:layout_marginTop="10dp"/>
+
+    <!-- TextBox para o usuário -->
+    <EditText
+        android:id="@+id/edit_user"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#D3D3D3"
+        android:hint="Digite o usuário"
+        android:padding="10dp"
+        android:layout_marginTop="8dp"
+        android:inputType="text"/>
+
+    <!-- "Senha" -->
+    <TextView
+        android:id="@+id/text_password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Senha"
+        android:textColor="#000000"
+        android:textSize="16sp"
+        android:layout_marginTop="16dp"/>
+
+    <!-- TextBox para inserir a senha -->
+    <EditText
+        android:id="@+id/edit_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#D3D3D3"
+        android:hint="Digite a senha"
+        android:padding="10dp"
+        android:layout_marginTop="8dp"
+        android:inputType="textPassword"/>
+
+    <TextView
+        android:id="@+id/text_forgot_password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Esqueci minha senha"
+        android:textColor="#9168A0"
+        android:textSize="14sp"
+        android:layout_marginTop="8dp"
+        android:clickable="true"
+        android:focusable="true"/>
+
+    <Button
+        android:id="@+id/button_continue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded"
+        android:text="Continuar"
+        android:textColor="#FFFFFF"
+        android:layout_marginTop="16dp" />
+
+
+</LinearLayout>
