@@ -44,7 +44,36 @@
         android:layout_marginBottom="16dp"
         android:inputType="textPersonName"
         android:background="@drawable/border_gray"
-        android:padding="12dp"
+        android:padding="8dp"
+        android:textColor="#4A4A4A"
+        android:textColorHint="#808080" />
+
+    <!-- Campo CPF -->
+    <EditText
+        android:id="@+id/TextCpf"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:inputType="number"
+        android:hint="CPF"
+        android:maxLength="11"
+        android:padding="8dp"
+        android:background="@drawable/border_gray"
+        android:textColor="#4A4A4A"
+        android:textColorHint="#808080" />
+
+
+
+    <!-- Campo Telefone -->
+    <EditText
+        android:id="@+id/TextTelefone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Telefone"
+        android:inputType="textEmailAddress"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/border_gray"
+        android:padding="8dp"
         android:textColor="#4A4A4A"
         android:textColorHint="#808080" />
 
@@ -55,10 +84,9 @@
         android:layout_height="wrap_content"
         android:hint="Email"
         android:inputType="textEmailAddress"
-        android:layout_marginTop="32dp"
         android:layout_marginBottom="16dp"
         android:background="@drawable/border_gray"
-        android:padding="12dp"
+        android:padding="8dp"
         android:textColor="#4A4A4A"
         android:textColorHint="#808080" />
 
@@ -69,10 +97,22 @@
         android:layout_height="wrap_content"
         android:hint="Senha"
         android:inputType="textPassword"
-        android:layout_marginTop="32dp"
         android:layout_marginBottom="16dp"
         android:background="@drawable/border_gray"
-        android:padding="12dp"
+        android:padding="8dp"
+        android:textColor="#4A4A4A"
+        android:textColorHint="#808080" />
+
+    <!-- Campo Confirmacao Senha -->
+    <EditText
+        android:id="@+id/TextSenhaConfirmacao"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Confirmar Senha"
+        android:inputType="textPassword"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/border_gray"
+        android:padding="8dp"
         android:textColor="#4A4A4A"
         android:textColorHint="#808080" />
 
@@ -85,7 +125,7 @@
         android:backgroundTint="#8A56AC"
         android:textColor="#FFFFFF"
         android:layout_marginTop="24dp"
-        android:padding="12dp"
+        android:padding="8dp"
         android:textSize="16sp"
         android:textStyle="bold" />
 

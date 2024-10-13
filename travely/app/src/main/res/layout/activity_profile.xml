@@ -172,7 +172,7 @@
                     android:id="@+id/buttonDescanso"
                     android:layout_width="110dp"
                     android:layout_height="110dp"
-                    android:src="@drawable/ProfileRelax"
+                    android:src="@drawable/profile_relax"
                     android:contentDescription="Descanso e relaxamento"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:layout_margin="20dp"/>
