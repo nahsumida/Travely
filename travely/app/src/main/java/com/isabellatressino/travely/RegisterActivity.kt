@@ -12,7 +12,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.functions.FirebaseFunctions
+//import com.google.firebase.functions.FirebaseFunctions
 import com.isabellatressino.travely.databinding.ActivityRegisterBinding
 import com.isabellatressino.travely.models.User
 
