@@ -1,0 +1,92 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#FFFFFF"
+    android:padding="24dp"
+    android:gravity="center"
+    tools:context=".RegisterActivity">
+
+    <!-- Logo do App (Travely) -->
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_marginBottom="32dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="Logo Travely"
+        android:src="@drawable/logo" />
+
+    <!-- pontos coloridos -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp"
+        android:gravity="center">
+
+        <View
+            android:layout_width="80dp"
+            android:layout_height="20dp"
+            android:background="@drawable/iconpoints"
+            android:layout_margin="4dp" />
+    </LinearLayout>
+
+    <!-- Campo Nome -->
+    <EditText
+        android:id="@+id/TextNome"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nome"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="16dp"
+        android:inputType="textPersonName"
+        android:background="@drawable/border_gray"
+        android:padding="12dp"
+        android:textColor="#4A4A4A"
+        android:textColorHint="#808080" />
+
+    <!-- Campo Email -->
+    <EditText
+        android:id="@+id/TextEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Email"
+        android:inputType="textEmailAddress"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/border_gray"
+        android:padding="12dp"
+        android:textColor="#4A4A4A"
+        android:textColorHint="#808080" />
+
+    <!-- Campo Senha -->
+    <EditText
+        android:id="@+id/TextSenha"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Senha"
+        android:inputType="textPassword"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/border_gray"
+        android:padding="12dp"
+        android:textColor="#4A4A4A"
+        android:textColorHint="#808080" />
+
+    <!-- Botão Cadastrar -->
+    <Button
+        android:id="@+id/buttonCadastrar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cadastrar"
+        android:backgroundTint="#8A56AC"
+        android:textColor="#FFFFFF"
+        android:layout_marginTop="24dp"
+        android:padding="12dp"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+</LinearLayout>
