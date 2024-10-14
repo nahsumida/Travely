@@ -46,7 +46,7 @@ class LoginActivity : AppCompatActivity() {
                     return@addOnSuccessListener
                 }
 
-                FirebaseFirestore.getInstance()
+                FirebaseFirestore.getInstance("default2")
                     .collection("users")
                     .document(authResult.user?.uid ?: "")
                     .get()
