@@ -38,8 +38,6 @@ class RegisterActivity : AppCompatActivity() {
         binding.buttonCadastrar.setOnClickListener {
             // obter dados do formulário
             senhaConf = binding.TextSenhaConfirmacao.text.toString().trim();
-
-            // criar objeto Pessoa com os dados do formulário
             user = User(
                 name = binding.TextNome.text.toString().trim(),
                 cpf = binding.TextCpf.text.toString().trim(),
@@ -47,7 +45,7 @@ class RegisterActivity : AppCompatActivity() {
                 email = binding.TextEmail.text.toString().trim(),
                 password = binding.TextSenha.text.toString().trim(),
                 authID = "",
-                //schedule = ,
+                schedule = null ,
                 profile = "",
             );
 
@@ -59,22 +57,19 @@ class RegisterActivity : AppCompatActivity() {
                 binding.TextCpf.setError("Preencha com um cpf válido")
             } else if (user.phone.isEmpty() || !user.isPhoneValid()) {
                 binding.TextTelefone.setError("Preencha com um telefone válido")
-            } else if (user.password.isEmpty() || !user.isPasswordValid()) {
+            } else if (user.password!!.isEmpty() || !user.isPasswordValid()) {
                 binding.TextSenha.setError("Preencha com uma senha de pelo menos 6 digitos")
-            } else if (user.email.isEmpty() && !user.isEmailValid()) {
+            } else if (user.email!!.isEmpty() && !user.isEmailValid()) {
                 binding.TextEmail.setError("Preencha com um email válido")
             } else if (senhaConf.isEmpty() || senhaConf != user.password) {
                 binding.TextSenhaConfirmacao.setError("Preencha a confimação igual a senha")
             } else {
                 // criar usuário com email e senha
-                auth.createUserWithEmailAndPassword(user.email, user.password)
+                auth.createUserWithEmailAndPassword(user.email!!, user.password!!)
                     .addOnCompleteListener(this) { task ->
                         if (task.isSuccessful) {
                             Log.d(ContentValues.TAG, "signInWithCustomToken:success")
-                            user.authID = task.result.user?.uid.toString()
-
-                            // adicionar pessoa ao firestore
-                            addUser(user)
+                            var authID = task.result.user?.uid.toString()
 
                             // enviar email de verificação para o usuário
                             auth.currentUser?.sendEmailVerification()
@@ -83,6 +78,10 @@ class RegisterActivity : AppCompatActivity() {
                             auth.signOut()
 
                             val iProfile = Intent(this, ProfileActivity::class.java)
+                            iProfile.putExtra("userName", user.name)
+                            iProfile.putExtra("userCPF", user.cpf)
+                            iProfile.putExtra("userPhone", user.phone)
+                            iProfile.putExtra("userAuthID", authID)
                             startActivity(iProfile)
                         } else {
                             Toast.makeText(
@@ -93,31 +92,5 @@ class RegisterActivity : AppCompatActivity() {
                     }
             }
         }
-    }
-
-
-    // metodo para adicionar um user ao firestore
-    fun addUser(user: User){
-        lateinit var firebase: FirebaseFirestore;
-        firebase = FirebaseFirestore.getInstance()
-
-        // Criando um hash map pessoa com os dados do usuario
-        val userDoc = hashMapOf(
-            "authID" to user.authID,
-            "cpf" to user.cpf,
-            "name" to user.name,
-            "phone" to user.phone,
-            "profile" to user.profile,
-        )
-
-        // Adicionando a pessoa no firestore
-        firebase.collection("users")
-            .add(userDoc)
-            .addOnSuccessListener { documentReference ->
-                Log.d("CadastroUser", "User adicionado com ID: ${documentReference.id}")
-            }
-            .addOnFailureListener { e ->
-                Log.w("Erro", "Erro ao adicionar pessoa", e)
-            }
     }
 }

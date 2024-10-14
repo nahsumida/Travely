@@ -5,10 +5,10 @@ import android.util.Patterns
 class User (var name: String,
               var cpf: String,
               var phone:String,
-              var email: String,
-              var password: String,
+              var email: String?,
+              var password: String?,
               var authID: String,
-             // var schedule: List<Schedule>,
+              var schedule: List<Schedule>?,
               var profile: String,){
 
     public fun isNameValid(): Boolean {
@@ -27,7 +27,7 @@ class User (var name: String,
     }
 
     public fun isPasswordValid(): Boolean {
-        return password.length >= 6
+        return password!!.length >= 6
     }
 
     public fun isEmailValid(): Boolean {

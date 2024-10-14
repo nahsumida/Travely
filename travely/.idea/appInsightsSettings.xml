@@ -9,7 +9,7 @@
               <option name="connection">
                 <ConnectionSetting>
                   <option name="appId" value="com.isabellatressino.travely" />
-                  <option name="mobileSdkAppId" value="1:725765975870:android:88b9acf3213a2f2d9d066f" />
+                  <option name="mobileSdkAppId" value="1:725765975870:android:e6435321aa2c6a949d066f" />
                   <option name="projectId" value="travely-pi4" />
                   <option name="projectNumber" value="725765975870" />
                 </ConnectionSetting>
