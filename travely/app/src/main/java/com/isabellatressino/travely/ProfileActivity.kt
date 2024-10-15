@@ -113,14 +113,14 @@ class ProfileActivity : AppCompatActivity() {
         firebase.collection("users")
             .add(userDoc)
             .addOnSuccessListener { documentReference ->
-                Toast.makeText(this, "User adicionado",
+                Toast.makeText(this, "User cadastrado com sucesso",
                     Toast.LENGTH_SHORT).show()
                 Log.d("Cadastro User", "User adicionado com ID: ${documentReference.id}")
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Cadastro falhou",
+                Toast.makeText(this, "Falha ao cadastrar User",
                     Toast.LENGTH_SHORT).show()
-                Log.w("Erro", "Erro ao adicionar pessoa", e)
+                Log.w("Erro", "Erro ao adicionar user", e)
             }
     }
 }

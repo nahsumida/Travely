@@ -85,7 +85,7 @@ class RegisterActivity : AppCompatActivity() {
                             startActivity(iProfile)
                         } else {
                             Toast.makeText(
-                                this, "Cadastro falhou",
+                                this, "Falha ao criar autenticação do usuário",
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
