@@ -1,7 +1,10 @@
 package com.isabellatressino.travely
 
+import android.content.ContentValues
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -18,6 +21,7 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var binding: ActivityProfileBinding
 
     lateinit var firebase: FirebaseFirestore
+    private lateinit var auth: FirebaseAuth;
 
     private lateinit var user: User
 
@@ -31,68 +35,53 @@ class ProfileActivity : AppCompatActivity() {
         val name = intent.getStringExtra("userName")
         val cpf = intent.getStringExtra("userCPF")
         val phone = intent.getStringExtra("userPhone")
-        val authID = intent.getStringExtra("userAuthID")
+        val email = intent.getStringExtra("userEmail")
+        val password = intent.getStringExtra("userPassword")
+
+        // inicializar as instancias do firebase auth e functions
+        auth = FirebaseAuth.getInstance();
 
         // criar objeto Pessoa com os dados do formulário
         user = User(
             name = name!!,
             cpf = cpf!!,
             phone = phone!!,
-            email = null,
-            password = null,
-            authID = authID!!,
+            email = email!!,
+            password = password!!,
+            authID = "",
             schedule = null,
             profile = "",
         );
 
         binding.btnFood.setOnClickListener {
             user.profile = "gastronomico"
-            addUser(user)
 
-            // mockado pra quando tiver mergeado
-            /*val iLogin = Intent(this, LoginActivity::class.java)
-            startActivity(iLogin)*/
+            isNewUser(user)
         }
         binding.btnAdventure.setOnClickListener {
             user.profile = "aventureiro"
-            addUser(user)
 
-            // mockado pra quando tiver mergeado
-            /*val iLogin = Intent(this, LoginActivity::class.java)
-            startActivity(iLogin)*/
+            isNewUser(user)
         }
         binding.btnRelax.setOnClickListener {
             user.profile = "descanso"
-            addUser(user)
 
-            // mockado pra quando tiver mergeado
-            /*val iLogin = Intent(this, LoginActivity::class.java)
-            startActivity(iLogin)*/
+            isNewUser(user)
         }
         binding.btnShopp.setOnClickListener {
             user.profile = "compras"
-            addUser(user)
 
-            // mockado pra quando tiver mergeado
-            /*val iLogin = Intent(this, LoginActivity::class.java)
-            startActivity(iLogin)*/
+            createAuthUser(user)
         }
         binding.btnBusiness.setOnClickListener {
             user.profile = "negocios"
-            addUser(user)
 
-
-            // mockado pra quando tiver mergeado
-            /*val iLogin = Intent(this, LoginActivity::class.java)
-            startActivity(iLogin)*/
+            isNewUser(user)
         }
         binding.btnCulture.setOnClickListener {
             user.profile = "cultural"
-            addUser(user)
 
-            // mockado pra quando tiver mergeado
-            /*val iLogin = Intent(this, LoginActivity::class.java)
-            startActivity(iLogin)*/
+            isNewUser(user)
         }
     }
 
@@ -116,11 +105,62 @@ class ProfileActivity : AppCompatActivity() {
                 Toast.makeText(this, "User cadastrado com sucesso",
                     Toast.LENGTH_SHORT).show()
                 Log.d("Cadastro User", "User adicionado com ID: ${documentReference.id}")
+
+                val iLogin = Intent(this, LoginActivity::class.java)
+                startActivity(iLogin)
             }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Falha ao cadastrar User",
                     Toast.LENGTH_SHORT).show()
                 Log.w("Erro", "Erro ao adicionar user", e)
+            }
+    }
+
+    fun createAuthUser (user: User){
+        auth.createUserWithEmailAndPassword(user.email, user.password)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    Log.d(ContentValues.TAG, "signInWithCustomToken:success")
+                    user.authID = task.result.user?.uid.toString()
+
+                    addUser(user)
+
+                    // enviar email de verificação para o usuário
+                    auth.currentUser?.sendEmailVerification()
+
+                    // deslogar o usuário
+                    auth.signOut()
+                } else {
+                    Toast.makeText(
+                        this, "Falha ao criar autenticação do usuário",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+    }
+
+    fun isNewUser(user: User){
+        // criar usuário com email e senha
+        auth.fetchSignInMethodsForEmail(user.email)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    // O usuário existe
+                    Toast.makeText(
+                        this, "O seu email já está vinculado a uma conta",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                     Handler(Looper.getMainLooper()).postDelayed({
+                         //mockado pra quando tiver mergeado
+                         val iLogin = Intent(this, LoginActivity::class.java)
+                         startActivity(iLogin)
+                         finish()
+                     }, 2000L)
+
+                    // deslogar o usuário
+                    auth.signOut()
+                } else {
+                    createAuthUser(user)
+                }
             }
     }
 }

@@ -5,8 +5,8 @@ import android.util.Patterns
 class User (var name: String,
               var cpf: String,
               var phone:String,
-              var email: String?,
-              var password: String?,
+              var email: String,
+              var password: String,
               var authID: String,
               var schedule: List<Schedule>?,
               var profile: String,){
@@ -27,10 +27,15 @@ class User (var name: String,
     }
 
     public fun isPasswordValid(): Boolean {
-        return password!!.length >= 6
+        if (!password.contains(" ")){
+            if (password.length >= 6){
+                return true
+            }
+        }
+        return false
     }
 
     public fun isEmailValid(): Boolean {
-        return Patterns.EMAIL_ADDRESS.matcher(email).matches()
+        return !email.contains(" ") || Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 }

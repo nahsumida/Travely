@@ -19,8 +19,6 @@ import com.isabellatressino.travely.models.User
 class RegisterActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterBinding
 
-    private lateinit var auth: FirebaseAuth;
-
     lateinit var senhaConf: String;
     lateinit var user: User;
 
@@ -30,9 +28,6 @@ class RegisterActivity : AppCompatActivity() {
         // inflar layout da activity
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        // inicializar as instancias do firebase auth e functions
-        auth = FirebaseAuth.getInstance();
 
         // configurar clique do botão de cadastro
         binding.buttonCadastrar.setOnClickListener {
@@ -49,7 +44,6 @@ class RegisterActivity : AppCompatActivity() {
                 profile = "",
             );
 
-
             // validar campos do formulário
             if (user.name.isEmpty() || !user.isNameValid()) {
                 binding.TextNome.setError("Preencha com um nome válido")
@@ -57,39 +51,20 @@ class RegisterActivity : AppCompatActivity() {
                 binding.TextCpf.setError("Preencha com um cpf válido")
             } else if (user.phone.isEmpty() || !user.isPhoneValid()) {
                 binding.TextTelefone.setError("Preencha com um telefone válido")
-            } else if (user.password!!.isEmpty() || !user.isPasswordValid()) {
-                binding.TextSenha.setError("Preencha com uma senha de pelo menos 6 digitos")
-            } else if (user.email!!.isEmpty() && !user.isEmailValid()) {
+            } else if (user.email.isBlank() || !user.isEmailValid()) {
                 binding.TextEmail.setError("Preencha com um email válido")
+            } else if (user.password.isEmpty() || !user.isPasswordValid()) {
+                binding.TextSenha.setError("Preencha com uma senha de pelo menos 6 dígitos e sem espaços")
             } else if (senhaConf.isEmpty() || senhaConf != user.password) {
                 binding.TextSenhaConfirmacao.setError("Preencha a confimação igual a senha")
             } else {
-                // criar usuário com email e senha
-                auth.createUserWithEmailAndPassword(user.email!!, user.password!!)
-                    .addOnCompleteListener(this) { task ->
-                        if (task.isSuccessful) {
-                            Log.d(ContentValues.TAG, "signInWithCustomToken:success")
-                            var authID = task.result.user?.uid.toString()
-
-                            // enviar email de verificação para o usuário
-                            auth.currentUser?.sendEmailVerification()
-
-                            // deslogar o usuário
-                            auth.signOut()
-
-                            val iProfile = Intent(this, ProfileActivity::class.java)
-                            iProfile.putExtra("userName", user.name)
-                            iProfile.putExtra("userCPF", user.cpf)
-                            iProfile.putExtra("userPhone", user.phone)
-                            iProfile.putExtra("userAuthID", authID)
-                            startActivity(iProfile)
-                        } else {
-                            Toast.makeText(
-                                this, "Falha ao criar autenticação do usuário",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    }
+                val iProfile = Intent(this, ProfileActivity::class.java)
+                iProfile.putExtra("userName", user.name)
+                iProfile.putExtra("userCPF", user.cpf)
+                iProfile.putExtra("userPhone", user.phone)
+                iProfile.putExtra("userEmail", user.email)
+                iProfile.putExtra("userPassword", user.password)
+                startActivity(iProfile)
             }
         }
     }
