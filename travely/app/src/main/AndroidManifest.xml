@@ -17,11 +17,14 @@
         android:theme="@style/Theme.Travely"
         tools:targetApi="31">
         <activity
-            android:name="com.isabellatressino.travely.MainActivity"
+            android:name=".RegisterActivity"
             android:theme="@style/Theme.Travely"
-            android:exported="false" />
+            android:exported="true"/>
         <activity
-            android:name="com.isabellatressino.travely.LoginActivity"
+            android:name=".ProfileActivity"
+            android:exported="true"/>
+        <activity
+            android:name=".LoginActivity"
             android:theme="@style/Theme.Travely"
             android:exported="true">
             <intent-filter>

@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:background="#FFFFFF"
+    tools:context=".ProfileActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="80dp"
+            android:src="@drawable/iconpoints"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="80dp"
+            android:layout_marginTop="30dp"
+            android:gravity="center"
+            android:text="Qual é o seu principal objetivo ao viajar?"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.496"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageView" />
+
+        <ImageButton
+            android:id="@+id/btnBusiness"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:layout_marginEnd="30dp"
+            android:background="@null"
+            android:src="@drawable/profilebusiness"
+            app:layout_constraintEnd_toStartOf="@+id/btnCulture"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+        <TextView
+            android:id="@+id/tvBusiness"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="Negócios"
+            android:textColor="#4A4A4A"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="@+id/btnBusiness"
+            app:layout_constraintStart_toStartOf="@+id/btnBusiness"
+            app:layout_constraintTop_toBottomOf="@+id/btnBusiness" />
+
+        <ImageButton
+            android:id="@+id/btnCulture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="40dp"
+            android:background="@null"
+            android:src="@drawable/profileculture"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/btnBusiness"
+            app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+        <TextView
+            android:id="@+id/tvCulture"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="Experiência cultural"
+            android:textColor="#4A4A4A"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="@+id/btnCulture"
+            app:layout_constraintStart_toStartOf="@+id/btnCulture"
+            app:layout_constraintTop_toBottomOf="@+id/btnCulture" />
+
+        <ImageButton
+            android:id="@+id/btnAdventure"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:src="@drawable/profileadventure"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvCulture" />
+
+        <TextView
+            android:id="@+id/tvAdventure"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="Aventura e exploração"
+            android:textColor="#4A4A4A"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="@+id/btnAdventure"
+            app:layout_constraintStart_toStartOf="@+id/btnAdventure"
+            app:layout_constraintTop_toBottomOf="@+id/btnAdventure" />
+
+        <ImageButton
+            android:id="@+id/btnFood"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="30dp"
+            android:background="@null"
+            android:src="@drawable/profilefood"
+            app:layout_constraintEnd_toStartOf="@+id/btnRelax"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvAdventure" />
+
+        <TextView
+            android:id="@+id/tvFood"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="Gastronomia"
+            android:textColor="#4A4A4A"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="@+id/btnFood"
+            app:layout_constraintStart_toStartOf="@+id/btnFood"
+            app:layout_constraintTop_toBottomOf="@+id/btnFood" />
+
+        <ImageButton
+            android:id="@+id/btnRelax"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:background="@null"
+            android:src="@drawable/profilerelax"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/btnFood"
+            app:layout_constraintTop_toBottomOf="@+id/tvAdventure" />
+
+        <TextView
+            android:id="@+id/tvRelax"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="Descanso e relaxamento"
+            android:textColor="#4A4A4A"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="@+id/btnRelax"
+            app:layout_constraintStart_toStartOf="@+id/btnRelax"
+            app:layout_constraintTop_toBottomOf="@+id/btnRelax" />
+
+        <ImageButton
+            android:id="@+id/btnShopp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:src="@drawable/profileshopp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvRelax" />
+
+        <TextView
+            android:id="@+id/tvShopp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="Compras"
+            android:textColor="#4A4A4A"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="@id/btnShopp"
+            app:layout_constraintStart_toStartOf="@id/btnShopp"
+            app:layout_constraintTop_toBottomOf="@id/btnShopp" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

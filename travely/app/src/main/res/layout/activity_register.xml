@@ -1,0 +1,171 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginHorizontal="10dp"
+    android:layout_marginTop="20dp"
+    android:background="#FFFFFF"
+    android:gravity="center"
+    android:paddingHorizontal="10dp"
+    tools:context=".RegisterActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Logo do App (Travely) -->
+
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="0dp"
+            android:layout_height="150dp"
+            android:layout_marginTop="50dp"
+            android:contentDescription="Logo Travely"
+            android:maxWidth="200dp"
+            android:src="@drawable/logo"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/imgPoints"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:src="@drawable/iconpoints"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/logo" />
+
+        <!-- Campo Nome -->
+        <TextView
+            android:id="@+id/tvName"
+            style="@style/LabelInputs"
+            android:text="Nome"
+            app:layout_constraintEnd_toEndOf="@+id/TextNome"
+            app:layout_constraintStart_toStartOf="@+id/TextNome"
+            app:layout_constraintTop_toBottomOf="@id/imgPoints" />
+
+        <EditText
+            android:id="@+id/TextNome"
+            style="@style/Inputs"
+            android:hint="Digite seu nome"
+            android:inputType="textPersonName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvName" />
+
+        <!-- Campo CPF -->
+
+        <TextView
+            android:id="@+id/tvCpf"
+            style="@style/LabelInputs"
+            android:text="CPF"
+            app:layout_constraintEnd_toEndOf="@+id/TextCpf"
+            app:layout_constraintStart_toStartOf="@+id/TextCpf"
+            app:layout_constraintTop_toBottomOf="@id/TextNome" />
+
+        <EditText
+            android:id="@+id/TextCpf"
+            style="@style/Inputs"
+            android:hint="ex.: 000.000.000-00"
+            android:inputType="number"
+            android:maxLength="11"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvCpf" />
+
+        <!-- Campo Telefone -->
+
+        <TextView
+            android:id="@+id/tvPhone"
+            style="@style/LabelInputs"
+            android:text="Telefone"
+            app:layout_constraintEnd_toEndOf="@+id/TextTelefone"
+            app:layout_constraintStart_toStartOf="@+id/TextTelefone"
+            app:layout_constraintTop_toBottomOf="@id/TextCpf" />
+
+        <EditText
+            android:id="@+id/TextTelefone"
+            style="@style/Inputs"
+            android:hint="ex.: (00) 00000 0000"
+            android:inputType="phone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvPhone" />
+
+        <!-- Campo Email -->
+
+        <TextView
+            android:id="@+id/tvEmail"
+            style="@style/LabelInputs"
+            android:text="Email"
+            app:layout_constraintEnd_toEndOf="@+id/TextEmail"
+            app:layout_constraintStart_toStartOf="@+id/TextEmail"
+            app:layout_constraintTop_toBottomOf="@id/TextTelefone" />
+
+        <EditText
+            android:id="@+id/TextEmail"
+            style="@style/Inputs"
+            android:hint="Email"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvEmail" />
+
+        <!-- Campo Senha -->
+
+        <TextView
+            android:id="@+id/tvPassword"
+            style="@style/LabelInputs"
+            android:text="Senha"
+            app:layout_constraintEnd_toEndOf="@+id/TextSenha"
+            app:layout_constraintStart_toStartOf="@+id/TextSenha"
+            app:layout_constraintTop_toBottomOf="@id/TextEmail" />
+
+        <EditText
+            android:id="@+id/TextSenha"
+            style="@style/Inputs"
+            android:hint="Digite sua senha"
+            android:inputType="textPassword"
+            android:padding="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvPassword" />
+
+        <!-- Campo Confirmacao Senha -->
+
+        <TextView
+            android:id="@+id/tvPasswordConfirm"
+            style="@style/LabelInputs"
+            android:text="Confirmação de senha"
+            app:layout_constraintEnd_toEndOf="@+id/TextSenhaConfirmacao"
+            app:layout_constraintStart_toStartOf="@+id/TextSenhaConfirmacao"
+            app:layout_constraintTop_toBottomOf="@id/TextSenha" />
+
+        <EditText
+            android:id="@+id/TextSenhaConfirmacao"
+            style="@style/Inputs"
+            android:hint="Digite sua senha novamente"
+            android:inputType="textPassword"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvPasswordConfirm" />
+
+        <!-- Botão Cadastrar -->
+        <Button
+            android:id="@+id/buttonCadastrar"
+            style="@style/Button"
+            android:layout_marginTop="40dp"
+            android:text="Cadastrar"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/TextSenhaConfirmacao" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>
+
+
