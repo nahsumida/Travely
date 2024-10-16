@@ -35,8 +35,8 @@ class ProfileActivity : AppCompatActivity() {
         val name = intent.getStringExtra("userName")
         val cpf = intent.getStringExtra("userCPF")
         val phone = intent.getStringExtra("userPhone")
-        val email = intent.getStringExtra("userEmail")
-        val password = intent.getStringExtra("userPassword")
+        val authID = intent.getStringExtra("userAuth")
+     //   val password = intent.getStringExtra("userPassword")
 
         // inicializar as instancias do firebase auth e functions
         auth = FirebaseAuth.getInstance();
@@ -46,9 +46,9 @@ class ProfileActivity : AppCompatActivity() {
             name = name!!,
             cpf = cpf!!,
             phone = phone!!,
-            email = email!!,
-            password = password!!,
-            authID = "",
+            email = "",
+            password = "",
+            authID = authID!!,
             schedule = null,
             profile = "",
         );
@@ -56,32 +56,32 @@ class ProfileActivity : AppCompatActivity() {
         binding.btnFood.setOnClickListener {
             user.profile = "gastronomico"
 
-            isNewUser(user)
+            addUser(user)
         }
         binding.btnAdventure.setOnClickListener {
             user.profile = "aventureiro"
 
-            isNewUser(user)
+            addUser(user)
         }
         binding.btnRelax.setOnClickListener {
             user.profile = "descanso"
 
-            isNewUser(user)
+            addUser(user)
         }
         binding.btnShopp.setOnClickListener {
             user.profile = "compras"
 
-            createAuthUser(user)
+            addUser(user)
         }
         binding.btnBusiness.setOnClickListener {
             user.profile = "negocios"
 
-            isNewUser(user)
+            addUser(user)
         }
         binding.btnCulture.setOnClickListener {
             user.profile = "cultural"
 
-            isNewUser(user)
+            addUser(user)
         }
     }
 
@@ -99,14 +99,13 @@ class ProfileActivity : AppCompatActivity() {
         )
 
         // Adicionando a pessoa no firestore
-        firebase.collection("users")
-            .add(userDoc)
+        firebase.collection("users").document(user.authID)
+            .set(userDoc)
             .addOnSuccessListener { documentReference ->
                 Toast.makeText(this, "User cadastrado com sucesso",
                     Toast.LENGTH_SHORT).show()
-                Log.d("Cadastro User", "User adicionado com ID: ${documentReference.id}")
-
-                val iLogin = Intent(this, LoginActivity::class.java)
+                Log.d("Cadastro User", "User adicionado com ID: ${user.authID}")
+                val iLogin = Intent(this@ProfileActivity, LoginActivity::class.java)
                 startActivity(iLogin)
             }
             .addOnFailureListener { e ->
@@ -130,6 +129,10 @@ class ProfileActivity : AppCompatActivity() {
 
                     // deslogar o usuário
                     auth.signOut()
+
+                    val iLogin = Intent(this@ProfileActivity, LoginActivity::class.java)
+                    startActivity(iLogin)
+
                 } else {
                     Toast.makeText(
                         this, "Falha ao criar autenticação do usuário",
@@ -138,7 +141,7 @@ class ProfileActivity : AppCompatActivity() {
                 }
             }
     }
-
+/*
     fun isNewUser(user: User){
         // criar usuário com email e senha
         auth.fetchSignInMethodsForEmail(user.email)
@@ -162,5 +165,5 @@ class ProfileActivity : AppCompatActivity() {
                     createAuthUser(user)
                 }
             }
-    }
+    }*/
 }

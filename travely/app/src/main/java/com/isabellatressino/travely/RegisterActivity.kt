@@ -21,9 +21,14 @@ class RegisterActivity : AppCompatActivity() {
 
     lateinit var senhaConf: String;
     lateinit var user: User;
+    private lateinit var auth: FirebaseAuth;
+
+    lateinit var firebase: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        auth = FirebaseAuth.getInstance();
 
         // inflar layout da activity
         binding = ActivityRegisterBinding.inflate(layoutInflater)
@@ -58,14 +63,68 @@ class RegisterActivity : AppCompatActivity() {
             } else if (senhaConf.isEmpty() || senhaConf != user.password) {
                 binding.TextSenhaConfirmacao.setError("Preencha a confimação igual a senha")
             } else {
-                val iProfile = Intent(this, ProfileActivity::class.java)
-                iProfile.putExtra("userName", user.name)
-                iProfile.putExtra("userCPF", user.cpf)
-                iProfile.putExtra("userPhone", user.phone)
-                iProfile.putExtra("userEmail", user.email)
-                iProfile.putExtra("userPassword", user.password)
-                startActivity(iProfile)
+                // metodo para adicionar um user ao firestore
+                createAuthUser(user)
+
             }
         }
+    }
+
+    fun createAuthUser (user: User) {
+        auth.createUserWithEmailAndPassword(user.email, user.password)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    Log.d(ContentValues.TAG, "signInWithCustomToken:success")
+                    user.authID = task.result.user?.uid.toString()
+
+                    //addUser(user)
+
+                    // enviar email de verificação para o usuário
+                    auth.currentUser?.sendEmailVerification()
+
+                    // deslogar o usuário
+                    auth.signOut()
+
+                    val iProfile = Intent(this, ProfileActivity::class.java)
+                    iProfile.putExtra("userName", user.name)
+                    iProfile.putExtra("userCPF", user.cpf)
+                    iProfile.putExtra("userPhone", user.phone)
+                    iProfile.putExtra("userAuth", user.authID)
+                    //  iProfile.putExtra("userPassword", user.password)
+                    startActivity(iProfile)
+
+                } else {
+                    Toast.makeText(
+                        this, "Falha ao criar autenticação do usuário",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+    }
+    fun addUser(user: User){
+        firebase = FirebaseFirestore.getInstance("default2")
+
+        // Criando um hash map pessoa com os dados do usuario
+        val userDoc = hashMapOf(
+            "authID" to user.authID,
+            "cpf" to user.cpf,
+            "name" to user.name,
+            "phone" to user.phone,
+            "profile" to user.profile,
+        )
+
+        // Adicionando a pessoa no firestore
+        firebase.collection("users")
+            .add(userDoc)
+            .addOnSuccessListener { documentReference ->
+                Toast.makeText(this, "User cadastrado com sucesso",
+                    Toast.LENGTH_SHORT).show()
+                Log.d("Cadastro User", "User adicionado com ID: ${documentReference.id}")
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Falha ao cadastrar User",
+                    Toast.LENGTH_SHORT).show()
+                Log.w("Erro", "Erro ao adicionar user", e)
+            }
     }
 }
