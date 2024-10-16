@@ -45,36 +45,35 @@ class LoginActivity : AppCompatActivity() {
                     ).show()
                     return@addOnSuccessListener
                 }
-
-                FirebaseFirestore.getInstance("default2")
-                    .collection("users")
-                    .document(authResult.user?.uid ?: "")
-                    .get()
-                    .addOnSuccessListener { snapshot ->
-                        if (snapshot.exists()) {
-                            Toast.makeText(this, "Login feito com sucesso", Toast.LENGTH_LONG)
-                                .show()
-                            // Aqui você pode redirecionar para a próxima tela
-                        } else {
+                val uid = authResult.user?.uid
+                if(uid != null) {
+                    FirebaseFirestore.getInstance("default2")
+                        .collection("users")
+                        .whereEqualTo("authId", uid)
+                        .get()
+                        .addOnSuccessListener { querySnapshot ->
+                            if (!querySnapshot.isEmpty) {
+                                Toast.makeText(this, "Login feito com sucesso", Toast.LENGTH_LONG)
+                                    .show()
+                                // Aqui você pode redirecionar para a próxima tela
+                            } else {
+                                Toast.makeText(
+                                    this,
+                                    "Usuário não encontrado na base de dados.",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        }
+                        .addOnFailureListener { exception ->
+                            Log.e("[ERRO] Login Auth:", exception.message.toString())
                             Toast.makeText(
                                 this,
-                                "Usuário não encontrado na base de dados.",
+                                "Erro ao acessar os dados do usuário.",
                                 Toast.LENGTH_LONG
                             ).show()
                         }
-                    }
-                    .addOnFailureListener { error ->
-                        Log.e("Isa firebase firestore tag", error.message.toString())
-                        Log.d(
-                            "Isa firebase firestore tag",
-                            "UID do usuário: ${authResult.user?.uid}"
-                        )
-                        Toast.makeText(
-                            this,
-                            "Erro ao acessar os dados do usuário.",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
+                }
+
             }.addOnFailureListener { exception ->
                 if (exception.message.toString() == "The email address is badly formatted.") {
                     Toast.makeText(
