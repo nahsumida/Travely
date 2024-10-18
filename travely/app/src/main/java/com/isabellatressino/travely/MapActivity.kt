@@ -5,6 +5,8 @@ import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.Manifest
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -41,6 +43,8 @@ class MapActivity : AppCompatActivity() {
             loadPlacesFromFirestore()
             getUserLocation()
         }
+
+        setStars(3.7)
     }
 
     companion object {
@@ -177,4 +181,44 @@ class MapActivity : AppCompatActivity() {
             marker?.tag = place
         }
     }
+
+    private fun setStars(rating: Double, maxStars: Int = 5) {
+        val starLayout = findViewById<LinearLayout>(R.id.starLayout)
+        starLayout.removeAllViews()
+
+        val filledStar = R.drawable.star_filled
+        val halfStar = R.drawable.star_half
+        val emptyStar = R.drawable.star_empty
+
+
+        val fullStars = rating.toInt()
+        val decimalPart = rating - fullStars
+
+        for (i in 1..fullStars) {
+            val star = ImageView(this)
+            star.setImageResource(filledStar)
+            val params = LinearLayout.LayoutParams(36, 36)
+            star.layoutParams = params
+            starLayout.addView(star)
+        }
+
+        if (decimalPart >= 0.5) {
+            val star = ImageView(this)
+            star.setImageResource(halfStar)
+            val params = LinearLayout.LayoutParams(36, 36)
+            star.layoutParams = params
+            starLayout.addView(star)
+        }
+
+        val remainingStars = maxStars - fullStars - if (decimalPart >= 0.5) 1 else 0
+        for (i in 1..remainingStars) {
+            val star = ImageView(this)
+            star.setImageResource(emptyStar)
+            val params = LinearLayout.LayoutParams(36, 36)
+            star.layoutParams = params
+            starLayout.addView(star)
+        }
+    }
+
+
 }
