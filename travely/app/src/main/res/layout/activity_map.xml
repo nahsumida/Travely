@@ -7,6 +7,95 @@
     android:layout_height="match_parent"
     tools:context=".MapActivity">
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/container_info"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginBottom="25dp"
+        android:background="@drawable/shape_view_infos"
+        android:elevation="10dp"
+        app:layout_constraintBottom_toTopOf="@id/nav_bar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="28dp"
+            android:layout_marginTop="25dp"
+            android:elevation="5dp"
+            android:text="Shopping Parque Dom Pedro"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_rating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:elevation="5dp"
+            android:text="4,1"
+            android:textColor="@color/grey"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="@+id/tv_name"
+            app:layout_constraintTop_toBottomOf="@+id/tv_name" />
+
+        <LinearLayout
+            android:id="@+id/starLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:elevation="5dp"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="@id/tv_rating"
+            app:layout_constraintStart_toEndOf="@id/tv_rating"
+            app:layout_constraintTop_toTopOf="@id/tv_rating" />
+
+        <TextView
+            android:id="@+id/tv_description"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:elevation="5dp"
+            android:text="Um lugar calmo e tranquilo snuasduadnasmdpasdmasldmas"
+            app:layout_constraintEnd_toEndOf="@+id/tv_name"
+            app:layout_constraintStart_toStartOf="@+id/tv_name"
+            app:layout_constraintTop_toBottomOf="@+id/tv_rating" />
+
+        <Button
+            android:id="@+id/btn_go"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/shape_button_infos"
+            android:elevation="5dp"
+            android:text="Ir até lá"
+            app:layout_constraintEnd_toEndOf="@id/tv_name"
+            app:layout_constraintStart_toStartOf="@id/tv_name"
+            app:layout_constraintTop_toBottomOf="@id/tv_description" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_see_more"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="22dp"
+            android:background="@drawable/shape_button_infos"
+            android:elevation="5dp"
+            android:text="Ver mais"
+            android:textColor="@color/white"
+            app:backgroundTint="@color/light_grey"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/tv_name"
+            app:layout_constraintStart_toStartOf="@id/tv_name"
+            app:layout_constraintTop_toBottomOf="@id/btn_go" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <EditText
         android:id="@+id/edit_search"
@@ -25,68 +114,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <View
-        android:id="@+id/view_container"
-        android:layout_width="0dp"
-        android:layout_height="250dp"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginBottom="20dp"
-        android:background="@drawable/shape_view_infos"
-        android:elevation="5dp"
-        app:layout_constraintBottom_toTopOf="@id/nav_bar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-        android:id="@+id/tv_name"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="25dp"
-        android:layout_marginTop="25dp"
-        android:elevation="5dp"
-        android:text="Shopping Parque Dom Pedro"
-        android:textColor="@color/black"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="@+id/view_container"
-        app:layout_constraintHorizontal_bias="0.56"
-        app:layout_constraintStart_toStartOf="@+id/view_container"
-        app:layout_constraintTop_toTopOf="@+id/view_container" />
-
-    <TextView
-        android:id="@+id/tv_rating"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:elevation="5dp"
-        android:text="4,1"
-        android:textColor="@color/gray"
-        android:textSize="12sp"
-        app:layout_constraintStart_toStartOf="@+id/tv_name"
-        app:layout_constraintTop_toBottomOf="@+id/tv_name" />
-
-    <LinearLayout
-        android:id="@+id/starLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:elevation="5dp"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="@id/tv_rating"
-        app:layout_constraintStart_toEndOf="@id/tv_rating"
-        app:layout_constraintTop_toTopOf="@id/tv_rating" />
-
-    <TextView
-        android:id="@+id/tv_description"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:elevation="5dp"
-        android:text="Um lugar calmo e tranquilo snuasduadnasmdpasdmasldmas"
-        app:layout_constraintEnd_toEndOf="@+id/tv_name"
-        app:layout_constraintStart_toStartOf="@+id/tv_name"
-        app:layout_constraintTop_toBottomOf="@+id/tv_rating" />
-
 
     <fragment
         android:id="@+id/map_fragment"

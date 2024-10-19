@@ -5,6 +5,10 @@ import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.Manifest
+import android.animation.ValueAnimator
+import android.util.Log
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -18,7 +22,8 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.firestore.FirebaseFirestore
-import com.isabellatressino.travely.databinding.ActivityMainBinding
+import com.google.firebase.firestore.GeoPoint
+import com.isabellatressino.travely.databinding.ActivityMapBinding
 import com.isabellatressino.travely.models.Place
 
 class MapActivity : AppCompatActivity() {
@@ -27,11 +32,11 @@ class MapActivity : AppCompatActivity() {
     private lateinit var firestore: FirebaseFirestore
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
-    private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
+    private val binding by lazy { ActivityMapBinding.inflate(layoutInflater) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_map)
+        setContentView(binding.root)
 
         firestore = FirebaseFirestore.getInstance("default2")
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -42,9 +47,10 @@ class MapActivity : AppCompatActivity() {
             googleMap = map
             loadPlacesFromFirestore()
             getUserLocation()
+            setupMapClickListeners()
         }
 
-        setStars(3.7)
+        binding.containerInfo.visibility = View.GONE
     }
 
     companion object {
@@ -52,7 +58,6 @@ class MapActivity : AppCompatActivity() {
     }
 
     private fun getUserLocation() {
-        // Verifica se a permissão de localização está concedida
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -62,7 +67,6 @@ class MapActivity : AppCompatActivity() {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            // Solicita permissão se não for concedida
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
@@ -153,7 +157,6 @@ class MapActivity : AppCompatActivity() {
             }
     }
 
-
     private fun addMarkers(places: List<Place>) {
         places.forEach { place ->
             val marker = place.geopoint.let { geoPoint ->
@@ -165,20 +168,34 @@ class MapActivity : AppCompatActivity() {
                     "negocios" -> R.drawable.pin_business
                     else -> R.drawable.location_pin
                 }
-                googleMap.addMarker(
-                    MarkerOptions()
-                        .title(place.name)
-                        .snippet(place.address)
-                        .position(LatLng(geoPoint.latitude, geoPoint.longitude))
-                        .icon(
-                            BitmapHelper.vectorToBitmap(
-                                this, iconResource,
-                                ContextCompat.getColor(this, R.color.purple_haze)
-                            )
+                val markerOptions = MarkerOptions()
+                    .title(place.name)
+                    .snippet(place.address)
+                    .position(LatLng(geoPoint.latitude, geoPoint.longitude))
+                    .icon(
+                        BitmapHelper.vectorToBitmap(
+                            this, iconResource,
+                            ContextCompat.getColor(this, R.color.purple_haze)
                         )
-                )
+                    )
+                val addedMarker = googleMap.addMarker(markerOptions)
+                addedMarker?.tag = place
             }
-            marker?.tag = place
+        }
+
+        googleMap.setOnMarkerClickListener { marker ->
+            googleMap.animateCamera(
+                CameraUpdateFactory.newLatLng(marker.position),
+                500,
+                null
+            )
+
+            val place = marker.tag as? Place
+            place?.let {
+                showPlaceInfo(it)
+            }
+
+            true
         }
     }
 
@@ -220,5 +237,36 @@ class MapActivity : AppCompatActivity() {
         }
     }
 
+    private fun showPlaceInfo(place: Place) {
+        binding.tvName.text = place.name
+        binding.tvRating.text = place.rate.toString()
+        setStars(place.rate)
+        binding.tvDescription.text = place.decription
+
+        binding.containerInfo.apply {
+            alpha = 0f
+            visibility = View.VISIBLE
+            animate()
+                .alpha(1f)
+                .setDuration(200)
+                .start()
+        }
+    }
+
+    private fun setupMapClickListeners() {
+        googleMap.setOnMapClickListener {
+            hideInfoView()
+        }
+    }
+
+    private fun hideInfoView() {
+        binding.containerInfo.animate()
+            .alpha(0f)
+            .setDuration(200)
+            .withEndAction {
+                binding.containerInfo.visibility = View.GONE
+            }
+            .start()
+    }
 
 }

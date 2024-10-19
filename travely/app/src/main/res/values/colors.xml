@@ -6,5 +6,6 @@
     <color name="purple_haze">#9168A0</color>
     <color name="yellow_mimosa">#ECC030</color>
     <color name="red">#F44336</color>
-    <color name="gray">#545454</color>
+    <color name="grey">#545454</color>
+    <color name="light_grey">#868686</color>
 </resources>
