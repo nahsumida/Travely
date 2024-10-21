@@ -31,7 +31,7 @@ class PlaceInfoActivity : AppCompatActivity() {
         if (placeId != null) {
             Log.d("IsabellaMAria", placeId)
             showLoading(true)
-            loadPlaceByUid(placeId)
+            loadPlaceById(placeId)
         }
 
         binding.btnBack.setOnClickListener {
@@ -40,10 +40,10 @@ class PlaceInfoActivity : AppCompatActivity() {
 
     }
 
-    private fun loadPlaceByUid(uid: String) {
+    private fun loadPlaceById(idPlace: String) {
         val placesCollection = firestore.collection("places")
 
-        placesCollection.document(uid).get()
+        placesCollection.document(idPlace).get()
             .addOnSuccessListener { document ->
                 if (document.exists()) {
                     val id = document.getString("id") ?: ""
@@ -104,11 +104,11 @@ class PlaceInfoActivity : AppCompatActivity() {
 
         val iconResource = if (place.profiles.isNotEmpty()) {
             when (place.profiles[0]) {
-                "Compras" -> R.drawable.profileshopp
-                "Gastronomia" -> R.drawable.profilefood
-                "Cultura" -> R.drawable.profileculture
-                "Aventura" -> R.drawable.profileadventure
-                "Negócios" -> R.drawable.profilebusiness
+                "compras" -> R.drawable.profileshopp
+                "gastronomico" -> R.drawable.profilefood
+                "cultura" -> R.drawable.profileculture
+                "aventureiro" -> R.drawable.profileadventure
+                "negocios" -> R.drawable.profilebusiness
                 else -> R.drawable.profile_unavailable
             }
         } else {
@@ -130,7 +130,7 @@ class PlaceInfoActivity : AppCompatActivity() {
                 showLoading(false)
             }
         } else {
-            binding.imgPlace.setImageResource(R.drawable.ic_launcher_background)
+            binding.imgPlace.setImageResource(R.drawable.image_unavailable)
             showLoading(false)
         }
 

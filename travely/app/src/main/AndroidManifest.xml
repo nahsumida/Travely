@@ -19,6 +19,9 @@
         android:theme="@style/Theme.Travely"
         tools:targetApi="31">
         <activity
+            android:name=".MapActivity"
+            android:exported="false" />
+        <activity
             android:name=".PlaceInfoActivity"
             android:exported="false" />
         <activity
@@ -33,7 +36,7 @@
             android:name=".ProfileActivity"
             android:exported="true" />
         <activity
-            android:name=".MapActivity"
+            android:name=".MainScreenActivity"
             android:exported="true"
             android:theme="@style/Theme.Travely">
             <intent-filter>
