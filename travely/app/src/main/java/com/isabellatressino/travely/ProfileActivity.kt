@@ -100,8 +100,6 @@ class ProfileActivity : AppCompatActivity() {
             .addOnSuccessListener { documentReference ->
 
                 createAuthUser(user, documentReference.id)
-                //val iLogin = Intent(this@ProfileActivity, LoginActivity::class.java)
-                //startActivity(iLogin)
             }
             .addOnFailureListener { e ->
                 Toast.makeText(
