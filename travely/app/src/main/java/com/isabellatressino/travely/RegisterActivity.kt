@@ -3,6 +3,8 @@ package com.isabellatressino.travely
 import android.content.ContentValues
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -11,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.firestore.FirebaseFirestore
 //import com.google.firebase.functions.FirebaseFunctions
 import com.isabellatressino.travely.databinding.ActivityRegisterBinding
@@ -46,11 +49,13 @@ class RegisterActivity : AppCompatActivity() {
                 password = binding.TextSenha.text.toString().trim(),
                 authID = "", //AuthID será gerado na ProfileActivity
                 schedule = null ,
-                profile = "",
+                profile = "", //Profile será gerado na ProfileActivity
             )
 
             // Valida se cada campo do form é válido
             if (isFormValido(senhaConf,user)) {
+                //isNewUser(user)
+
                 // Passar dados do usuário para a ProfileActivity
                 val intent = Intent(this, ProfileActivity::class.java).apply {
                     putExtra("userName", user.name)
@@ -146,5 +151,28 @@ class RegisterActivity : AppCompatActivity() {
                 Log.w("Erro", "Erro ao adicionar user", e)
             }
     }
-     */
+
+// a funcao nova
+    fun isNewUser(user: User) {
+        auth.createUserWithEmailAndPassword(user.email, user.password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {} else {
+                    try {
+                        throw task.exception!!
+                    } catch (e: FirebaseAuthUserCollisionException) {
+                        // O e-mail já está registrado
+                        Log.d("Auth", "O e-mail já está em uso por outro usuário.")
+                        Toast.makeText(
+                            this, "Já existe uma conta com o seu e-mail",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            // Redirecionar para a tela de Login
+                            val iLogin = Intent(this@RegisterActivity, LoginActivity::class.java)
+                            startActivity(iLogin)
+                        }, 3000L)
+                    }
+                }
+            }
+    }*/
 }

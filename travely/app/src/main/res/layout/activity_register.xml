@@ -110,6 +110,9 @@
             android:id="@+id/TextEmail"
             style="@style/Inputs"
             android:hint="Email"
+            android:maxLines = "1"
+            android:inputType="textEmailAddress"
+            android:singleLine="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvEmail" />
@@ -130,6 +133,7 @@
             android:hint="Digite sua senha"
             android:inputType="textPassword"
             android:padding="8dp"
+            android:singleLine="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvPassword" />
@@ -149,6 +153,7 @@
             style="@style/Inputs"
             android:hint="Digite sua senha novamente"
             android:inputType="textPassword"
+            android:singleLine="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvPasswordConfirm" />

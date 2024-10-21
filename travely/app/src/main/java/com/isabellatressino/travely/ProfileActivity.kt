@@ -7,6 +7,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.firestore.FirebaseFirestore
 import com.isabellatressino.travely.databinding.ActivityProfileBinding
 import com.isabellatressino.travely.models.User
@@ -30,6 +31,7 @@ class ProfileActivity : AppCompatActivity() {
         val name = intent.getStringExtra("userName")
         val cpf = intent.getStringExtra("userCPF")
         val phone = intent.getStringExtra("userPhone")
+        val email = intent.getStringExtra("userEmail")
         val password = intent.getStringExtra("userPassword")
 
         // inicializar as instancias do firebase auth e functions
@@ -40,8 +42,8 @@ class ProfileActivity : AppCompatActivity() {
             name = name!!,
             cpf = cpf!!,
             phone = phone!!,
-            email = "",
-            password = "",
+            email = email!!,
+            password = password!!,
             authID = "", //AuthID será gerado após sucesso no registro no db
             schedule = null,
             profile = "",
@@ -98,7 +100,7 @@ class ProfileActivity : AppCompatActivity() {
                     this, "User cadastrado com sucesso",
                     Toast.LENGTH_SHORT
                 ).show()
-                Log.d("Cadastro User", "User adicionado com ID: $documentReference")
+                Log.d("Cadastro User", "User adicionado com ID: ${documentReference.id}")
                 createAuthUser(user, documentReference.id)
                 //val iLogin = Intent(this@ProfileActivity, LoginActivity::class.java)
                 //startActivity(iLogin)
@@ -129,7 +131,7 @@ class ProfileActivity : AppCompatActivity() {
                                 updateUID(user, docId)
                                 Toast.makeText(
                                     this, "Verifique seu e-mail para seguir com " +
-                                            "cadastro", Toast.LENGTH_SHORT
+                                            "cadastro", Toast.LENGTH_LONG
                                 ).show()
                             } else {
                                 // Falha ao enviar email
@@ -168,37 +170,10 @@ class ProfileActivity : AppCompatActivity() {
                 // Redirecionar para a tela de Login
                 val iLogin = Intent(this@ProfileActivity, LoginActivity::class.java)
                 startActivity(iLogin)
-                finish()
             }
             .addOnFailureListener { e: Exception ->
                 Log.w("updateUID", "Erro ao atualizar authID no db", e)
             }
 
     }
-        /*
-    fun isNewUser(user: User){
-        // criar usuário com email e senha
-        auth.fetchSignInMethodsForEmail(user.email)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    // O usuário existe
-                    Toast.makeText(
-                        this, "O seu email já está vinculado a uma conta",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                     Handler(Looper.getMainLooper()).postDelayed({
-                         //mockado pra quando tiver mergeado
-                         val iLogin = Intent(this, LoginActivity::class.java)
-                         startActivity(iLogin)
-                         finish()
-                     }, 2000L)
-
-                    // deslogar o usuário
-                    auth.signOut()
-                } else {
-                    createAuthUser(user)
-                }
-            }
-    }*/
-
 }
