@@ -3,6 +3,8 @@ package com.isabellatressino.travely
 import android.content.ContentValues
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -141,6 +143,21 @@ class ProfileActivity : AppCompatActivity() {
                             }
                         }
                 } else {
+                    try {
+                        throw task.exception!!
+                    } catch (e: FirebaseAuthUserCollisionException) {
+                        // O e-mail já está registrado
+                        Log.d("Auth", "O e-mail já está em uso por outro usuário.")
+                        Toast.makeText(
+                            this, "Já existe uma conta com o seu e-mail",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            // Redirecionar para a tela de Login
+                            val iLogin = Intent(this@ProfileActivity, LoginActivity::class.java)
+                            startActivity(iLogin)
+                        }, 3000L)
+                    }
                     // Caso falha ao criar Auth User, remove usuário do db
                     firebase.collection("users").document(docId).delete()
                     Log.e(
