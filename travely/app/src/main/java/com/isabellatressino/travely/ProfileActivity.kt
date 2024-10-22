@@ -148,9 +148,10 @@ class ProfileActivity : AppCompatActivity() {
                         ).show()
                         Handler(Looper.getMainLooper()).postDelayed({
                             // Redirecionar para a tela de Login
-                            val iLogin = Intent(this@ProfileActivity, LoginActivity::class.java)
-                            startActivity(iLogin)
-                        }, 3000L)
+                            val iRegister = Intent(this@ProfileActivity, RegisterActivity::class.java)
+                            startActivity(iRegister)
+                            finish()
+                        }, 2500L)
                     }
                     // Caso falha ao criar Auth User, remove usuário do db
                     firebase.collection("users").document(docId).delete()
@@ -176,10 +177,8 @@ class ProfileActivity : AppCompatActivity() {
             .addOnSuccessListener {
                 Log.d("updateUID","Sucesso ao atualizar campo authID.")
                 Log.d("Cadastro User", "User adicionado com ID: ${docId}")
-                Toast.makeText(
-                    this, "User cadastrado com sucesso",
-                    Toast.LENGTH_SHORT
-                ).show()
+                //Toast.makeText(this, "User cadastrado com sucesso", Toast.LENGTH_SHORT
+                //).show()
                 // deslogar o usuário
                 auth.signOut()
 
