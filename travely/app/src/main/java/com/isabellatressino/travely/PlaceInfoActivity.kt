@@ -13,6 +13,8 @@ import com.google.firebase.storage.FirebaseStorage
 import com.isabellatressino.travely.databinding.ActivityPlaceInfoBinding
 import com.isabellatressino.travely.models.Place
 import com.bumptech.glide.Glide
+import com.google.firebase.Timestamp
+import com.isabellatressino.travely.models.Schedule
 
 class PlaceInfoActivity : AppCompatActivity() {
 
@@ -64,6 +66,22 @@ class PlaceInfoActivity : AppCompatActivity() {
                     val profiles = (document.get("profiles") as? List<String>)?.toTypedArray()
                     val picture = document.getString("picture") ?: ""
 
+                    // Extração dos dados do schedule
+                    val scheduleMap = document.get("schedule") as? Map<String, Any>
+
+                    // Verifica se o schedule existe e extrai os dados
+                    val schedule = if (scheduleMap != null) {
+                        val bookingData =
+                            scheduleMap["bookingData"] as? Timestamp ?: Timestamp.now()
+                        //val placeID = scheduleMap["placeID"] as? String ?: ""
+                        val compra = scheduleMap["compra"] as? String ?: ""
+                        val preco = (scheduleMap["preco"] as? Double ?: 0.0).toFloat()
+
+                        Schedule(bookingData, compra, preco)
+                    } else {
+                        null
+                    }
+
                     if (geopoint != null) {
                         val place = Place(
                             id,
@@ -75,7 +93,8 @@ class PlaceInfoActivity : AppCompatActivity() {
                             businessHoursArray,
                             geopoint,
                             profiles ?: emptyArray(),
-                            picture
+                            picture,
+                            schedule ?: Schedule(Timestamp.now(), "", 0.0f)
                         )
 
                         showPlaceInfos(place)
