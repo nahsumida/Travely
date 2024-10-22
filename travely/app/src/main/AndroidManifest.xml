@@ -4,7 +4,9 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.NFC" />
 
     <application
         android:allowBackup="true"
@@ -17,21 +19,36 @@
         android:theme="@style/Theme.Travely"
         tools:targetApi="31">
         <activity
-            android:name=".RegisterActivity"
-            android:theme="@style/Theme.Travely"
-            android:exported="true"/>
+            android:name=".MapActivity"
+            android:exported="false" />
         <activity
-            android:name=".ProfileActivity"
-            android:exported="true"/>
+            android:name=".PlaceInfoActivity"
+            android:exported="false" />
         <activity
             android:name=".LoginActivity"
-            android:theme="@style/Theme.Travely"
-            android:exported="true">
+            android:exported="false"
+            android:theme="@style/Theme.Travely" />
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Travely" />
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="true" />
+        <activity
+            android:name=".MainScreenActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Travely">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${GOOGLE_MAPS_API_KEY}" />
     </application>
 
 </manifest>
