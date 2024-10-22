@@ -98,14 +98,8 @@ class ProfileActivity : AppCompatActivity() {
         // Adicionando  usuário no firestore
         firebase.collection("users").add(userDoc)
             .addOnSuccessListener { documentReference ->
-                Toast.makeText(
-                    this, "User cadastrado com sucesso",
-                    Toast.LENGTH_SHORT
-                ).show()
-                Log.d("Cadastro User", "User adicionado com ID: ${documentReference.id}")
+
                 createAuthUser(user, documentReference.id)
-                //val iLogin = Intent(this@ProfileActivity, LoginActivity::class.java)
-                //startActivity(iLogin)
             }
             .addOnFailureListener { e ->
                 Toast.makeText(
@@ -149,7 +143,7 @@ class ProfileActivity : AppCompatActivity() {
                         // O e-mail já está registrado
                         Log.d("Auth", "O e-mail já está em uso por outro usuário.")
                         Toast.makeText(
-                            this, "Já existe uma conta com o seu e-mail",
+                            this, "Já existe uma conta com esse e-mail",
                             Toast.LENGTH_LONG
                         ).show()
                         Handler(Looper.getMainLooper()).postDelayed({
@@ -181,6 +175,11 @@ class ProfileActivity : AppCompatActivity() {
             .update(userUpdate as Map<String, Any>)
             .addOnSuccessListener {
                 Log.d("updateUID","Sucesso ao atualizar campo authID.")
+                Log.d("Cadastro User", "User adicionado com ID: ${docId}")
+                Toast.makeText(
+                    this, "User cadastrado com sucesso",
+                    Toast.LENGTH_SHORT
+                ).show()
                 // deslogar o usuário
                 auth.signOut()
 
