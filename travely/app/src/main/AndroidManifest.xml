@@ -25,7 +25,7 @@
             android:name=".PlaceInfoActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".ProfileActivity"
             android:exported="false"
             android:theme="@style/Theme.Travely" />
         <activity
@@ -33,7 +33,7 @@
             android:exported="true"
             android:theme="@style/Theme.Travely" />
         <activity
-            android:name=".ProfileActivity"
+            android:name=".LoginActivity"
             android:exported="true" />
         <activity
             android:name=".MainScreenActivity"
