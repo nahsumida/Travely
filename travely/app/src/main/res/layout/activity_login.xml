@@ -62,7 +62,8 @@
         android:layout_marginTop="8dp"
         android:background="@drawable/inputs"
         android:hint="Digite seu email"
-        android:inputType="text"
+        android:inputType="textEmailAddress"
+        android:singleLine="true"
         android:padding="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -94,6 +95,7 @@
         android:paddingStart="15dp"
         android:inputType="textPassword"
         android:padding="10dp"
+        android:singleLine="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text_password" />

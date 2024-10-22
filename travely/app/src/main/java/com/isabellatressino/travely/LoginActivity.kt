@@ -11,7 +11,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.isabellatressino.travely.databinding.ActivityLoginBinding
 
-
+// Classe de Login
 class LoginActivity : AppCompatActivity() {
 
     private val binding by lazy { ActivityLoginBinding.inflate(layoutInflater) }
