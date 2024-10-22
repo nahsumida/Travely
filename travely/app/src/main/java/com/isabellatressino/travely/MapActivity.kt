@@ -219,11 +219,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             val marker = place.geopoint.let { geoPoint ->
                 val iconResource = if (place.profiles.isNotEmpty()) {
                     when (place.profiles[0]) {
-                        "compras" -> R.drawable.profileshopp
-                        "gastronomico" -> R.drawable.profilefood
-                        "cultura" -> R.drawable.profileculture
-                        "aventureiro" -> R.drawable.profileadventure
-                        "negocios" -> R.drawable.profilebusiness
+                        "compras" -> R.drawable.pin_buy
+                        "gastronomico" -> R.drawable.pin_food
+                        "cultura" -> R.drawable.pin_culture
+                        "aventureiro" -> R.drawable.pin_adventure
+                        "negocios" -> R.drawable.pin_business
                         else -> R.drawable.location_pin
                     }
                 } else {

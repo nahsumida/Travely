@@ -1,5 +1,6 @@
 package com.isabellatressino.travely
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -43,6 +44,10 @@ class MainScreenActivity : AppCompatActivity() {
         recyclerView.adapter = adapter
 
         loadPlacesFromFirestore()
+
+        binding.cardViewMap.setOnClickListener{
+            startActivity(Intent(this,MapActivity::class.java))
+        }
 
     }
 
