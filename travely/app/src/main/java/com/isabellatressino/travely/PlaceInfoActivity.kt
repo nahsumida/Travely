@@ -16,6 +16,7 @@ import com.bumptech.glide.Glide
 import com.google.firebase.Timestamp
 import com.isabellatressino.travely.models.Schedule
 
+
 class PlaceInfoActivity : AppCompatActivity() {
 
     private val binding by lazy { ActivityPlaceInfoBinding.inflate(layoutInflater) }

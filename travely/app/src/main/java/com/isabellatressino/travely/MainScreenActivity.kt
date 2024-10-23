@@ -97,7 +97,6 @@ class MainScreenActivity : AppCompatActivity() {
                     } else {
                         null
                     }
-
                     if (geopoint != null) {
                         val place = Place(
                             id,
@@ -111,6 +110,7 @@ class MainScreenActivity : AppCompatActivity() {
                             profiles ?: emptyArray(),
                             picture,
                             schedule ?: Schedule(Timestamp.now(), "", 0.0f)
+
                         )
                         places.add(place)
                     }

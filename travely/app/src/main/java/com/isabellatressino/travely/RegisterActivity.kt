@@ -3,6 +3,8 @@ package com.isabellatressino.travely
 import android.content.ContentValues
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -11,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.firestore.FirebaseFirestore
 //import com.google.firebase.functions.FirebaseFunctions
 import com.isabellatressino.travely.databinding.ActivityRegisterBinding
@@ -19,16 +22,16 @@ import com.isabellatressino.travely.models.User
 class RegisterActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterBinding
 
-    lateinit var senhaConf: String;
-    lateinit var user: User;
-    private lateinit var auth: FirebaseAuth;
+    private lateinit var senhaConf: String
+    lateinit var user: User
+    private lateinit var auth: FirebaseAuth
 
     lateinit var firebase: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        auth = FirebaseAuth.getInstance();
+        auth = FirebaseAuth.getInstance()
 
         // inflar layout da activity
         binding = ActivityRegisterBinding.inflate(layoutInflater)
@@ -37,39 +40,60 @@ class RegisterActivity : AppCompatActivity() {
         // configurar clique do botão de cadastro
         binding.buttonCadastrar.setOnClickListener {
             // obter dados do formulário
-            senhaConf = binding.TextSenhaConfirmacao.text.toString().trim();
+            senhaConf = binding.TextSenhaConfirmacao.text.toString().trim()
             user = User(
                 name = binding.TextNome.text.toString().trim(),
                 cpf = binding.TextCpf.text.toString().trim(),
                 phone = binding.TextTelefone.text.toString().trim(),
                 email = binding.TextEmail.text.toString().trim(),
                 password = binding.TextSenha.text.toString().trim(),
-                authID = "",
+                authID = "", //AuthID será gerado na ProfileActivity
                 schedule = null ,
-                profile = "",
-            );
+                profile = "", //Profile será gerado na ProfileActivity
+            )
 
-            // validar campos do formulário
-            if (user.name.isEmpty() || !user.isNameValid()) {
-                binding.TextNome.setError("Preencha com um nome válido")
-            } else if (user.cpf.isEmpty() || !user.isCpfValid()) {
-                binding.TextCpf.setError("Preencha com um cpf válido")
-            } else if (user.phone.isEmpty() || !user.isPhoneValid()) {
-                binding.TextTelefone.setError("Preencha com um telefone válido")
-            } else if (user.email.isBlank() || !user.isEmailValid()) {
-                binding.TextEmail.setError("Preencha com um email válido")
-            } else if (user.password.isEmpty() || !user.isPasswordValid()) {
-                binding.TextSenha.setError("Preencha com uma senha de pelo menos 6 dígitos e sem espaços")
-            } else if (senhaConf.isEmpty() || senhaConf != user.password) {
-                binding.TextSenhaConfirmacao.setError("Preencha a confimação igual a senha")
-            } else {
-                // metodo para adicionar um user ao firestore
-                createAuthUser(user)
+            // Valida se cada campo do form é válido
+            if (isFormValido(senhaConf,user)) {
+                //isNewUser(user)
 
+                // Passar dados do usuário para a ProfileActivity
+                val intent = Intent(this, ProfileActivity::class.java).apply {
+                    putExtra("userName", user.name)
+                    putExtra("userCPF", user.cpf)
+                    putExtra("userPhone", user.phone)
+                    putExtra("userEmail", user.email)
+                    putExtra("userPassword", user.password)
+                }
+                startActivity(intent)
             }
         }
     }
+    // Função que valida todos os campos do formulário
+    private fun isFormValido(senhaConf:String, user: User): Boolean{
+        if (user.name.isEmpty() || !user.isNameValid()) {
+            binding.TextNome.error = "Preencha com um nome válido"
+            return false
+        } else if (user.cpf.isEmpty() || !user.isCpfValid()) {
+            binding.TextCpf.error = "Preencha com um cpf válido"
+            return false
+        } else if (user.phone.isEmpty() || !user.isPhoneValid()) {
+            binding.TextTelefone.error = "Preencha com um telefone válido"
+            return false
+        } else if (user.email.isBlank() || !user.isEmailValid()) {
+            binding.TextEmail.error = "Preencha com um email válido"
+            return false
+        } else if (user.password.isEmpty() || !user.isPasswordValid()) {
+            binding.TextSenha.error = "Preencha com uma senha de pelo menos 6 dígitos e sem espaços"
+            return false
+        } else if (senhaConf.isEmpty() || senhaConf != user.password) {
+            binding.TextSenhaConfirmacao.setError("As senhas devem ser idênticas.")
+            return false
+        } else {
+            return true
+        }
+    }
 
+    /*
     fun createAuthUser (user: User) {
         auth.createUserWithEmailAndPassword(user.email, user.password)
             .addOnCompleteListener(this) { task ->
@@ -127,4 +151,28 @@ class RegisterActivity : AppCompatActivity() {
                 Log.w("Erro", "Erro ao adicionar user", e)
             }
     }
+
+// a funcao nova
+    fun isNewUser(user: User) {
+        auth.createUserWithEmailAndPassword(user.email, user.password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {} else {
+                    try {
+                        throw task.exception!!
+                    } catch (e: FirebaseAuthUserCollisionException) {
+                        // O e-mail já está registrado
+                        Log.d("Auth", "O e-mail já está em uso por outro usuário.")
+                        Toast.makeText(
+                            this, "Já existe uma conta com o seu e-mail",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            // Redirecionar para a tela de Login
+                            val iLogin = Intent(this@RegisterActivity, LoginActivity::class.java)
+                            startActivity(iLogin)
+                        }, 3000L)
+                    }
+                }
+            }
+    }*/
 }

@@ -33,6 +33,7 @@ import com.isabellatressino.travely.models.Schedule
 import com.google.firebase.Timestamp
 
 
+
 class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var googleMap: GoogleMap
@@ -204,7 +205,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     } else {
                         null
                     }
-
+                    
                     if (geopoint != null) {
                         val place = Place(
                             id,
