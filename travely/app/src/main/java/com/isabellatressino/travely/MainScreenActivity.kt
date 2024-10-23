@@ -3,8 +3,12 @@ package com.isabellatressino.travely
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
+import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -12,10 +16,12 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.libraries.places.api.Places
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.isabellatressino.travely.databinding.ActivityMainScreenBinding
 import com.isabellatressino.travely.models.Place
+import com.isabellatressino.travely.models.Schedule
 
 class MainScreenActivity : AppCompatActivity() {
 
@@ -45,8 +51,8 @@ class MainScreenActivity : AppCompatActivity() {
 
         loadPlacesFromFirestore()
 
-        binding.cardViewMap.setOnClickListener{
-            startActivity(Intent(this,MapActivity::class.java))
+        binding.cardViewMap.setOnClickListener {
+            startActivity(Intent(this, MapActivity::class.java))
         }
 
     }
@@ -76,6 +82,21 @@ class MainScreenActivity : AppCompatActivity() {
                     val profiles = (document.get("profiles") as? List<String>)?.toTypedArray()
                     val picture = document.getString("picture") ?: ""
 
+                    // Extração dos dados do schedule
+                    val scheduleMap = document.get("schedule") as? Map<String, Any>
+
+                    // Verifica se o schedule existe e extrai os dados
+                    val schedule = if (scheduleMap != null) {
+                        val bookingData =
+                            scheduleMap["bookingData"] as? Timestamp ?: Timestamp.now()
+                        //val placeID = scheduleMap["placeID"] as? String ?: ""
+                        val compra = scheduleMap["compra"] as? String ?: ""
+                        val preco = (scheduleMap["preco"] as? Double ?: 0.0).toFloat()
+
+                        Schedule(bookingData, compra, preco)
+                    } else {
+                        null
+                    }
                     if (geopoint != null) {
                         val place = Place(
                             id,
@@ -87,7 +108,9 @@ class MainScreenActivity : AppCompatActivity() {
                             businessHoursArray,
                             geopoint,
                             profiles ?: emptyArray(),
-                            picture
+                            picture,
+                            schedule ?: Schedule(Timestamp.now(), "", 0.0f)
+
                         )
                         places.add(place)
                     }
