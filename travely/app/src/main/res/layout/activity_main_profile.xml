@@ -7,7 +7,33 @@
     android:layout_height="match_parent"
     android:background="#F8F8F8"
     tools:context=".MainProfileActivity">
+    
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:ignore="MissingConstraints">
 
+        <ImageView
+            android:id="@+id/background_img"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/background_purple"
+            android:scaleType="centerCrop"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBaseline_toTopOf="parent"/>
 
+        <ImageView
+            android:id="@+id/user_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:elevation="10dp"
+            android:src="@drawable/image_profile_user"
+            app:layout_constraintEnd_toEndOf="@id/card_view_infos"
+            app:layout_constraintStart_toStartOf="@id/card_view_infos"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
