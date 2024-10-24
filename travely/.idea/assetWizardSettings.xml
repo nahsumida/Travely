@@ -19,8 +19,8 @@
                         <option name="values">
                           <map>
                             <entry key="assetSourceType" value="FILE" />
-                            <entry key="outputName" value="iconpoints" />
-                            <entry key="sourceFile" value="C:\Users\Izabelle\Downloads\Group 5.svg" />
+                            <entry key="outputName" value="icon_nav_home" />
+                            <entry key="sourceFile" value="C:\Users\Izabelle\Downloads\nav_home.svg" />
                           </map>
                         </option>
                       </PersistentState>
