@@ -1,6 +1,5 @@
 package com.isabellatressino.travely.models
 
-
 import com.google.firebase.Timestamp
 
 class Schedule(
@@ -13,3 +12,4 @@ class Schedule(
         return "Schedule(bookingData=$bookingData, placeID='$placeID', compra='$type', preco=$preco)"
     }
 }
+

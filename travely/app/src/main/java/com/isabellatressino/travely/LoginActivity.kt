@@ -2,11 +2,18 @@ package com.isabellatressino.travely
 
 import android.content.ContentValues
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.util.Patterns
+import android.view.LayoutInflater
+import android.view.WindowManager
+import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.isabellatressino.travely.databinding.ActivityLoginBinding
@@ -25,7 +32,10 @@ class LoginActivity : AppCompatActivity() {
         with(binding) {
             buttonContinue.setOnClickListener {
                 validUser(editUser.text.toString().trim(), editPassword.text.toString())
+                buttonContinue.isEnabled = false
             }
+
+            buttonContinue.isEnabled = true
         }
 
         binding.textSingUp.setOnClickListener {
@@ -36,18 +46,22 @@ class LoginActivity : AppCompatActivity() {
         binding.textForgotPassword.setOnClickListener {
             var email = binding.editUser.text.toString().trim();
 
-            if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches() || email.contains(" ")) {
+            if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email)
+                    .matches() || email.contains(" ")
+            ) {
                 binding.editUser.setError("Preencha com um email válido")
+                showAlertMessage("Atenção","Preencha um email válido")
             } else {
                 auth.sendPasswordResetEmail(email).addOnCompleteListener { task ->
                     //se o envio for um sucesso
                     if (task.isSuccessful) {
                         Log.d(ContentValues.TAG, "sendPasswordResetEmail:success")
-                        Toast.makeText(
-                            baseContext,
-                            "Email de recuperação enviado, verifique seu email",
-                            Toast.LENGTH_SHORT
-                        ).show()
+//                        Toast.makeText(
+//                            baseContext,
+//                            "Email de recuperação enviado, verifique seu email",
+//                            Toast.LENGTH_SHORT
+//                        ).show()
+                        showAlertMessage("Email de verificação enviado","Confira a caixa de entrada de seu email")
                     } else {
                         Log.w(ContentValues.TAG, "sendPasswordResetEmail:failure", task.exception)
                         Toast.makeText(
@@ -64,7 +78,7 @@ class LoginActivity : AppCompatActivity() {
     private fun validUser(email: String, password: String) {
 
         if (email.isBlank() or password.isBlank()) {
-            Toast.makeText(this, "Preencha os campos para continuar", Toast.LENGTH_LONG).show()
+            showAlertMessage("Atenção", "Preencha todos os campos para continuar")
             return
         }
 
@@ -80,23 +94,27 @@ class LoginActivity : AppCompatActivity() {
                     return@addOnSuccessListener
                 }
                 val uid = authResult.user?.uid
-                if(uid != null) {
-                    FirebaseFirestore.getInstance("default2")
+                if (uid != null) {
+                    FirebaseFirestore.getInstance()
                         .collection("users")
                         .whereEqualTo("authID", uid)
                         .get()
                         .addOnSuccessListener { querySnapshot ->
                             if (!querySnapshot.isEmpty) {
-                                Toast.makeText(this, "Login feito com sucesso", Toast.LENGTH_LONG)
-                                    .show()
                                 // Aqui você pode redirecionar para a próxima tela
+                                startActivity(Intent(this, MainScreenActivity::class.java))
+                                finish()
                             } else {
-                                Log.d("[ERRO] LoginActivity ", "UID do usuário nao encontrado: $uid")
+                                Log.d(
+                                    "[ERRO] LoginActivity ",
+                                    "UID do usuário nao encontrado: $uid"
+                                )
                                 Toast.makeText(
                                     this,
                                     "Usuário não encontrado na base de dados.",
                                     Toast.LENGTH_LONG
                                 ).show()
+                                binding.buttonContinue.isEnabled = true
                             }
                         }
                         .addOnFailureListener { exception ->
@@ -106,23 +124,47 @@ class LoginActivity : AppCompatActivity() {
                                 "Erro ao acessar os dados do usuário.",
                                 Toast.LENGTH_LONG
                             ).show()
+                            binding.buttonContinue.isEnabled = true
                         }
                 }
 
             }.addOnFailureListener { exception ->
                 if (exception.message.toString() == "The email address is badly formatted.") {
-                    Toast.makeText(
-                        this,
-                        "Endereço de email inválido, por favor digite novamente!",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    showAlertMessage("Erro","Endereço de email inválido, por favor digite novamente")
                 } else {
-                    Toast.makeText(
-                        this,
-                        "Erro: Usuário e/ou senha inválidos.",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    showAlertMessage("Erro","Usuário e/ou senha inválidos")
                 }
             }
     }
+
+    private fun showAlertMessage(type: String, message: String) {
+        val inflater = LayoutInflater.from(this)
+        val view = inflater.inflate(R.layout.custom_dialog, null)
+
+        val alertDialog = AlertDialog.Builder(this)
+            .setView(view)
+            .create()
+
+        alertDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        val title = view.findViewById<TextView>(R.id.tv_title)
+        val text = view.findViewById<TextView>(R.id.tv_text)
+        val button = view.findViewById<Button>(R.id.btn_dialog)
+
+        title.text = type
+        text.text = message
+
+        button.setOnClickListener {
+            alertDialog.dismiss()
+            binding.buttonContinue.isEnabled = true
+        }
+
+        alertDialog.show()
+
+        alertDialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.85).toInt(),
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
+    }
+
 }
