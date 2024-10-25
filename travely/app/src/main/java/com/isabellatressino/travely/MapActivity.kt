@@ -212,7 +212,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             isInitialLocationSet = true // Marca que o zoom inicial foi feito
         } else {
             // Move a câmera suavemente para a nova localização do usuário
-            googleMap.animateCamera(CameraUpdateFactory.newLatLng(userLocation), 1000, null)
+            //googleMap.animateCamera(CameraUpdateFactory.newLatLng(userLocation), 1000, null)
         }
     }
 
