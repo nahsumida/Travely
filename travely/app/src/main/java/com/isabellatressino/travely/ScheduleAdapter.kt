@@ -1,11 +1,18 @@
 package com.isabellatressino.travely
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.firestore.FirebaseFirestore
 import com.isabellatressino.travely.models.Schedule
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import com.google.firebase.Timestamp
 
 class ScheduleAdapter(private val schedules: MutableList<Schedule>) :
     RecyclerView.Adapter<ScheduleAdapter.CardItemViewHolder>() {
@@ -28,8 +35,41 @@ class ScheduleAdapter(private val schedules: MutableList<Schedule>) :
 
     override fun onBindViewHolder(holder: CardItemViewHolder, position: Int) {
         val schedule = schedules[position]
-        holder.placeName.text = "teste"
-        holder.date.text = "Data: ${schedule.bookingData}"
-        holder.time.text = "11"
+
+        Log.d("TESTE FIREBASE SCHEDULE", "Binding schedule at position $position: $schedule")
+
+        val timeStamp = schedule.bookingData.toDate()
+
+        // Formatação da data
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        val formattedDate = dateFormat.format(timeStamp)
+
+        // Formatação do horário
+        val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+        val formattedTime = timeFormat.format(timeStamp)
+
+        // Atribuindo valores às views
+        holder.date.text = "Data: $formattedDate"
+        holder.time.text = "Horário: $formattedTime"
+
+        // Carrega o nome do local de forma assíncrona
+        loadPlaceNameFromFirestore(schedule.placeID) { name ->
+            holder.placeName.text = name
+        }
     }
+
+    private fun loadPlaceNameFromFirestore(placeId: String, callback: (String) -> Unit) {
+        val firestore = FirebaseFirestore.getInstance()
+
+        firestore.collection("places").document(placeId).get()
+            .addOnSuccessListener { document ->
+                val name = document.getString("name") ?: ""
+                callback(name) // Passa o nome recuperado para a callback
+            }
+            .addOnFailureListener {
+                Log.d("TESTE FIREBASE SCHEDULE", "Não foi possivel obter as informações do banco")
+                callback("Nome não encontrado")
+            }
+    }
+
 }
