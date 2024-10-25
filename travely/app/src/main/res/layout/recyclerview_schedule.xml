@@ -14,46 +14,48 @@
 
         <!-- Nome do parque -->
         <TextView
-            android:id="@+id/tvParkName"
+            android:id="@+id/tvPlaceName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Parque Dom Pedro"
-            android:textSize="18sp"
             android:textColor="#000000"
+            android:textSize="18sp"
             android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Data da reserva -->
         <TextView
             android:id="@+id/tvDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
             android:text="Data: 10/10/2024"
             android:textColor="#555555"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvParkName"/>
+            app:layout_constraintTop_toBottomOf="@id/tvPlaceName" />
 
         <!-- Horário da reserva -->
         <TextView
             android:id="@+id/tvTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
             android:text="Horário: 10:30"
             android:textColor="#555555"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvParkName"/>
+            app:layout_constraintTop_toBottomOf="@id/tvPlaceName" />
 
         <!-- Ícone de opções (três pontos) -->
         <ImageView
             android:id="@+id/imgMoreOptions"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_more_vert"
             android:contentDescription="Mais opções"
+            android:src="@drawable/icon_more"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
+
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
