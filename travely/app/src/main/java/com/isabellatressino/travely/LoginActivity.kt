@@ -95,7 +95,7 @@ class LoginActivity : AppCompatActivity() {
                 }
                 val uid = authResult.user?.uid
                 if (uid != null) {
-                    FirebaseFirestore.getInstance("default2")
+                    FirebaseFirestore.getInstance()
                         .collection("users")
                         .whereEqualTo("authID", uid)
                         .get()

@@ -37,7 +37,7 @@ class MainScreenActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        firestore = FirebaseFirestore.getInstance("default2")
+        firestore = FirebaseFirestore.getInstance()
         storage = FirebaseStorage.getInstance()
 
         recyclerView = binding.recyclerViewSuggestions
@@ -69,7 +69,7 @@ class MainScreenActivity : AppCompatActivity() {
                     val address = document.getString("address") ?: ""
                     val description = document.getString("description") ?: ""
                     val type = document.getString("type") ?: ""
-                    val rate = document.getDouble("rate") ?: 0.0
+                    val rate = document.getDouble("rating") ?: 0.0
 
                     val businessHoursMap =
                         document.get("businessHours") as? Map<String, List<String>> ?: emptyMap()

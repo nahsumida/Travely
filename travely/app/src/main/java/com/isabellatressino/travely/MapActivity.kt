@@ -47,7 +47,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        firestore = FirebaseFirestore.getInstance("default2")
+        firestore = FirebaseFirestore.getInstance()
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         val mapFragment =
@@ -175,7 +175,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     val address = document.getString("address") ?: ""
                     val description = document.getString("description") ?: ""
                     val type = document.getString("type") ?: ""
-                    val rate = document.getDouble("rate") ?: 0.0
+                    val rate = document.getDouble("rating") ?: 0.0
 
                     // Verifica se businessHours é um Map e trata corretamente
                     val businessHoursMap =
