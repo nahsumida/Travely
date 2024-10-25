@@ -61,8 +61,9 @@
             android:layout_height="60dp"
             android:layout_marginHorizontal="30dp"
             android:shadowRadius="20"
-            android:text="Reservas"
+            android:text=" Minhas Reservas"
             android:layout_marginTop="370dp"
+            android:drawableRight=""
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/card_view_info"/>
