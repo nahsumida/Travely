@@ -1,8 +1,10 @@
 package com.isabellatressino.travely.models
 
-import com.google.type.DateTime
+import com.google.firebase.Timestamp
 
-class Schedule (var bookingData: DateTime,
-                var palceID: String,
-                var compra:String,
-                var preco: Float){}
+class Schedule(
+    var bookingData: Timestamp,
+    //var palceID: String,
+    var compra: String,
+    var preco: Float
+) {}
