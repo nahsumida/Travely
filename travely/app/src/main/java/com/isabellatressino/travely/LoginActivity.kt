@@ -75,6 +75,11 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        binding.buttonContinue.isEnabled = true
+    }
+
     private fun validUser(email: String, password: String) {
 
         if (email.isBlank() or password.isBlank()) {
@@ -86,11 +91,12 @@ class LoginActivity : AppCompatActivity() {
             .addOnSuccessListener { authResult ->
                 if (authResult.user?.isEmailVerified == false) {
                     auth.signOut()
-                    Toast.makeText(
-                        this,
-                        "Por favor, ative a conta através do link enviado no email e tente novamente!",
-                        Toast.LENGTH_LONG
-                    ).show()
+//                    Toast.makeText(
+//                        this,
+//                        "Por favor, ative a conta através do link enviado no email e tente novamente!",
+//                        Toast.LENGTH_LONG
+//                    ).show()
+                    showAlertMessage("Ativação de conta","Por favor, ative a conta através do link enviado no email e tente novamente!")
                     return@addOnSuccessListener
                 }
                 val uid = authResult.user?.uid

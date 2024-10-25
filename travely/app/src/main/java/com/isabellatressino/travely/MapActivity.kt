@@ -17,6 +17,9 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -33,7 +36,6 @@ import com.isabellatressino.travely.models.Schedule
 import com.google.firebase.Timestamp
 
 
-
 class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var googleMap: GoogleMap
@@ -41,7 +43,16 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val cityMarkers = mutableListOf<Marker>()
 
+    private lateinit var locationRequest: LocationRequest
+    private lateinit var locationCallback: LocationCallback
+    private var userMarker: Marker? = null
+    private var isInitialLocationSet = false
+
     private val binding by lazy { ActivityMapBinding.inflate(layoutInflater) }
+
+    companion object {
+        private const val LOCATION_PERMISSION_REQUEST_CODE = 1
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,7 +66,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync { map ->
             googleMap = map
             loadPlacesFromFirestore()
-            getUserLocation()
+            setupLocationUpdates()
             setupMapClickListeners()
         }
 
@@ -75,14 +86,23 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
 
-        binding.btnUserLocation.setOnClickListener {
-            getUserLocation()
+        binding.btnUserLocation.setOnClickListener { centerMapOnUserLocation() }
+
+
+    }
+
+    private fun centerMapOnUserLocation() {
+        if (userMarker != null) {
+            val userLocation = userMarker?.position
+            userLocation?.let {
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(it, 15f), 1000, null)
+            }
+        } else {
+            // Caso ainda não tenha a localização do usuário
+            Toast.makeText(this, "Localização do usuário não encontrada", Toast.LENGTH_SHORT).show()
         }
     }
 
-    companion object {
-        private const val LOCATION_PERMISSION_REQUEST_CODE = 1
-    }
 
     private fun searchCity(cityName: String) {
         val geocoder = Geocoder(this)
@@ -105,62 +125,96 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun getUserLocation() {
+    private fun setupLocationUpdates() {
+        locationRequest = LocationRequest.create().apply {
+            interval = 10000
+            fastestInterval = 5000
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        }
+
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                for (location in locationResult.locations) {
+                    updateUserLocationOnMap(location)
+                }
+            }
+        }
+
+        startLocationUpdates()
+    }
+
+    private fun startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED &&
-            ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
+            ) == PackageManager.PERMISSION_GRANTED
         ) {
+            fusedLocationClient.requestLocationUpdates(
+                locationRequest,
+                locationCallback,
+                mainLooper
+            )
+        } else {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                 LOCATION_PERMISSION_REQUEST_CODE
             )
-            return
-        }
-
-        // Obtém a última localização conhecida
-        fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
-            if (location != null) {
-                // Obtém as coordenadas da localização
-                val userLocation = LatLng(location.latitude, location.longitude)
-                // Move a câmera para a localização do usuário
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15f))
-                googleMap.addMarker(
-                    MarkerOptions()
-                        .position(userLocation)
-                        .title("Você está aqui")
-                        .icon(
-                            BitmapHelper.vectorToBitmap(
-                                this, R.drawable.person_pin,
-                                ContextCompat.getColor(this, R.color.purple_haze)
-                            )
-                        )
-                )
-            } else {
-                Toast.makeText(this, "Localização não disponível", Toast.LENGTH_SHORT).show()
-            }
         }
     }
 
+    private fun stopLocationUpdates() {
+        fusedLocationClient.removeLocationUpdates(locationCallback)
+    }
+
+    private fun updateUserLocationOnMap(location: Location) {
+        val userLocation = LatLng(location.latitude, location.longitude)
+
+        // Atualiza o marcador do usuário ou adiciona-o se ainda não existir
+        if (userMarker == null) {
+            userMarker = googleMap.addMarker(
+                MarkerOptions().position(userLocation).title("Você está aqui")
+            )
+        } else {
+            userMarker?.position = userLocation
+        }
+
+        // Verifica se o zoom inicial já foi feito
+        if (!isInitialLocationSet) {
+            // Configura o zoom inicial uma única vez ao abrir o mapa
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15f))
+            isInitialLocationSet = true // Marca que o zoom inicial foi feito
+        } else {
+            // Move a câmera suavemente para a nova localização do usuário
+            googleMap.animateCamera(CameraUpdateFactory.newLatLng(userLocation), 1000, null)
+        }
+    }
+
+
     override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
+        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                getUserLocation()
+                startLocationUpdates()
             } else {
                 Toast.makeText(this, "Permissão de localização negada", Toast.LENGTH_SHORT).show()
             }
         }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        stopLocationUpdates() // Para as atualizações ao sair da Activity
+    }
+
+    override fun onMapReady(gM: GoogleMap) {
+        googleMap = gM
+    }
+
+
+///////////////////////////////////////////////////////////////////////////////
 
     private fun loadPlacesFromFirestore() {
         val placesCollection = firestore.collection("places")
@@ -197,15 +251,15 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     val schedule = if (scheduleMap != null) {
                         val bookingData =
                             scheduleMap["bookingData"] as? Timestamp ?: Timestamp.now()
-                        //val placeID = scheduleMap["placeID"] as? String ?: ""
+                        val placeID = scheduleMap["placeID"] as? String ?: ""
                         val compra = scheduleMap["compra"] as? String ?: ""
                         val preco = (scheduleMap["preco"] as? Double ?: 0.0).toFloat()
 
-                        Schedule(bookingData, compra, preco)
+                        Schedule(bookingData, placeID, compra, preco)
                     } else {
                         null
                     }
-                    
+
                     if (geopoint != null) {
                         val place = Place(
                             id,
@@ -218,7 +272,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                             geopoint,
                             profiles ?: emptyArray(),
                             picture,
-                            schedule ?: Schedule(Timestamp.now(), "", 0.0f)
+                            schedule ?: Schedule(Timestamp.now(), "", "", 0.0f)
                         )
                         places.add(place)
                     }
@@ -376,10 +430,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(webUri))
             startActivity(webIntent)
         }
-    }
-
-    override fun onMapReady(gM: GoogleMap) {
-        googleMap = gM
     }
 
 }
