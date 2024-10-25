@@ -126,3 +126,11 @@ class MainScreenActivity : AppCompatActivity() {
             }
     }
 }
+
+/**
+ * .icon(
+ *                             BitmapHelper.vectorToBitmap(
+ *                                 this, R.drawable.person_pin,
+ *                                 ContextCompat.getColor(this, R.color.purple_haze)
+ *                             )
+ */

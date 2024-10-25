@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="40dp"
+    android:background="@color/white"
     android:elevation="10dp"
     app:cardCornerRadius="10dp">
 
@@ -11,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingHorizontal="30dp"
+        android:background="@color/white"
         android:paddingVertical="20dp"
         >
 
@@ -30,6 +32,7 @@
         <TextView
             android:id="@+id/tv_text"
             android:layout_width="0dp"
+            android:textColor="@color/grey"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:text="Preencha todos os campos antes de continuar"

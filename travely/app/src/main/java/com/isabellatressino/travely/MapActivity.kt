@@ -42,7 +42,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var firestore: FirebaseFirestore
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val cityMarkers = mutableListOf<Marker>()
-
     private lateinit var locationRequest: LocationRequest
     private lateinit var locationCallback: LocationCallback
     private var userMarker: Marker? = null
@@ -61,6 +60,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         firestore = FirebaseFirestore.getInstance()
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
+        // Configuração do mapa
         val mapFragment =
             supportFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment
         mapFragment.getMapAsync { map ->
@@ -70,27 +70,27 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             setupMapClickListeners()
         }
 
-        binding.containerInfo.visibility = View.GONE
-
-        binding.editSearch.setOnClickListener {
-            hideInfoView()
-        }
-
-        binding.editSearch.setOnEditorActionListener { v, actionId, event ->
-            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                val cityName = binding.editSearch.text.toString()
-                searchCity(cityName)
-                true
-            } else {
-                false
+        with(binding) {
+            containerInfo.visibility = View.GONE
+            editSearch.setOnClickListener {
+                hideInfoView()
             }
+            editSearch.setOnEditorActionListener { v, actionId, event ->
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    val cityName = binding.editSearch.text.toString()
+                    searchCity(cityName)
+                    true
+                } else {
+                    false
+                }
+            }
+            btnUserLocation.setOnClickListener { centerMapOnUserLocation() }
         }
-
-        binding.btnUserLocation.setOnClickListener { centerMapOnUserLocation() }
-
-
     }
 
+    /**
+     * Centraliza o mapa na localização do usuário
+     */
     private fun centerMapOnUserLocation() {
         if (userMarker != null) {
             val userLocation = userMarker?.position
@@ -103,7 +103,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-
+    /**
+     * Busca a cidade pelo nome e adiciona um marcador no mapa se achar
+     *
+     * @param cityName O nome da cidade que se deseja buscar
+     */
     private fun searchCity(cityName: String) {
         val geocoder = Geocoder(this)
         val addresses = geocoder.getFromLocationName(cityName, 1)
@@ -125,6 +129,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+
+    /**
+     * Configura o mapa para ajustar à localização do usuário
+     */
     private fun setupLocationUpdates() {
         locationRequest = LocationRequest.create().apply {
             interval = 10000
@@ -143,6 +151,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         startLocationUpdates()
     }
 
+    /**
+     * Faz uma requisição da localização se a permissão for aceita.
+     */
     private fun startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -163,17 +174,32 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    /**
+     * Para a atualização da localização
+     */
     private fun stopLocationUpdates() {
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 
+    /**
+     * Atualiza a localização do usuário no mapa e adiciona um marker
+     *
+     * @param location A localização atual do usuário
+     */
     private fun updateUserLocationOnMap(location: Location) {
         val userLocation = LatLng(location.latitude, location.longitude)
 
-        // Atualiza o marcador do usuário ou adiciona-o se ainda não existir
         if (userMarker == null) {
             userMarker = googleMap.addMarker(
-                MarkerOptions().position(userLocation).title("Você está aqui")
+                MarkerOptions()
+                    .position(userLocation)
+                    .title("Você está aqui")
+                    .icon(
+                        BitmapHelper.vectorToBitmap(
+                            this, R.drawable.person_pin,
+                            ContextCompat.getColor(this, R.color.purple_haze)
+                        )
+                    )
             )
         } else {
             userMarker?.position = userLocation
@@ -190,32 +216,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                startLocationUpdates()
-            } else {
-                Toast.makeText(this, "Permissão de localização negada", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        stopLocationUpdates() // Para as atualizações ao sair da Activity
-    }
-
-    override fun onMapReady(gM: GoogleMap) {
-        googleMap = gM
-    }
-
-
-///////////////////////////////////////////////////////////////////////////////
-
+    /**
+     * Carrega os documentos da coleção "places" do Firestore
+     */
     private fun loadPlacesFromFirestore() {
         val placesCollection = firestore.collection("places")
 
@@ -288,6 +291,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
     }
 
+    /**
+     * Adiciona os marcadores no mapa
+     *
+     * @param places The list of places to display.
+     */
     private fun addMarkers(places: List<Place>) {
         places.forEach { place ->
             val marker = place.geopoint.let { geoPoint ->
@@ -372,6 +380,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    /**
+     * Exibe as informações do local selecionado
+     *
+     * @param place O local a ser exibido as informações
+     */
     private fun showPlaceInfo(place: Place) {
         binding.tvName.text = place.name
         binding.tvRating.text = place.rate.toString()
@@ -398,12 +411,18 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    /**
+     * Chama evento de clique no mapa, para que o card de informações pare de ser exibido
+     */
     private fun setupMapClickListeners() {
         googleMap.setOnMapClickListener {
             hideInfoView()
         }
     }
 
+    /**
+     * Esconde o card de informações do local
+     */
     private fun hideInfoView() {
         binding.containerInfo.animate()
             .alpha(0f)
@@ -414,6 +433,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             .start()
     }
 
+    /**
+     * Opens Google Maps to navigate to the given location.
+     * Abre a navegação do Google Maps do local dado
+     *
+     * @param geopoint Coordenadas do local
+     */
     private fun openGoogleMaps(geopoint: GeoPoint) {
         val latitude = geopoint.latitude
         val longitude = geopoint.longitude
@@ -430,6 +455,29 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(webUri))
             startActivity(webIntent)
         }
+    }
+
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                startLocationUpdates()
+            } else {
+                Toast.makeText(this, "Permissão de localização negada", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        stopLocationUpdates() // Para as atualizações ao sair da Activity
+    }
+
+    override fun onMapReady(gM: GoogleMap) {
+        googleMap = gM
     }
 
 }

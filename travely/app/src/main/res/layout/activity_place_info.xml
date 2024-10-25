@@ -91,6 +91,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
+            android:background="@color/white"
             android:layout_height="match_parent">
 
             <TextView
@@ -110,6 +111,7 @@
             <TextView
                 android:id="@+id/tv_address"
                 android:layout_width="0dp"
+                android:textColor="@color/grey"
                 android:layout_height="wrap_content"
                 android:text=""
                 app:layout_constraintEnd_toEndOf="@+id/tv_name"
@@ -123,7 +125,7 @@
                 android:layout_marginTop="8dp"
                 android:elevation="5dp"
                 android:text=""
-                android:textColor="@color/grey"
+                android:textColor="@color/yellow_mimosa"
                 android:textSize="12sp"
                 app:layout_constraintStart_toStartOf="@+id/tv_name"
                 app:layout_constraintTop_toBottomOf="@+id/tv_address" />
@@ -141,6 +143,7 @@
 
             <TextView
                 android:id="@+id/tv_description"
+                android:textColor="@color/grey"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
@@ -167,6 +170,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
+                android:textColor="@color/grey"
                 android:text=""
                 app:layout_constraintBottom_toBottomOf="@id/tv_status"
                 app:layout_constraintStart_toEndOf="@id/tv_status"
