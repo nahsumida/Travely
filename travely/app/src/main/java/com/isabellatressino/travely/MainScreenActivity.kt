@@ -89,11 +89,11 @@ class MainScreenActivity : AppCompatActivity() {
                     val schedule = if (scheduleMap != null) {
                         val bookingData =
                             scheduleMap["bookingData"] as? Timestamp ?: Timestamp.now()
-                        //val placeID = scheduleMap["placeID"] as? String ?: ""
+                        val placeID = scheduleMap["placeID"] as? String ?: ""
                         val compra = scheduleMap["compra"] as? String ?: ""
                         val preco = (scheduleMap["preco"] as? Double ?: 0.0).toFloat()
 
-                        Schedule(bookingData, compra, preco)
+                        Schedule(bookingData, placeID, compra, preco)
                     } else {
                         null
                     }
@@ -109,7 +109,7 @@ class MainScreenActivity : AppCompatActivity() {
                             geopoint,
                             profiles ?: emptyArray(),
                             picture,
-                            schedule ?: Schedule(Timestamp.now(), "", 0.0f)
+                            schedule ?: Schedule(Timestamp.now(), "", "", 0.0f)
 
                         )
                         places.add(place)
@@ -126,3 +126,11 @@ class MainScreenActivity : AppCompatActivity() {
             }
     }
 }
+
+/**
+ * .icon(
+ *                             BitmapHelper.vectorToBitmap(
+ *                                 this, R.drawable.person_pin,
+ *                                 ContextCompat.getColor(this, R.color.purple_haze)
+ *                             )
+ */

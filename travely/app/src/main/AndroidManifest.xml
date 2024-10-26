@@ -22,6 +22,9 @@
             android:name=".MapActivity"
             android:exported="false" />
         <activity
+            android:name=".ScheduleActivity"
+            android:exported="false" />
+        <activity
             android:name=".PlaceInfoActivity"
             android:exported="false" />
         <activity
