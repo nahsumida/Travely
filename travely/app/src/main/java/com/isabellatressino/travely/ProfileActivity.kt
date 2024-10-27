@@ -85,7 +85,7 @@ class ProfileActivity : AppCompatActivity() {
 
     // metodo para adicionar um user ao firestore
     private fun addUser(user: User) {
-        firebase = FirebaseFirestore.getInstance("default2")
+        firebase = FirebaseFirestore.getInstance()
 
         // Criando um hash map pessoa com os dados do usuario
         val userDoc = hashMapOf(
@@ -98,12 +98,11 @@ class ProfileActivity : AppCompatActivity() {
         // Adicionando  usuário no firestore
         firebase.collection("users").add(userDoc)
             .addOnSuccessListener { documentReference ->
-
                 createAuthUser(user, documentReference.id)
             }
             .addOnFailureListener { e ->
                 Toast.makeText(
-                    this, "Falha ao cadastrar User",
+                    this, "Falha ao cadastrar usuário",
                     Toast.LENGTH_SHORT
                 ).show()
                 Log.w("Erro", "Erro ao adicionar user no Firestore", e)
@@ -115,7 +114,7 @@ class ProfileActivity : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     Log.d(ContentValues.TAG, "signInWithCustomToken:success")
-                    firebase = FirebaseFirestore.getInstance("default2")
+                    firebase = FirebaseFirestore.getInstance()
                     val firebaseUser = auth.currentUser
                     val uid = firebaseUser?.uid ?: ""
                     user.authID = uid
@@ -166,7 +165,7 @@ class ProfileActivity : AppCompatActivity() {
 
     // Função para atualizar campo 'authID' do usuário no Firestore
     private fun updateUID(user: User, docId: String) {
-        firebase = FirebaseFirestore.getInstance("default2")
+        firebase = FirebaseFirestore.getInstance()
         val userUpdate = hashMapOf(
             "authID" to user.authID
         )
