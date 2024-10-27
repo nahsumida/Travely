@@ -53,7 +53,7 @@ class RegisterActivity : AppCompatActivity() {
             )
 
             // Valida se cada campo do form é válido
-            if (isFormValido(senhaConf,user)) {
+            if (isFormValid(senhaConf,user)) {
                 //isNewUser(user)
 
                 // Passar dados do usuário para a ProfileActivity
@@ -69,7 +69,7 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
     // Função que valida todos os campos do formulário
-    private fun isFormValido(senhaConf:String, user: User): Boolean{
+    private fun isFormValid(senhaConf:String, user: User): Boolean{
         if (user.name.isEmpty() || !user.isNameValid()) {
             binding.TextNome.error = "Preencha com um nome válido"
             return false
@@ -92,87 +92,4 @@ class RegisterActivity : AppCompatActivity() {
             return true
         }
     }
-
-    /*
-    fun createAuthUser (user: User) {
-        auth.createUserWithEmailAndPassword(user.email, user.password)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    Log.d(ContentValues.TAG, "signInWithCustomToken:success")
-                    user.authID = task.result.user?.uid.toString()
-
-                    //addUser(user)
-
-                    // enviar email de verificação para o usuário
-                    auth.currentUser?.sendEmailVerification()
-
-                    // deslogar o usuário
-                    auth.signOut()
-
-                    val iProfile = Intent(this, ProfileActivity::class.java)
-                    iProfile.putExtra("userName", user.name)
-                    iProfile.putExtra("userCPF", user.cpf)
-                    iProfile.putExtra("userPhone", user.phone)
-                    iProfile.putExtra("userAuth", user.authID)
-                    //  iProfile.putExtra("userPassword", user.password)
-                    startActivity(iProfile)
-
-                } else {
-                    Toast.makeText(
-                        this, "Falha ao criar autenticação do usuário",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-    }
-    fun addUser(user: User){
-        firebase = FirebaseFirestore.getInstance("default2")
-
-        // Criando um hash map pessoa com os dados do usuario
-        val userDoc = hashMapOf(
-            "authID" to user.authID,
-            "cpf" to user.cpf,
-            "name" to user.name,
-            "phone" to user.phone,
-            "profile" to user.profile,
-        )
-
-        // Adicionando a pessoa no firestore
-        firebase.collection("users")
-            .add(userDoc)
-            .addOnSuccessListener { documentReference ->
-                Toast.makeText(this, "User cadastrado com sucesso",
-                    Toast.LENGTH_SHORT).show()
-                Log.d("Cadastro User", "User adicionado com ID: ${documentReference.id}")
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Falha ao cadastrar User",
-                    Toast.LENGTH_SHORT).show()
-                Log.w("Erro", "Erro ao adicionar user", e)
-            }
-    }
-
-// a funcao nova
-    fun isNewUser(user: User) {
-        auth.createUserWithEmailAndPassword(user.email, user.password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {} else {
-                    try {
-                        throw task.exception!!
-                    } catch (e: FirebaseAuthUserCollisionException) {
-                        // O e-mail já está registrado
-                        Log.d("Auth", "O e-mail já está em uso por outro usuário.")
-                        Toast.makeText(
-                            this, "Já existe uma conta com o seu e-mail",
-                            Toast.LENGTH_LONG
-                        ).show()
-                        Handler(Looper.getMainLooper()).postDelayed({
-                            // Redirecionar para a tela de Login
-                            val iLogin = Intent(this@RegisterActivity, LoginActivity::class.java)
-                            startActivity(iLogin)
-                        }, 3000L)
-                    }
-                }
-            }
-    }*/
 }

@@ -36,10 +36,10 @@
             android:exported="true"
             android:theme="@style/Theme.Travely" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".MainScreenActivity"
             android:exported="true" />
         <activity
-            android:name=".MainScreenActivity"
+            android:name=".LoginActivity"
             android:exported="true"
             android:theme="@style/Theme.Travely">
             <intent-filter>
