@@ -1,4 +1,4 @@
-package com.isabellatressino.travely
+package com.isabellatressino.travely.models
 
 import android.content.ContentValues
 import android.content.Intent
@@ -12,7 +12,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.firestore.FirebaseFirestore
 import com.isabellatressino.travely.databinding.ActivityProfileBinding
-import com.isabellatressino.travely.models.User
 import java.lang.Exception
 
 class ProfileActivity : AppCompatActivity() {

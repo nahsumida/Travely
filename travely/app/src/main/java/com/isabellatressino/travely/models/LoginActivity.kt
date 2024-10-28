@@ -1,4 +1,4 @@
-package com.isabellatressino.travely
+package com.isabellatressino.travely.models
 
 import android.content.ContentValues
 import android.content.Intent
@@ -16,6 +16,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.isabellatressino.travely.R
 import com.isabellatressino.travely.databinding.ActivityLoginBinding
 
 // Classe de Login

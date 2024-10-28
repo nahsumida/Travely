@@ -1,4 +1,4 @@
-package com.isabellatressino.travely
+package com.isabellatressino.travely.activities
 
 import android.content.Context
 import android.view.View
