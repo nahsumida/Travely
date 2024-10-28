@@ -152,7 +152,7 @@ class MainScreenActivity : AppCompatActivity() {
 
                         )
                         // Limitar quantidade de locais sugeridos ao usuário
-                        for (i in 0..6) {
+                        if (places.size < 6 ){
                             places.add(place)
                         }
                     }
