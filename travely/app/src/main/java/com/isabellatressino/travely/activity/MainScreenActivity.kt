@@ -3,6 +3,7 @@ package com.isabellatressino.travely.activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -11,7 +12,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
-import com.isabellatressino.travely.MainProfileActivity
+import com.isabellatressino.travely.R
 import com.isabellatressino.travely.adapters.SuggestionsAdapter
 import com.isabellatressino.travely.databinding.ActivityMainScreenBinding
 import com.isabellatressino.travely.models.Place
@@ -55,9 +56,7 @@ class MainScreenActivity : AppCompatActivity() {
         }
 
         binding.imgCalendar.setOnClickListener {
-            startActivity(Intent(this, MainProfileActivity::class.java))
         }
-
     }
 
     /**

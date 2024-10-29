@@ -32,7 +32,7 @@
             android:exported="true"
             android:theme="@style/Theme.Travely" />
         <activity
-            android:name=".MainProfileActivity"
+            android:name=".activity.MainProfileActivity"
             android:exported="false" />
         <activity
             android:name=".activity.RegisterActivity"
