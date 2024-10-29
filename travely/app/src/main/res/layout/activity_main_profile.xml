@@ -70,13 +70,14 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:background="@color/white"
-                    android:layout_height="wrap_content">
+                    android:layout_height="match_parent">
 
                     <TextView
                         android:id="@+id/tv_nome"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginTop="20dp"
+                        android:textColor="@color/black"
                         android:textSize="20dp"
                         android:textAlignment="center"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -101,13 +102,14 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:background="@color/white"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_margin="20dp">
 
                     <TextView
                         android:id="@+id/tv_nome_completo"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:textColor="@color/black"
                         android:textSize="20dp"
                         android:layout_marginTop="30dp"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -119,6 +121,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="30dp"
+                        android:textColor="@color/black"
                         android:textSize="20dp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -128,6 +131,7 @@
                         android:id="@+id/tv_tipo_perfil"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:textColor="@color/black"
                         android:layout_marginTop="30dp"
                         android:textSize="20dp"
                         app:layout_constraintEnd_toEndOf="parent"
