@@ -3,6 +3,7 @@ package com.isabellatressino.travely.activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -29,6 +30,8 @@ class MainScreenActivity : AppCompatActivity() {
     private lateinit var firestore: FirebaseFirestore
     private lateinit var storage: FirebaseStorage
     private lateinit var auth: FirebaseAuth;
+
+    private var tasksPending = 2
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,6 +65,8 @@ class MainScreenActivity : AppCompatActivity() {
         binding.imgUser.setOnClickListener {
             startActivity(Intent(this, MainProfileActivity::class.java))
         }
+
+        showLoading(true)
     }
 
     /**
@@ -96,6 +101,7 @@ class MainScreenActivity : AppCompatActivity() {
                     Log.w("getUserInfo", "Usuário não encontrado")
                     callback("")
                 }
+                markTaskComplete()
             } .addOnFailureListener {
                 Log.e("getUserInfo", "Falha ao fazer requisição")
                 Toast.makeText(
@@ -103,6 +109,7 @@ class MainScreenActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
                 callback("")
+                markTaskComplete()
             }
     }
     private fun loadPlacesFromFirestore(userProfile: String) {
@@ -165,6 +172,7 @@ class MainScreenActivity : AppCompatActivity() {
                     }
                 }
                 adapter.notifyDataSetChanged()
+                markTaskComplete()
             }
             .addOnFailureListener {
                 Toast.makeText(
@@ -172,6 +180,7 @@ class MainScreenActivity : AppCompatActivity() {
                     "Não foi possível obter as informações do banco.",
                     Toast.LENGTH_SHORT
                 ).show()
+                markTaskComplete()
             }
     }
 
@@ -190,6 +199,16 @@ class MainScreenActivity : AppCompatActivity() {
         val formattedName = listOfNotNull(firstName, lastName).joinToString(" ")
         return formattedName
     }
+
+    private fun markTaskComplete() {
+        tasksPending -= 1
+        if (tasksPending == 0) showLoading(false) // Oculta a ProgressBar quando todas as tarefas completarem
+    }
+
+    private fun showLoading(isLoading: Boolean) {
+        binding.layoutProgressbar.visibility = if (isLoading) View.VISIBLE else View.GONE
+    }
+
 }
 
 /**
