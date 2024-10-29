@@ -9,6 +9,7 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.location.Geocoder
 import android.net.Uri
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
@@ -32,6 +33,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import com.isabellatressino.travely.databinding.ActivityMapBinding
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
 import com.isabellatressino.travely.BitmapHelper
 import com.isabellatressino.travely.R
 import com.isabellatressino.travely.models.Place
@@ -48,6 +50,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var locationCallback: LocationCallback
     private var userMarker: Marker? = null
     private var isInitialLocationSet = false
+    private lateinit var auth: FirebaseAuth;
 
     private val binding by lazy { ActivityMapBinding.inflate(layoutInflater) }
 
@@ -60,6 +63,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(binding.root)
 
         firestore = FirebaseFirestore.getInstance()
+        auth = FirebaseAuth.getInstance()
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         // Configuração do mapa
@@ -219,6 +224,36 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     /**
+     * Função que recupera os dados do usuário e os atribui ao layout
+     */
+    private fun getUserInfo(callback: (String) -> Unit) {
+        val firebaseUser = auth.currentUser
+        val uid = firebaseUser?.uid
+
+        firestore.collection("users").whereEqualTo("authID",uid).get()
+            .addOnSuccessListener { documents ->
+                val user = documents.firstOrNull()
+                if (user != null) {
+                    val profile = user.getString("profile") ?: ""
+
+                    if (profile.isNotEmpty()) {
+                        callback(profile)
+                    }
+                } else {
+                    Log.w("getUserInfo", "Usuário não encontrado")
+                    callback("")
+                }
+            } .addOnFailureListener {
+                Log.e("getUserInfo", "Falha ao fazer requisição")
+                Toast.makeText(
+                    this, "Falha ao buscar usuário",
+                    Toast.LENGTH_SHORT
+                ).show()
+                callback("")
+            }
+    }
+
+    /**
      * Carrega os documentos da coleção "places" do Firestore
      */
     private fun loadPlacesFromFirestore() {
@@ -282,7 +317,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                         places.add(place)
                     }
                 }
-                addMarkers(places)
+                getUserInfo { profile ->
+                    addMarkers(places, profile)
+                }
             }
             .addOnFailureListener {
                 Toast.makeText(
@@ -298,11 +335,22 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
      *
      * @param places The list of places to display.
      */
-    private fun addMarkers(places: List<Place>) {
+    private fun addMarkers(places: List<Place>, userProfile: String) {
         places.forEach { place ->
             val marker = place.geopoint.let { geoPoint ->
                 val iconResource = if (place.profiles.isNotEmpty()) {
-                    when (place.profiles[0]) {
+                    for (profile in place.profiles) {
+                        if(profile == userProfile)
+                            when (profile)  {
+                                "compras" -> R.drawable.pin_buy
+                                "gastronomico" -> R.drawable.pin_food
+                                "cultura" -> R.drawable.pin_culture
+                                "aventureiro" -> R.drawable.pin_adventure
+                                "negocios" -> R.drawable.pin_business
+                                else -> R.drawable.location_pin
+                            }
+                    }
+                    when (place.profiles[0])  {
                         "compras" -> R.drawable.pin_buy
                         "gastronomico" -> R.drawable.pin_food
                         "cultura" -> R.drawable.pin_culture
