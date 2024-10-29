@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.util.Patterns
 import android.view.LayoutInflater
+import android.view.View
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.TextView
@@ -88,10 +89,13 @@ class LoginActivity : AppCompatActivity() {
             return
         }
 
+        showLoading(true)
+
         auth.signInWithEmailAndPassword(email, password)
             .addOnSuccessListener { authResult ->
                 if (authResult.user?.isEmailVerified == false) {
                     auth.signOut()
+                    showLoading(false)
 //                    Toast.makeText(
 //                        this,
 //                        "Por favor, ative a conta através do link enviado no email e tente novamente!",
@@ -122,6 +126,7 @@ class LoginActivity : AppCompatActivity() {
                                     Toast.LENGTH_LONG
                                 ).show()
                                 binding.buttonContinue.isEnabled = true
+                                showLoading(false)
                             }
                         }
                         .addOnFailureListener { exception ->
@@ -132,6 +137,7 @@ class LoginActivity : AppCompatActivity() {
                                 Toast.LENGTH_LONG
                             ).show()
                             binding.buttonContinue.isEnabled = true
+                            showLoading(false)
                         }
                 }
 
@@ -141,6 +147,7 @@ class LoginActivity : AppCompatActivity() {
                 } else {
                     showAlertMessage("Erro","Usuário e/ou senha inválidos")
                 }
+                showLoading(false)
             }
     }
 
@@ -172,6 +179,10 @@ class LoginActivity : AppCompatActivity() {
             (resources.displayMetrics.widthPixels * 0.85).toInt(),
             WindowManager.LayoutParams.WRAP_CONTENT
         )
+    }
+
+    private fun showLoading(isLoading: Boolean) {
+        binding.layoutProgressbar.visibility = if (isLoading) View.VISIBLE else View.GONE
     }
 
 }
