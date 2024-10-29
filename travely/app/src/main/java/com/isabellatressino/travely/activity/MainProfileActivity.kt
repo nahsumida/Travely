@@ -35,6 +35,7 @@ class MainProfileActivity : AppCompatActivity() {
         val btnHome = findViewById<ImageButton>(R.id.btn_home)
         val btnLocal = findViewById<ImageButton>(R.id.btn_local)
         val btnPerfil = findViewById<ImageButton>(R.id.btn_profile)
+        val btnReservas = findViewById<Button>(R.id.btn_reservas)
 
         getUserInfo { user ->
             carregarDadosUsuario(tvNome, tvNomeCompleto, tvEmail, tvTipoPerfil, user!!)
@@ -48,6 +49,11 @@ class MainProfileActivity : AppCompatActivity() {
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
             finish()
+        }
+
+        //reservas
+        btnReservas.setOnClickListener{
+            startActivity(Intent(this,ScheduleActivity::class.java))
         }
 
         //nav
