@@ -56,6 +56,11 @@ class MainScreenActivity : AppCompatActivity() {
         }
 
         binding.imgCalendar.setOnClickListener {
+            startActivity(Intent(this, ScheduleActivity::class.java))
+        }
+
+        binding.imgUser.setOnClickListener {
+            startActivity(Intent(this, MainProfileActivity::class.java))
         }
     }
 
