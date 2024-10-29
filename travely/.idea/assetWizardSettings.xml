@@ -33,8 +33,9 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="outputName" value="icon_back" />
-                            <entry key="sourceFile" value="C:\Users\55199\Downloads\Star.svg" />
+                            <entry key="assetSourceType" value="FILE" />
+                            <entry key="outputName" value="pin_food_star" />
+                            <entry key="sourceFile" value="C:\Users\jessi\Downloads\pin_food_star.svg" />
                           </map>
                         </option>
                       </PersistentState>

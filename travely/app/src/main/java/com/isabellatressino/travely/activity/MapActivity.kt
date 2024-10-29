@@ -339,9 +339,20 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         places.forEach { place ->
             val marker = place.geopoint.let { geoPoint ->
                 val iconResource = if (place.profiles.isNotEmpty()) {
+                    var resource = R.drawable.location_pin
                     for (profile in place.profiles) {
-                        if(profile == userProfile)
-                            when (profile)  {
+                        resource = if (profile != userProfile) {
+
+                            when (profile) {
+                                "compras" -> R.drawable.pin_buy_star
+                                "gastronomico" -> R.drawable.pin_food_star
+                                "cultura" -> R.drawable.pin_culture_star
+                                "aventureiro" -> R.drawable.pin_adventure_star
+                                "negocios" -> R.drawable.pin_business_star
+                                else -> R.drawable.location_pin
+                            }
+                        } else {
+                            when (profile) {
                                 "compras" -> R.drawable.pin_buy
                                 "gastronomico" -> R.drawable.pin_food
                                 "cultura" -> R.drawable.pin_culture
@@ -349,15 +360,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                                 "negocios" -> R.drawable.pin_business
                                 else -> R.drawable.location_pin
                             }
+                        }
                     }
-                    when (place.profiles[0])  {
-                        "compras" -> R.drawable.pin_buy
-                        "gastronomico" -> R.drawable.pin_food
-                        "cultura" -> R.drawable.pin_culture
-                        "aventureiro" -> R.drawable.pin_adventure
-                        "negocios" -> R.drawable.pin_business
-                        else -> R.drawable.location_pin
-                    }
+                    resource
                 } else {
                     R.drawable.location_pin
                 }
