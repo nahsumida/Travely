@@ -127,9 +127,10 @@ class PlaceInfoActivity : AppCompatActivity() {
             when (place.profiles[0]) {
                 "compras" -> R.drawable.profileshopp
                 "gastronomico" -> R.drawable.profilefood
-                "cultura" -> R.drawable.profileculture
+                "cultural" -> R.drawable.profileculture
                 "aventureiro" -> R.drawable.profileadventure
                 "negocios" -> R.drawable.profilebusiness
+                "descanso" -> R.drawable.profilerelax
                 else -> R.drawable.profile_unavailable
             }
         } else {

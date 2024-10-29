@@ -343,7 +343,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                             when (userProfile) {
                                 "compras" -> R.drawable.pin_buy_star
                                 "gastronomico" -> R.drawable.pin_food_star
-                                "cultura" -> R.drawable.pin_culture_star
+                                "cultural" -> R.drawable.pin_culture_star
                                 "aventureiro" -> R.drawable.pin_adventure_star
                                 "negocios" -> R.drawable.pin_business_star
                                 else -> 0
@@ -352,7 +352,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                             when (place.profiles[0]) {
                                 "compras" -> R.drawable.pin_buy
                                 "gastronomico" -> R.drawable.pin_food
-                                "cultura" -> R.drawable.pin_culture
+                                "cultural" -> R.drawable.pin_culture
                                 "aventureiro" -> R.drawable.pin_adventure
                                 "negocios" -> R.drawable.pin_business
                                 else -> 0
