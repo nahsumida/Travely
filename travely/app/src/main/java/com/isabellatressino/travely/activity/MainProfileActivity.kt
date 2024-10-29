@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -31,11 +32,15 @@ class MainProfileActivity : AppCompatActivity() {
         val tvEmail = findViewById<TextView>(R.id.tv_email)
         val tvTipoPerfil = findViewById<TextView>(R.id.tv_tipo_perfil)
         val btnSair = findViewById<Button>(R.id.btn_logout)
+        val btnHome = findViewById<ImageButton>(R.id.btn_home)
+        val btnLocal = findViewById<ImageButton>(R.id.btn_local)
+        val btnPerfil = findViewById<ImageButton>(R.id.btn_profile)
 
         getUserInfo { user ->
             carregarDadosUsuario(tvNome, tvNomeCompleto, tvEmail, tvTipoPerfil, user!!)
         }
 
+        //logout
         btnSair.setOnClickListener{
             FirebaseAuth.getInstance().signOut()
 
@@ -43,6 +48,17 @@ class MainProfileActivity : AppCompatActivity() {
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
             finish()
+        }
+
+        //nav
+        btnHome.setOnClickListener{
+            startActivity(Intent(this,MainScreenActivity::class.java))
+        }
+        btnLocal.setOnClickListener{
+            startActivity(Intent(this,MapActivity::class.java))
+        }
+        btnPerfil.setOnClickListener{
+            startActivity(Intent(this,MainProfileActivity::class.java))
         }
     }
     /**
