@@ -1,6 +1,7 @@
-package com.isabellatressino.travely.activities
+package com.isabellatressino.travely
 
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,9 +11,7 @@ import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.firebase.storage.FirebaseStorage
-import com.isabellatressino.travely.R
 import com.isabellatressino.travely.models.Place
-import com.isabellatressino.travely.models.PlaceInfoActivity
 
 class SuggestionsAdapter(private val places: MutableList<Place>) :
     RecyclerView.Adapter<SuggestionsAdapter.CardItemViewHolder>() {

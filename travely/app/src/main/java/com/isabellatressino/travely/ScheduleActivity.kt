@@ -1,4 +1,4 @@
-package com.isabellatressino.travely.models
+package com.isabellatressino.travely
 
 import android.os.Bundle
 import android.util.Log
@@ -7,9 +7,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
 import com.isabellatressino.travely.databinding.ActivityScheduleBinding
+import com.isabellatressino.travely.models.Schedule
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
-import com.isabellatressino.travely.activities.ScheduleAdapter
 
 val TAG = "TESTE FIREBASE SCHEDULE"
 

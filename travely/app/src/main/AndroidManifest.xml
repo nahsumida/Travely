@@ -19,27 +19,27 @@
         android:theme="@style/Theme.Travely"
         tools:targetApi="31">
         <activity
-            android:name=".models.MapActivity"
+            android:name=".MapActivity"
             android:exported="false" />
         <activity
-            android:name=".models.ScheduleActivity"
+            android:name=".ScheduleActivity"
             android:exported="false" />
         <activity
-            android:name=".models.PlaceInfoActivity"
+            android:name=".PlaceInfoActivity"
             android:exported="false" />
         <activity
-            android:name=".models.ProfileActivity"
+            android:name=".ProfileActivity"
             android:exported="false"
             android:theme="@style/Theme.Travely" />
         <activity
-            android:name=".models.RegisterActivity"
+            android:name=".RegisterActivity"
             android:exported="true"
             android:theme="@style/Theme.Travely" />
         <activity
-            android:name=".models.MainScreenActivity"
+            android:name=".MainScreenActivity"
             android:exported="true" />
         <activity
-            android:name=".models.LoginActivity"
+            android:name=".LoginActivity"
             android:exported="true"
             android:theme="@style/Theme.Travely">
             <intent-filter>
