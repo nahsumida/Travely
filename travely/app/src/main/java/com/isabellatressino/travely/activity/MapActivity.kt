@@ -346,6 +346,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                                 "cultural" -> R.drawable.pin_culture_star
                                 "aventureiro" -> R.drawable.pin_adventure_star
                                 "negocios" -> R.drawable.pin_business_star
+                                "descanso" -> R.drawable.pin_relax_star
                                 else -> 0
                             }
                         } else {
@@ -355,6 +356,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                                 "cultural" -> R.drawable.pin_culture
                                 "aventureiro" -> R.drawable.pin_adventure
                                 "negocios" -> R.drawable.pin_business
+                                "descanso" -> R.drawable.pin_relax
                                 else -> 0
                             }
                         }
