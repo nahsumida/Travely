@@ -82,8 +82,14 @@ class MainScreenActivity : AppCompatActivity() {
 
                     if (name.isNotEmpty()) {
                         tvName.text = formatName(name)
-                        tvProfile.text = "Turista $profile"
-
+                        when (profile) {
+                            "compras" -> tvProfile.text = "Turista de Compras"
+                            "gastronomico" -> tvProfile.text = "Turista Gastronômico"
+                            "cultura" -> tvProfile.text = "Turista Cultural"
+                            "aventureiro" -> tvProfile.text ="Turista Aventureiro"
+                            "negocios" -> tvProfile.text ="Turista de Negócios"
+                            else ->  tvProfile.text = "Turista $profile"
+                        }
                         callback(profile)
                     }
                 } else {
