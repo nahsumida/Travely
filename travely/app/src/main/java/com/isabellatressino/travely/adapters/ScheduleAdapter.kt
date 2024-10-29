@@ -1,18 +1,16 @@
-package com.isabellatressino.travely
+package com.isabellatressino.travely.adapters
 
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
-import com.isabellatressino.travely.models.Schedule
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
-import com.google.firebase.Timestamp
+import com.isabellatressino.travely.R
+import com.isabellatressino.travely.models.Schedule
 
 class ScheduleAdapter(private val schedules: MutableList<Schedule>) :
     RecyclerView.Adapter<ScheduleAdapter.CardItemViewHolder>() {

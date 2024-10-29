@@ -1,4 +1,4 @@
-package com.isabellatressino.travely
+package com.isabellatressino.travely.activity
 
 import android.content.pm.PackageManager
 import android.location.Location
@@ -31,9 +31,11 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import com.isabellatressino.travely.databinding.ActivityMapBinding
+import com.google.firebase.Timestamp
+import com.isabellatressino.travely.BitmapHelper
+import com.isabellatressino.travely.R
 import com.isabellatressino.travely.models.Place
 import com.isabellatressino.travely.models.Schedule
-import com.google.firebase.Timestamp
 
 
 class MapActivity : AppCompatActivity(), OnMapReadyCallback {

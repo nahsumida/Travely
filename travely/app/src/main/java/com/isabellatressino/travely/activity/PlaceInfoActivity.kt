@@ -1,4 +1,4 @@
-package com.isabellatressino.travely
+package com.isabellatressino.travely.activity
 
 import android.graphics.Color
 import android.os.Bundle
@@ -11,9 +11,10 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.isabellatressino.travely.databinding.ActivityPlaceInfoBinding
-import com.isabellatressino.travely.models.Place
 import com.bumptech.glide.Glide
 import com.google.firebase.Timestamp
+import com.isabellatressino.travely.R
+import com.isabellatressino.travely.models.Place
 import com.isabellatressino.travely.models.Schedule
 
 

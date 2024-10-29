@@ -1,28 +1,20 @@
-package com.isabellatressino.travely
+package com.isabellatressino.travely.activity
 
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
-import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.libraries.places.api.Places
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import com.isabellatressino.travely.adapters.SuggestionsAdapter
 import com.isabellatressino.travely.databinding.ActivityMainScreenBinding
 import com.isabellatressino.travely.models.Place
 import com.isabellatressino.travely.models.Schedule
-import com.isabellatressino.travely.models.User
 import java.util.Locale
 
 class MainScreenActivity : AppCompatActivity() {

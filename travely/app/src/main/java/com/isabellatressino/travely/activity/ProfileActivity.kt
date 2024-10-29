@@ -1,4 +1,4 @@
-package com.isabellatressino.travely
+package com.isabellatressino.travely.activity
 
 import android.content.ContentValues
 import android.content.Intent
