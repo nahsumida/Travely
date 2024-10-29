@@ -9,7 +9,7 @@
     android:background="#FFFFFF"
     android:gravity="center"
     android:paddingHorizontal="10dp"
-    tools:context=".RegisterActivity">
+    tools:context=".activity.RegisterActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

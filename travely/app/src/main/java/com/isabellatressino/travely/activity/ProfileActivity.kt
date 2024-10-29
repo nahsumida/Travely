@@ -1,4 +1,4 @@
-package com.isabellatressino.travely
+package com.isabellatressino.travely.activity
 
 import android.content.ContentValues
 import android.content.Intent
@@ -98,12 +98,11 @@ class ProfileActivity : AppCompatActivity() {
         // Adicionando  usuário no firestore
         firebase.collection("users").add(userDoc)
             .addOnSuccessListener { documentReference ->
-
                 createAuthUser(user, documentReference.id)
             }
             .addOnFailureListener { e ->
                 Toast.makeText(
-                    this, "Falha ao cadastrar User",
+                    this, "Falha ao cadastrar usuário",
                     Toast.LENGTH_SHORT
                 ).show()
                 Log.w("Erro", "Erro ao adicionar user no Firestore", e)

@@ -65,6 +65,7 @@
         android:inputType="textEmailAddress"
         android:singleLine="true"
         android:padding="10dp"
+        android:textColor="#000000"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text_user" />
@@ -96,6 +97,7 @@
         android:inputType="textPassword"
         android:padding="10dp"
         android:singleLine="true"
+        android:textColor="#000000"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text_password" />

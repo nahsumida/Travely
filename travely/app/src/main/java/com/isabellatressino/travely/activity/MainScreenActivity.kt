@@ -1,27 +1,22 @@
-package com.isabellatressino.travely
+package com.isabellatressino.travely.activity
 
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.widget.Button
-import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.libraries.places.api.Places
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import com.isabellatressino.travely.MainProfileActivity
+import com.isabellatressino.travely.adapters.SuggestionsAdapter
 import com.isabellatressino.travely.databinding.ActivityMainScreenBinding
 import com.isabellatressino.travely.models.Place
 import com.isabellatressino.travely.models.Schedule
+import java.util.Locale
 
 class MainScreenActivity : AppCompatActivity() {
 
@@ -32,6 +27,7 @@ class MainScreenActivity : AppCompatActivity() {
     private lateinit var adapter: SuggestionsAdapter
     private lateinit var firestore: FirebaseFirestore
     private lateinit var storage: FirebaseStorage
+    private lateinit var auth: FirebaseAuth;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +35,7 @@ class MainScreenActivity : AppCompatActivity() {
 
         firestore = FirebaseFirestore.getInstance()
         storage = FirebaseStorage.getInstance()
+        auth = FirebaseAuth.getInstance()
 
         recyclerView = binding.recyclerViewSuggestions
         recyclerView.layoutManager =
@@ -49,20 +46,59 @@ class MainScreenActivity : AppCompatActivity() {
 
         recyclerView.adapter = adapter
 
-        loadPlacesFromFirestore()
+        getUserInfo { profile ->
+            loadPlacesFromFirestore(profile)
+        }
 
         binding.cardViewMap.setOnClickListener {
             startActivity(Intent(this, MapActivity::class.java))
         }
 
+        binding.imgCalendar.setOnClickListener {
+            startActivity(Intent(this, MainProfileActivity::class.java))
+        }
+
     }
 
-    private fun loadPlacesFromFirestore() {
-        val placesCollection = firestore.collection("places")
+    /**
+     * Função que recupera os dados do usuário e os atribui ao layout
+     */
+    private fun getUserInfo(callback: (String) -> Unit) {
+        val firebaseUser = auth.currentUser
+        val uid = firebaseUser?.uid
+        val tvName = binding.tvName
+        val tvProfile = binding.tvProfile
 
-        placesCollection.get()
+        firestore.collection("users").whereEqualTo("authID",uid).get()
             .addOnSuccessListener { documents ->
+                val user = documents.firstOrNull()
+                if (user != null) {
+                    val name = user.getString("name") ?: ""
+                    val profile = user.getString("profile") ?: ""
 
+                    if (name.isNotEmpty()) {
+                        tvName.text = formatName(name)
+                        tvProfile.text = "Turista $profile"
+
+                        callback(profile)
+                    }
+                } else {
+                    Log.w("getUserInfo", "Usuário não encontrado")
+                    callback("")
+                }
+            } .addOnFailureListener {
+                Log.e("getUserInfo", "Falha ao fazer requisição")
+                Toast.makeText(
+                    this, "Falha ao buscar usuário",
+                    Toast.LENGTH_SHORT
+                ).show()
+                callback("")
+            }
+    }
+    private fun loadPlacesFromFirestore(userProfile: String) {
+        val placesCollection = firestore.collection("places")
+        placesCollection.whereArrayContains("profiles", userProfile).get()
+            .addOnSuccessListener { documents ->
                 for (document in documents) {
                     val id = document.getString("id") ?: ""
                     val name = document.getString("name") ?: ""
@@ -112,7 +148,10 @@ class MainScreenActivity : AppCompatActivity() {
                             schedule ?: Schedule(Timestamp.now(), "", "", 0.0f)
 
                         )
-                        places.add(place)
+                        // Limitar quantidade de locais sugeridos ao usuário
+                        if (places.size < 6 ){
+                            places.add(place)
+                        }
                     }
                 }
                 adapter.notifyDataSetChanged()
@@ -124,6 +163,22 @@ class MainScreenActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             }
+    }
+
+    private fun formatName(name: String): String {
+        val nameParts = name.split(" ")
+        val firstName = nameParts.firstOrNull()?.replaceFirstChar {
+            if (it.isLowerCase()) it.titlecase(Locale.getDefault())
+            else it.toString()
+        }
+        val lastName = nameParts.lastOrNull()?.replaceFirstChar {
+            if (it.isLowerCase()) it.titlecase(Locale.getDefault())
+            else it.toString()
+        }
+
+        // Concatena o primeiro e o último nome
+        val formattedName = listOfNotNull(firstName, lastName).joinToString(" ")
+        return formattedName
     }
 }
 
