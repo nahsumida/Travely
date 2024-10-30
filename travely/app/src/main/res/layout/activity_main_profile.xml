@@ -103,7 +103,7 @@
                     android:layout_width="match_parent"
                     android:background="@color/white"
                     android:layout_height="wrap_content"
-                    android:layout_margin="10dp">
+                    android:padding="35dp">
 
                     <TextView
                         android:id="@+id/tv_nome_completo"
@@ -150,6 +150,8 @@
                 android:layout_height="60dp"
                 android:layout_marginHorizontal="30dp"
                 android:shadowRadius="20"
+                android:textColor="@color/white"
+                android:layout_marginBottom="30dp"
                 android:layout_marginTop="60dp"
                 android:text="Minhas Reservas"
                 app:layout_constraintEnd_toEndOf="parent"

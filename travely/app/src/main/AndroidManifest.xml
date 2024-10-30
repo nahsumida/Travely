@@ -29,22 +29,19 @@
             android:exported="false" />
         <activity
             android:name=".activity.ProfileActivity"
-            android:exported="true"
-            android:theme="@style/Theme.Travely" />
+            android:exported="true"/>
         <activity
             android:name=".activity.MainProfileActivity"
             android:exported="false" />
         <activity
             android:name=".activity.RegisterActivity"
-            android:exported="true"
-            android:theme="@style/Theme.Travely" />
+            android:exported="true"/>
         <activity
             android:name=".activity.MainScreenActivity"
             android:exported="true" />
         <activity
             android:name=".activity.LoginActivity"
-            android:exported="true"
-            android:theme="@style/Theme.Travely">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
