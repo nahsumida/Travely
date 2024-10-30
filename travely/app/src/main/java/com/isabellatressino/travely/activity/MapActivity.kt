@@ -12,6 +12,7 @@ import android.net.Uri
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -64,6 +65,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         firestore = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
+        val btnHome = findViewById<ImageButton>(R.id.btn_home)
+        val btnLocal = findViewById<ImageButton>(R.id.btn_local)
+        val btnPerfil = findViewById<ImageButton>(R.id.btn_profile)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
@@ -92,6 +96,17 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
             }
             btnUserLocation.setOnClickListener { centerMapOnUserLocation() }
+        }
+
+        //nav
+        btnHome.setOnClickListener{
+            startActivity(Intent(this,MainScreenActivity::class.java))
+        }
+        btnLocal.setOnClickListener{
+            startActivity(Intent(this,MapActivity::class.java))
+        }
+        btnPerfil.setOnClickListener{
+            startActivity(Intent(this,MainProfileActivity::class.java))
         }
     }
 

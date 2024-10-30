@@ -41,6 +41,10 @@ class MainScreenActivity : AppCompatActivity() {
         storage = FirebaseStorage.getInstance()
         auth = FirebaseAuth.getInstance()
 
+        val btnHome = findViewById<ImageButton>(R.id.btn_home)
+        val btnLocal = findViewById<ImageButton>(R.id.btn_local)
+        val btnPerfil = findViewById<ImageButton>(R.id.btn_profile)
+
         recyclerView = binding.recyclerViewSuggestions
         recyclerView.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
@@ -67,6 +71,17 @@ class MainScreenActivity : AppCompatActivity() {
         }
 
         showLoading(true)
+
+        //nav
+        btnHome.setOnClickListener{
+            startActivity(Intent(this,MainScreenActivity::class.java))
+        }
+        btnLocal.setOnClickListener{
+            startActivity(Intent(this,MapActivity::class.java))
+        }
+        btnPerfil.setOnClickListener{
+            startActivity(Intent(this,MainProfileActivity::class.java))
+        }
     }
 
     /**
