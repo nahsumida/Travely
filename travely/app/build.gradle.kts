@@ -69,5 +69,8 @@ dependencies {
     implementation("com.github.bumptech.glide:compiler:4.12.0")
 
 
+    // https://github.com/santalu/maskara - biblioteca mascaras
+    implementation("com.github.santalu:maskara:1.0.0")
+
 
 }
