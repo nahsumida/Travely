@@ -45,6 +45,7 @@ class PlaceInfoActivity : AppCompatActivity() {
     private lateinit var timeList: MutableList<String>
     private lateinit var spinnerItems: MutableList<String>
 
+    private lateinit var place: Place
 
     private var selectedMonth: Int = 0
     private var selectedYear: Int = 0
@@ -80,35 +81,57 @@ class PlaceInfoActivity : AppCompatActivity() {
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         daysList = mutableListOf()
         adapterDays = DaysAdapter(daysList)
+
+        adapterDays.onDaySelected = { selectedDayOfWeek ->
+            // Chama setupRecyclerViewTime para atualizar os horários com o dia selecionado
+            setupRecyclerViewTime(selectedDayOfWeek.replace(".", ""))
+            //Log.d(TAG2,"${selectedDayOfWeek.replace(".", "")}")
+        }
+
+
         recyclerViewDays.adapter = adapterDays
     }
 
-    private fun setupRecyclerViewTime(place: Place) {
+
+    private fun setupRecyclerViewTime(selectedDayOfWeek: String) {
         recyclerViewTime = binding.recyclerviewTime
         recyclerViewTime.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
-        val currentDayOfWeek = SimpleDateFormat("EEE", Locale("en", "US")).format(Calendar.getInstance().time)
-        val businessHours = place.businessHours[currentDayOfWeek]
+        Log.d(TAG2, "dia selecionado $selectedDayOfWeek")
 
-        Log.d(TAG2,"setuprecyclerviewtime - $currentDayOfWeek")
-        Log.d(TAG2,"setuprecyclerviewtime - $businessHours")
+        val selectedDayOfWeekFormated = when (selectedDayOfWeek) {
+            "seg" -> "Mon"
+            "ter" -> "Tue"
+            "qua" -> "Wed"
+            "qui" -> "Thu"
+            "sex" -> "Fri"
+            "sáb" -> "Sat"
+            "dom" -> "Sun"
+            else -> ""
+        }
+
+        Log.d(TAG2, "dia formatado $selectedDayOfWeekFormated")
+
+        val businessHours = place.businessHours[selectedDayOfWeekFormated]
 
         val timeList = if (businessHours != null && businessHours.size >= 2) {
             val openingTime = businessHours[0]
             val closingTime = businessHours[1]
             generateTimeSlots(openingTime, closingTime)
         } else {
-            mutableListOf()
+            mutableListOf("fechado")
         }
 
-        adapterTime = TimeAdapter(timeList.toMutableList())
-        recyclerViewTime.adapter = adapterTime
-
-       // Log.d(TAG2,"setuprecyclerviewtime - $timeList")
-
+        if (::adapterTime.isInitialized) {
+            // Atualiza a lista de horários no adaptador existente
+            adapterTime.updateTimeList(timeList)
+        } else {
+            // Inicializa o adaptador se ele ainda não foi criado
+            adapterTime = TimeAdapter(timeList.toMutableList())
+            recyclerViewTime.adapter = adapterTime
+        }
     }
-
 
     private fun setupSpinner() {
         spinnerItems = getNextSixMonths()
@@ -197,7 +220,9 @@ class PlaceInfoActivity : AppCompatActivity() {
         return months
     }
 
-    private fun generateTimeSlots(openingTime: String, closingTime: String): List<String> {
+    private fun generateTimeSlots(openingTime: String?, closingTime: String?): List<String> {
+        if (openingTime == null || closingTime == null) return emptyList() // Retorna uma lista vazia se algum for nulo
+
         val timeSlots = mutableListOf<String>()
         val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
 
@@ -221,10 +246,19 @@ class PlaceInfoActivity : AppCompatActivity() {
         firestore.collection("places").document(idPlace).get()
             .addOnSuccessListener { document ->
                 if (document.exists()) {
-                    val place = extractPlaceData(document)
-                    if (place != null) {
+                    val loadedPlace = extractPlaceData(document)
+                    if (loadedPlace != null) {
+                        // Armazena o place carregado na variável de instância
+                        place = loadedPlace
                         showPlaceInfos(place)
-                        setupRecyclerViewTime(place)
+
+                        val calendar = Calendar.getInstance()
+                        val dayOfWeekFormat = SimpleDateFormat("EEE", Locale("pt", "BR"))
+                        val todayDayOfWeek = dayOfWeekFormat.format(calendar.time)
+
+                        Log.d(TAG2, "Hoje é: $todayDayOfWeek")
+
+                        setupRecyclerViewTime(todayDayOfWeek.replace(".", ""))
                     }
                 } else {
                     showError("Documento não encontrado")
@@ -234,6 +268,7 @@ class PlaceInfoActivity : AppCompatActivity() {
                 showError("Erro ao carregar documento: ${exception.message}")
             }
     }
+
 
     private fun extractPlaceData(document: DocumentSnapshot): Place? {
         val id = document.getString("id") ?: ""

@@ -30,9 +30,9 @@ class TimeAdapter(private var times: MutableList<String>) :
         holder.textView.text = times[position]
     }
 
-    fun updateTimeSlots(newTimeSlots: List<String>) {
-        times.clear()  // Corrigido para usar 'times'
-        times.addAll(newTimeSlots)
+    fun updateTimeList(newTimeList: List<String>) {
+        times.clear()
+        times.addAll(newTimeList)
         notifyDataSetChanged()
     }
 }

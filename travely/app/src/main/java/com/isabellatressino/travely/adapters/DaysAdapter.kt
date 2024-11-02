@@ -18,6 +18,7 @@ class DaysAdapter(
 ) : RecyclerView.Adapter<DaysAdapter.DaysItemViewHolder>() {
 
     private var selectedPosition = -1
+    var onDaySelected: ((String) -> Unit)? = null
 
     inner class DaysItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val dayTextView: TextView = itemView.findViewById(R.id.tv_day)
@@ -99,7 +100,12 @@ class DaysAdapter(
             // Notifica apenas os itens afetados
             notifyItemChanged(previousPosition)
             notifyItemChanged(selectedPosition)
+
+            // Chama o callback onDaySelected para enviar o dia da semana selecionado
+            onDaySelected?.invoke(weekDay)
+           // Log.d("ADAPTER TIME"," $weekDay")
         }
+
     }
 
     override fun getItemCount(): Int = days.size
