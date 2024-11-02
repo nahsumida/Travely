@@ -10,7 +10,6 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentSnapshot
@@ -32,11 +31,15 @@ class PlaceInfoActivity : AppCompatActivity() {
 
     private val binding by lazy { ActivityPlaceInfoBinding.inflate(layoutInflater) }
     private val firestore by lazy { FirebaseFirestore.getInstance() }
+    private val calendar by lazy { Calendar.getInstance() }
 
     private lateinit var adapterDays: DaysAdapter
     private lateinit var adapterTime: TimeAdapter
-
     private lateinit var place: Place
+    private lateinit var placeType: String
+
+    private var scheduleDate: String? = null
+    private var scheduleTime: String? = null
 
     private var selectedMonth: Int = 0
     private var selectedYear: Int = 0
@@ -58,12 +61,41 @@ class PlaceInfoActivity : AppCompatActivity() {
             finish()
         }
 
+        binding.btnSchedule.setOnClickListener {
+            addSchedule()
+        }
+
+        binding.btnSchedule.isEnabled = false
+    }
+
+    private fun addSchedule() {
+        Toast.makeText(this, "confirmado, prox activity", Toast.LENGTH_SHORT).show()
+    }
+
+
+    private fun updateDateSchedule(day: String, month: String, year: String) {
+        scheduleDate = "$year-$month-$day"
+        updateButtonState()
+    }
+
+    private fun updateTimeSchedule(time: String){
+        scheduleTime = time
+        updateButtonState()
+    }
+
+    private fun updateButtonState(){
+        if (!scheduleDate.isNullOrEmpty() && !scheduleTime.isNullOrEmpty()) binding.btnSchedule.isEnabled = true
     }
 
     private fun setupRecyclerViewDays() {
         adapterDays = DaysAdapter(mutableListOf()).apply {
-            onDaySelected = { setupRecyclerViewTime(it.replace(".", "")) }
+            onDaySelected = { data ->
+                val (day, weekDay, month, year) = data.split("-")
+                updateDateSchedule(day,month,year)
+                setupRecyclerViewTime(weekDay.replace(".", ""))
+            }
         }
+
         binding.recyclerviewDays.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         binding.recyclerviewDays.adapter = adapterDays
@@ -81,9 +113,6 @@ class PlaceInfoActivity : AppCompatActivity() {
         val formattedDay = dayOfWeekMap[selectedDayOfWeek] ?: ""
         val businessHours = place.businessHours[formattedDay]
 
-        val calendar = Calendar.getInstance()
-        val currentTime = SimpleDateFormat("HH:mm").format(calendar.time)
-
         val timeList = businessHours?.takeIf { it.size >= 2 }?.let {
             generateTimeSlots(it[0], it[1])
         } ?: listOf("Fechado")
@@ -93,6 +122,10 @@ class PlaceInfoActivity : AppCompatActivity() {
         } else {
             adapterTime = TimeAdapter(timeList.toMutableList())
             binding.recyclerviewTime.adapter = adapterTime
+        }
+
+        adapterTime.onTimeSelect = { time ->
+            updateTimeSchedule(time)
         }
     }
 
@@ -134,7 +167,6 @@ class PlaceInfoActivity : AppCompatActivity() {
 
     private fun getDaysOfMonth(month: Int, year: Int): List<String> {
         val days = mutableListOf<String>()
-        val calendar = Calendar.getInstance()
         calendar.set(year, month, 1)
 
         val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
@@ -149,17 +181,16 @@ class PlaceInfoActivity : AppCompatActivity() {
             if (month == currentMonth) {
                 if (day >= currentDay) {
                     // Adiciona o dia, dia da semana e o mês
-                    days.add(String.format("%02d-%s-%02d", day, dayOfWeek, month + 1))
+                    days.add(String.format("%02d-%s-%02d-%04d", day, dayOfWeek, month + 1, year))
                 }
             } else {
-                days.add(String.format("%02d-%s-%02d", day, dayOfWeek, month + 1))
+                days.add(String.format("%02d-%s-%02d-%04d", day, dayOfWeek, month + 1, year))
             }
         }
         return days
     }
 
     private fun getNextSixMonths(): List<String> {
-        val calendar = Calendar.getInstance()
         return (0..5).map {
             SimpleDateFormat("MMMM yyyy", Locale("pt", "BR")).format(calendar.time).uppercase()
                 .also {
@@ -188,14 +219,12 @@ class PlaceInfoActivity : AppCompatActivity() {
                     val loadedPlace = extractPlaceData(document)
                     if (loadedPlace != null) {
                         // Armazena o place carregado na variável de instância
+                        placeType = loadedPlace.type
                         place = loadedPlace
                         showPlaceInfos(place)
 
-                        val calendar = Calendar.getInstance()
                         val dayOfWeekFormat = SimpleDateFormat("EEE", Locale("pt", "BR"))
                         val todayDayOfWeek = dayOfWeekFormat.format(calendar.time)
-
-                        Log.d(TAG2, "Hoje é: $todayDayOfWeek")
 
                         setupRecyclerViewTime(todayDayOfWeek.replace(".", ""))
                     }

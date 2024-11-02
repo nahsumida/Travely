@@ -1,0 +1,7 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/purple_haze_pressed" android:state_pressed="true" />
+    <item android:color="@color/purple_haze_pressed" android:state_focused="true" />
+    <item android:color="@color/purple_haze_pressed" android:state_hovered="true" />
+    <item android:color="@color/purple_haze_enabled" android:state_enabled="false" /> <!-- Cor para disabled -->
+    <item android:color="@color/purple_haze" /> <!-- Cor padrão -->
+</selector>

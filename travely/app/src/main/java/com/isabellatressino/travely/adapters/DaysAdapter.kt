@@ -34,12 +34,14 @@ class DaysAdapter(
 
     override fun onBindViewHolder(holder: DaysItemViewHolder, position: Int) {
         val dayWithWeekday = days[position]
-        val (day, weekDay, month) = dayWithWeekday.split("-")
+        val (day, weekDay, month,year) = dayWithWeekday.split("-")
         val dayWithMonth = getCurrentDayAndMonth()
         val (currentDay, currentMonth) = dayWithMonth.split("-")
 
         holder.dayTextView.text = day
         holder.dayOfWeekTextView.text = weekDay.replace(".", "")
+
+        Log.d("TESTE1","$day,$weekDay,$month,$year")
 
         // Define a cor do item baseado na seleção ou se é o dia atual
         if (position == selectedPosition) {
@@ -102,8 +104,7 @@ class DaysAdapter(
             notifyItemChanged(selectedPosition)
 
             // Chama o callback onDaySelected para enviar o dia da semana selecionado
-            onDaySelected?.invoke(weekDay)
-           // Log.d("ADAPTER TIME"," $weekDay")
+            onDaySelected?.invoke("$day-$weekDay-$month-$year")
         }
 
     }
@@ -116,6 +117,7 @@ class DaysAdapter(
         days.addAll(newDays)
         Log.d("DaysUpdate", "Dias novos: $newDays")
         notifyDataSetChanged()
+        Log.d("TESTE1","$newDays")
     }
 
     // Pega o dia e o mes atual

@@ -8,4 +8,7 @@
     <color name="red">#F44336</color>
     <color name="grey">#545454</color>
     <color name="light_grey">#868686</color>
+
+    <color name="purple_haze_enabled">#869168A0</color>
+    <color name="purple_haze_pressed">#8435A1</color>
 </resources>
