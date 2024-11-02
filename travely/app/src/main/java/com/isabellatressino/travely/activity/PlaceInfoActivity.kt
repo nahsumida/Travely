@@ -85,9 +85,7 @@ class PlaceInfoActivity : AppCompatActivity() {
         adapterDays.onDaySelected = { selectedDayOfWeek ->
             // Chama setupRecyclerViewTime para atualizar os horários com o dia selecionado
             setupRecyclerViewTime(selectedDayOfWeek.replace(".", ""))
-            //Log.d(TAG2,"${selectedDayOfWeek.replace(".", "")}")
         }
-
 
         recyclerViewDays.adapter = adapterDays
     }
@@ -201,16 +199,30 @@ class PlaceInfoActivity : AppCompatActivity() {
         val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
         val dayOfWeekFormat = SimpleDateFormat("EEE", Locale("pt", "BR"))
 
+        // Obtém o dia e o mês atuais
+        val currentDay = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+        val currentMonth = Calendar.getInstance().get(Calendar.MONTH)
+
         for (day in 1..daysInMonth) {
             calendar.set(year, month, day)
             val dayOfWeek = dayOfWeekFormat.format(calendar.time)
 
-            // Adiciona o dia, dia da semana e o mês
-            days.add(String.format("%02d-%s-%02d", day, dayOfWeek, month + 1))
+            // Se o mês for o atual, filtra os dias
+            if (month == currentMonth) {
+                if (day >= currentDay) {
+                    // Adiciona o dia, dia da semana e o mês
+                    days.add(String.format("%02d-%s-%02d", day, dayOfWeek, month + 1))
+                }
+            } else {
+                // Para meses futuros, adiciona todos os dias a partir do dia 1
+                days.add(String.format("%02d-%s-%02d", day, dayOfWeek, month + 1))
+            }
         }
 
+        Log.d(TAG2, "$days")
         return days
     }
+
 
     private fun getNextSixMonths(): MutableList<String> {
         val months = mutableListOf<String>()
