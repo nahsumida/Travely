@@ -31,19 +31,10 @@ val TAG2 = "ADAPTER TIME"
 class PlaceInfoActivity : AppCompatActivity() {
 
     private val binding by lazy { ActivityPlaceInfoBinding.inflate(layoutInflater) }
-    private lateinit var firestore: FirebaseFirestore
-    private lateinit var storage: FirebaseStorage
+    private val firestore by lazy { FirebaseFirestore.getInstance() }
 
     private lateinit var adapterDays: DaysAdapter
-    private lateinit var adapterMenu: ArrayAdapter<String>
     private lateinit var adapterTime: TimeAdapter
-
-    private lateinit var recyclerViewDays: RecyclerView
-    private lateinit var recyclerViewTime: RecyclerView
-
-    private lateinit var daysList: MutableList<String>
-    private lateinit var timeList: MutableList<String>
-    private lateinit var spinnerItems: MutableList<String>
 
     private lateinit var place: Place
 
@@ -54,7 +45,6 @@ class PlaceInfoActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        initializeFirebase()
         setupRecyclerViewDays()
         setupSpinner()
 
@@ -70,77 +60,48 @@ class PlaceInfoActivity : AppCompatActivity() {
 
     }
 
-    private fun initializeFirebase() {
-        firestore = FirebaseFirestore.getInstance()
-        storage = FirebaseStorage.getInstance()
-    }
-
     private fun setupRecyclerViewDays() {
-        recyclerViewDays = binding.recyclerviewDays
-        recyclerViewDays.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        daysList = mutableListOf()
-        adapterDays = DaysAdapter(daysList)
-
-        adapterDays.onDaySelected = { selectedDayOfWeek ->
-            // Chama setupRecyclerViewTime para atualizar os horários com o dia selecionado
-            setupRecyclerViewTime(selectedDayOfWeek.replace(".", ""))
+        adapterDays = DaysAdapter(mutableListOf()).apply {
+            onDaySelected = { setupRecyclerViewTime(it.replace(".", "")) }
         }
-
-        recyclerViewDays.adapter = adapterDays
+        binding.recyclerviewDays.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.recyclerviewDays.adapter = adapterDays
     }
-
 
     private fun setupRecyclerViewTime(selectedDayOfWeek: String) {
-        recyclerViewTime = binding.recyclerviewTime
-        recyclerViewTime.layoutManager =
+        binding.recyclerviewTime.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
-        Log.d(TAG2, "dia selecionado $selectedDayOfWeek")
+        val dayOfWeekMap = mapOf(
+            "seg" to "Mon", "ter" to "Tue", "qua" to "Wed",
+            "qui" to "Thu", "sex" to "Fri", "sáb" to "Sat", "dom" to "Sun"
+        )
 
-        val selectedDayOfWeekFormated = when (selectedDayOfWeek) {
-            "seg" -> "Mon"
-            "ter" -> "Tue"
-            "qua" -> "Wed"
-            "qui" -> "Thu"
-            "sex" -> "Fri"
-            "sáb" -> "Sat"
-            "dom" -> "Sun"
-            else -> ""
-        }
-
-//        Log.d(TAG2, "dia formatado $selectedDayOfWeekFormated")
-
-        val businessHours = place.businessHours[selectedDayOfWeekFormated]
+        val formattedDay = dayOfWeekMap[selectedDayOfWeek] ?: ""
+        val businessHours = place.businessHours[formattedDay]
 
         val calendar = Calendar.getInstance()
         val currentTime = SimpleDateFormat("HH:mm").format(calendar.time)
 
-        val timeList = if (businessHours != null && businessHours.size >= 2) {
-            var openingTime = businessHours[0]
-            val closingTime = businessHours[1]
-
-            generateTimeSlots(openingTime, closingTime)
-        } else {
-            mutableListOf("Fechado")
-        }
+        val timeList = businessHours?.takeIf { it.size >= 2 }?.let {
+            generateTimeSlots(it[0], it[1])
+        } ?: listOf("Fechado")
 
         if (::adapterTime.isInitialized) {
-            // Atualiza a lista de horários no adaptador existente
             adapterTime.updateTimeList(timeList)
         } else {
-            // Inicializa o adaptador se ele ainda não foi criado
             adapterTime = TimeAdapter(timeList.toMutableList())
-            recyclerViewTime.adapter = adapterTime
+            binding.recyclerviewTime.adapter = adapterTime
         }
     }
 
     private fun setupSpinner() {
-        spinnerItems = getNextSixMonths()
-        adapterMenu = ArrayAdapter(this, android.R.layout.simple_spinner_item, spinnerItems).apply {
-            setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        }
-        binding.spinner.adapter = adapterMenu
+        val spinnerItems = getNextSixMonths()
+        binding.spinner.adapter =
+            ArrayAdapter(this, android.R.layout.simple_spinner_item, spinnerItems).apply {
+                setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            }
 
         binding.spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
@@ -149,19 +110,12 @@ class PlaceInfoActivity : AppCompatActivity() {
                 position: Int,
                 id: Long
             ) {
-                val selectedItem = parent.getItemAtPosition(position).toString()
-                Log.d("DaysUpdate", "$selectedItem")
-
-                val (month, year) = parseSelectedMonth(selectedItem)
+                val (month, year) = parseSelectedMonth(
+                    parent.getItemAtPosition(position).toString()
+                )
                 selectedMonth = month
                 selectedYear = year
-                Log.d("DaysUpdate", "$selectedMonth , $selectedYear")
-
-                // Gerar os dias do mês selecionado
-                val daysOfMonth = getDaysOfMonth(selectedMonth, selectedYear)
-                // Atualizar o adapter com os dias do mês selecionado
-                adapterDays.updateDays(daysOfMonth)
-                //Log.d("DaysUpdate", "Dias atualizados: $daysOfMonth")
+                adapterDays.updateDays(getDaysOfMonth(month, year))
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {}
@@ -169,26 +123,13 @@ class PlaceInfoActivity : AppCompatActivity() {
     }
 
     private fun parseSelectedMonth(selectedItem: String): Pair<Int, Int> {
-        val parts = selectedItem.split(" ")
-        val monthName = parts[0]
-        val year = parts[1].toInt()
-
-        val month = when (monthName) {
-            "JANEIRO" -> 0
-            "FEVEREIRO" -> 1
-            "MARÇO" -> 2
-            "ABRIL" -> 3
-            "MAIO" -> 4
-            "JUNHO" -> 5
-            "JULHO" -> 6
-            "AGOSTO" -> 7
-            "SETEMBRO" -> 8
-            "OUTUBRO" -> 9
-            "NOVEMBRO" -> 10
-            "DEZEMBRO" -> 11
-            else -> 0
-        }
-        return Pair(month, year)
+        val (monthName, yearStr) = selectedItem.split(" ")
+        val month = listOf(
+            "JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO",
+            "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"
+        )
+            .indexOf(monthName.uppercase())
+        return month to yearStr.toInt()
     }
 
     private fun getDaysOfMonth(month: Int, year: Int): List<String> {
@@ -199,64 +140,46 @@ class PlaceInfoActivity : AppCompatActivity() {
         val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
         val dayOfWeekFormat = SimpleDateFormat("EEE", Locale("pt", "BR"))
 
-        // Obtém o dia e o mês atuais
         val currentDay = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
         val currentMonth = Calendar.getInstance().get(Calendar.MONTH)
 
         for (day in 1..daysInMonth) {
             calendar.set(year, month, day)
             val dayOfWeek = dayOfWeekFormat.format(calendar.time)
-
-            // Se o mês for o atual, filtra os dias
             if (month == currentMonth) {
                 if (day >= currentDay) {
                     // Adiciona o dia, dia da semana e o mês
                     days.add(String.format("%02d-%s-%02d", day, dayOfWeek, month + 1))
                 }
             } else {
-                // Para meses futuros, adiciona todos os dias a partir do dia 1
                 days.add(String.format("%02d-%s-%02d", day, dayOfWeek, month + 1))
             }
         }
-
-        Log.d(TAG2, "$days")
         return days
     }
 
-
-    private fun getNextSixMonths(): MutableList<String> {
-        val months = mutableListOf<String>()
+    private fun getNextSixMonths(): List<String> {
         val calendar = Calendar.getInstance()
-        val dateFormat = SimpleDateFormat("MMMM yyyy", Locale("pt", "BR"))
-
-        for (i in 0 until 6) {
-            months.add(dateFormat.format(calendar.time).uppercase(Locale.getDefault()))
-            calendar.add(Calendar.MONTH, 1)
+        return (0..5).map {
+            SimpleDateFormat("MMMM yyyy", Locale("pt", "BR")).format(calendar.time).uppercase()
+                .also {
+                    calendar.add(Calendar.MONTH, 1)
+                }
         }
-        return months
     }
 
-    private fun generateTimeSlots(openingTime: String?, closingTime: String?): List<String> {
-        if (openingTime == null || closingTime == null) return emptyList() // Retorna uma lista vazia se algum for nulo
-
-        val timeSlots = mutableListOf<String>()
+    private fun generateTimeSlots(openingTime: String, closingTime: String): List<String> {
         val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+        val openCal = Calendar.getInstance().apply { time = dateFormat.parse(openingTime) }
+        val closeCal = Calendar.getInstance().apply { time = dateFormat.parse(closingTime) }
 
-        val openingCalendar = Calendar.getInstance().apply {
-            time = dateFormat.parse(openingTime)
+        return buildList {
+            while (openCal.before(closeCal) || openCal == closeCal) {
+                add(dateFormat.format(openCal.time))
+                openCal.add(Calendar.MINUTE, 30)
+            }
         }
-
-        val closingCalendar = Calendar.getInstance().apply {
-            time = dateFormat.parse(closingTime)
-        }
-
-        while (openingCalendar.before(closingCalendar) || openingCalendar == closingCalendar) {
-            timeSlots.add(dateFormat.format(openingCalendar.time))
-            openingCalendar.add(Calendar.MINUTE, 30)
-        }
-        return timeSlots
     }
-
 
     private fun loadPlaceById(idPlace: String) {
         firestore.collection("places").document(idPlace).get()
@@ -423,14 +346,7 @@ class PlaceInfoActivity : AppCompatActivity() {
     }
 
     private fun showLoading(isLoading: Boolean) {
-        with(binding) {
-            progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
-            tvLoading.visibility = if (isLoading) View.VISIBLE else View.GONE
-            btnBack.visibility = if (isLoading) View.GONE else View.VISIBLE
-            imgType.visibility = if (isLoading) View.GONE else View.VISIBLE
-            cvImage.visibility = if (isLoading) View.GONE else View.VISIBLE
-            cvInfos.visibility = if (isLoading) View.GONE else View.VISIBLE
-        }
+        binding.layoutProgressbar.visibility = if (isLoading) View.VISIBLE else View.GONE
     }
 
     private fun showError(message: String) {
