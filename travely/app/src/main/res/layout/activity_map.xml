@@ -60,13 +60,35 @@
             android:id="@+id/tv_description"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textColor="@color/grey"
             android:layout_marginTop="10dp"
             android:elevation="5dp"
             android:text="Um lugar calmo e tranquilo snuasduadnasmdpasdmasldmas"
+            android:textColor="@color/grey"
             app:layout_constraintEnd_toEndOf="@+id/tv_name"
             app:layout_constraintStart_toStartOf="@+id/tv_name"
             app:layout_constraintTop_toBottomOf="@+id/tv_rating" />
+
+        <TextView
+            android:id="@+id/tv_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+            android:text="Aberto"
+            android:textColor="@color/lime_green"
+            app:layout_constraintStart_toStartOf="@+id/tv_name"
+            app:layout_constraintTop_toBottomOf="@id/tv_description" />
+
+        <TextView
+            android:id="@+id/tv_open_closed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:text="dasdasdsdasd"
+            android:textColor="@color/grey"
+            app:layout_constraintBottom_toBottomOf="@id/tv_status"
+            app:layout_constraintStart_toEndOf="@id/tv_status"
+            app:layout_constraintTop_toTopOf="@id/tv_status" />
 
         <Button
             android:id="@+id/btn_go"
@@ -79,7 +101,7 @@
             android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="@id/tv_name"
             app:layout_constraintStart_toStartOf="@id/tv_name"
-            app:layout_constraintTop_toBottomOf="@id/tv_description" />
+            app:layout_constraintTop_toBottomOf="@id/tv_open_closed" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_see_more"
@@ -104,8 +126,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="30dp"
-        android:background="@null"
         android:layout_marginBottom="20dp"
+        android:background="@null"
         android:elevation="10dp"
         android:src="@drawable/icon_navigation"
         app:layout_constraintBottom_toTopOf="@+id/container_info"
@@ -113,9 +135,7 @@
 
     <EditText
         android:id="@+id/edit_search"
-        android:imeOptions="actionSearch"
         android:layout_width="0dp"
-        android:textColor="@color/black"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="30dp"
         android:layout_marginTop="30dp"
@@ -125,8 +145,10 @@
         android:drawablePadding="15dp"
         android:elevation="5dp"
         android:hint="Digite a cidade de destino"
+        android:imeOptions="actionSearch"
         android:inputType="text"
         android:padding="15dp"
+        android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

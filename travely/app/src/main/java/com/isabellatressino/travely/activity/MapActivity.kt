@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.Manifest
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.graphics.Color
 import android.location.Geocoder
 import android.net.Uri
 import android.util.Log
@@ -99,14 +100,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         //nav
-        btnHome.setOnClickListener{
-            startActivity(Intent(this,MainScreenActivity::class.java))
+        btnHome.setOnClickListener {
+            startActivity(Intent(this, MainScreenActivity::class.java))
         }
-        btnLocal.setOnClickListener{
-            startActivity(Intent(this,MapActivity::class.java))
+        btnLocal.setOnClickListener {
+            startActivity(Intent(this, MapActivity::class.java))
         }
-        btnPerfil.setOnClickListener{
-            startActivity(Intent(this,MainProfileActivity::class.java))
+        btnPerfil.setOnClickListener {
+            startActivity(Intent(this, MainProfileActivity::class.java))
         }
     }
 
@@ -245,7 +246,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         val firebaseUser = auth.currentUser
         val uid = firebaseUser?.uid
 
-        firestore.collection("users").whereEqualTo("authID",uid).get()
+        firestore.collection("users").whereEqualTo("authID", uid).get()
             .addOnSuccessListener { documents ->
                 val user = documents.firstOrNull()
                 if (user != null) {
@@ -258,7 +259,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     Log.w("getUserInfo", "Usuário não encontrado")
                     callback("")
                 }
-            } .addOnFailureListener {
+            }.addOnFailureListener {
                 Log.e("getUserInfo", "Falha ao fazer requisição")
                 Toast.makeText(
                     this, "Falha ao buscar usuário",
@@ -354,27 +355,27 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         places.forEach { place ->
             val marker = place.geopoint.let { geoPoint ->
                 val iconResource = if (place.profiles.isNotEmpty()) {
-                       if (place.profiles.contains(userProfile)) {
-                            when (userProfile) {
-                                "compras" -> R.drawable.pin_buy_star
-                                "gastronomico" -> R.drawable.pin_food_star
-                                "cultural" -> R.drawable.pin_culture_star
-                                "aventureiro" -> R.drawable.pin_adventure_star
-                                "negocios" -> R.drawable.pin_business_star
-                                "descanso" -> R.drawable.pin_relax_star
-                                else -> 0
-                            }
-                        } else {
-                            when (place.profiles[0]) {
-                                "compras" -> R.drawable.pin_buy
-                                "gastronomico" -> R.drawable.pin_food
-                                "cultural" -> R.drawable.pin_culture
-                                "aventureiro" -> R.drawable.pin_adventure
-                                "negocios" -> R.drawable.pin_business
-                                "descanso" -> R.drawable.pin_relax
-                                else -> 0
-                            }
+                    if (place.profiles.contains(userProfile)) {
+                        when (userProfile) {
+                            "compras" -> R.drawable.pin_buy_star
+                            "gastronomico" -> R.drawable.pin_food_star
+                            "cultural" -> R.drawable.pin_culture_star
+                            "aventureiro" -> R.drawable.pin_adventure_star
+                            "negocios" -> R.drawable.pin_business_star
+                            "descanso" -> R.drawable.pin_relax_star
+                            else -> 0
                         }
+                    } else {
+                        when (place.profiles[0]) {
+                            "compras" -> R.drawable.pin_buy
+                            "gastronomico" -> R.drawable.pin_food
+                            "cultural" -> R.drawable.pin_culture
+                            "aventureiro" -> R.drawable.pin_adventure
+                            "negocios" -> R.drawable.pin_business
+                            "descanso" -> R.drawable.pin_relax
+                            else -> 0
+                        }
+                    }
                 } else {
                     R.drawable.location_pin
                 }
@@ -475,6 +476,16 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 .alpha(1f)
                 .setDuration(200)
                 .start()
+        }
+
+        if (place.isOpen()) {
+            binding.tvStatus.text = "Aberto"
+            binding.tvOpenClosed.text = "Fecha às ${place.getCloseTime()}"
+            binding.tvStatus.setTextColor(Color.parseColor("#9BB550"))
+        } else {
+            binding.tvStatus.text = "Fechado"
+            binding.tvOpenClosed.text = "Abre ${place.getNextOpenTime()}"
+            binding.tvStatus.setTextColor(Color.parseColor("#F44336"))
         }
     }
 
