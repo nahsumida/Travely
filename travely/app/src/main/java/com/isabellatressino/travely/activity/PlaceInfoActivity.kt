@@ -111,16 +111,20 @@ class PlaceInfoActivity : AppCompatActivity() {
             else -> ""
         }
 
-        Log.d(TAG2, "dia formatado $selectedDayOfWeekFormated")
+//        Log.d(TAG2, "dia formatado $selectedDayOfWeekFormated")
 
         val businessHours = place.businessHours[selectedDayOfWeekFormated]
 
+        val calendar = Calendar.getInstance()
+        val currentTime = SimpleDateFormat("HH:mm").format(calendar.time)
+
         val timeList = if (businessHours != null && businessHours.size >= 2) {
-            val openingTime = businessHours[0]
+            var openingTime = businessHours[0]
             val closingTime = businessHours[1]
+
             generateTimeSlots(openingTime, closingTime)
         } else {
-            mutableListOf("fechado")
+            mutableListOf("Fechado")
         }
 
         if (::adapterTime.isInitialized) {

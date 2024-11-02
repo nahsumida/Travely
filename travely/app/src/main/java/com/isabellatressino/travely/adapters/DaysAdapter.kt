@@ -118,6 +118,7 @@ class DaysAdapter(
         notifyDataSetChanged()
     }
 
+    // Pega o dia e o mes atual
     private fun getCurrentDayAndMonth(): String {
         val calendar = Calendar.getInstance()
         return SimpleDateFormat("dd-MM", Locale.getDefault()).format(calendar.time)
