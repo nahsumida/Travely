@@ -78,20 +78,20 @@ class PlaceInfoActivity : AppCompatActivity() {
         updateButtonState()
     }
 
-    private fun updateTimeSchedule(time: String){
+    private fun updateTimeSchedule(time: String) {
         scheduleTime = time
         updateButtonState()
     }
 
-    private fun updateButtonState(){
-        if (!scheduleDate.isNullOrEmpty() && !scheduleTime.isNullOrEmpty()) binding.btnSchedule.isEnabled = true
+    private fun updateButtonState() {
+        binding.btnSchedule.isEnabled = !scheduleDate.isNullOrEmpty() && !scheduleTime.isNullOrEmpty() && scheduleTime != "Fechado"
     }
 
     private fun setupRecyclerViewDays() {
         adapterDays = DaysAdapter(mutableListOf()).apply {
             onDaySelected = { data ->
                 val (day, weekDay, month, year) = data.split("-")
-                updateDateSchedule(day,month,year)
+                updateDateSchedule(day, month, year)
                 setupRecyclerViewTime(weekDay.replace(".", ""))
             }
         }
@@ -148,6 +148,9 @@ class PlaceInfoActivity : AppCompatActivity() {
                 )
                 selectedMonth = month
                 selectedYear = year
+                adapterDays.resetSelection()
+                scheduleDate = null
+                updateButtonState()
                 adapterDays.updateDays(getDaysOfMonth(month, year))
             }
 

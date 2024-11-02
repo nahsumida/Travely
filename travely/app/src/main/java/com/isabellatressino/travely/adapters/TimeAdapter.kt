@@ -75,4 +75,9 @@ class TimeAdapter(private var times: MutableList<String>) :
         times.addAll(newTimeList)
         notifyDataSetChanged()
     }
+
+    fun resetSelection() {
+        selectedPosition = -1
+        notifyDataSetChanged()
+    }
 }

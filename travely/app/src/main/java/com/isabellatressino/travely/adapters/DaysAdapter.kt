@@ -41,8 +41,6 @@ class DaysAdapter(
         holder.dayTextView.text = day
         holder.dayOfWeekTextView.text = weekDay.replace(".", "")
 
-        Log.d("TESTE1","$day,$weekDay,$month,$year")
-
         // Define a cor do item baseado na seleção ou se é o dia atual
         if (position == selectedPosition) {
             holder.cardView.setCardBackgroundColor(
@@ -119,6 +117,12 @@ class DaysAdapter(
         notifyDataSetChanged()
         Log.d("TESTE1","$newDays")
     }
+
+    fun resetSelection() {
+        selectedPosition = -1
+        notifyDataSetChanged()
+    }
+
 
     // Pega o dia e o mes atual
     private fun getCurrentDayAndMonth(): String {
