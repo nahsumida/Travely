@@ -37,6 +37,7 @@ class PlaceInfoActivity : AppCompatActivity() {
     private lateinit var adapterTime: TimeAdapter
     private lateinit var place: Place
     private lateinit var placeType: String
+    private lateinit var placeID: String
 
     private var scheduleDate: String? = null
     private var scheduleTime: String? = null
@@ -51,10 +52,11 @@ class PlaceInfoActivity : AppCompatActivity() {
         setupRecyclerViewDays()
         setupSpinner()
 
-        val placeId = intent.getStringExtra("PLACE_ID")
-        if (placeId != null) {
+        val placeIdIntent = intent.getStringExtra("PLACE_ID")
+        if (placeIdIntent != null) {
             showLoading(true)
-            loadPlaceById(placeId)
+            loadPlaceById(placeIdIntent)
+            placeID = placeIdIntent
         }
 
         binding.btnBack.setOnClickListener {
@@ -84,7 +86,8 @@ class PlaceInfoActivity : AppCompatActivity() {
     }
 
     private fun updateButtonState() {
-        binding.btnSchedule.isEnabled = !scheduleDate.isNullOrEmpty() && !scheduleTime.isNullOrEmpty() && scheduleTime != "Fechado"
+        binding.btnSchedule.isEnabled =
+            !scheduleDate.isNullOrEmpty() && !scheduleTime.isNullOrEmpty() && scheduleTime != "Fechado"
     }
 
     private fun setupRecyclerViewDays() {
@@ -111,11 +114,32 @@ class PlaceInfoActivity : AppCompatActivity() {
         )
 
         val formattedDay = dayOfWeekMap[selectedDayOfWeek] ?: ""
-        val businessHours = place.businessHours[formattedDay]
+        val timeList: List<String>
 
-        val timeList = businessHours?.takeIf { it.size >= 2 }?.let {
-            generateTimeSlots(it[0], it[1])
-        } ?: listOf("Fechado")
+        if (placeType == "reserva") {
+            // Caso seja do tipo "reserva", gera intervalos de horários com base no horário de abertura e fechamento
+            val businessHours = place.businessHours[formattedDay]
+            timeList = businessHours?.takeIf { it.size >= 2 }?.let {
+                generateTimeSlots(it[0], it[1])
+            } ?: listOf("Fechado")
+        } else if (placeType == "compra") {
+            val listSchedules = place.schedule.toList()
+            val list = mutableListOf<String>()
+            for (schedule in listSchedules) {
+                val tag = "TESTE3"
+                Log.d(tag,"Data do agendamento: ${schedule.toString()}")
+                Log.d(tag,schedule.getDay())
+                Log.d(tag,schedule.getMonth())
+                Log.d(tag,schedule.getYear())
+                Log.d(tag,schedule.getHourMinute())
+
+                val timeAndDate = "${schedule.getHourMinute()}-${schedule.getDay()}-${schedule.getMonth()}-${schedule.getYear()}"
+                list.add(timeAndDate)
+            }
+            timeList = list
+        } else {
+            timeList = listOf("Fechado")
+        }
 
         if (::adapterTime.isInitialized) {
             adapterTime.updateTimeList(timeList)
@@ -251,14 +275,17 @@ class PlaceInfoActivity : AppCompatActivity() {
 
         val businessHoursMap =
             document.get("businessHours") as? Map<String, List<String>> ?: emptyMap()
-        val businessHoursArray =
-            businessHoursMap.map { entry -> entry.key to entry.value.toTypedArray() }.toMap()
+
+        val businessHoursArray = businessHoursMap.map { entry ->
+            entry.key to entry.value.toTypedArray()
+        }.toMap()
 
         val geopoint = document.getGeoPoint("geopoint")
         val profiles = (document.get("profiles") as? List<String>)?.toTypedArray()
         val picture = document.getString("picture") ?: ""
 
-        val schedule = extractScheduleData(document)
+        // Extração dos dados do schedule
+        val schedule = extractScheduleData(document) ?: emptyList()
 
         return if (geopoint != null) {
             Place(
@@ -272,24 +299,27 @@ class PlaceInfoActivity : AppCompatActivity() {
                 geopoint,
                 profiles ?: emptyArray(),
                 picture,
-                schedule ?: Schedule(Timestamp.now(), "", "", 0.0f)
+                schedule
             )
         } else {
             null
         }
     }
 
-    private fun extractScheduleData(document: DocumentSnapshot): Schedule? {
-        val scheduleMap = document.get("schedule") as? Map<String, Any>
-        return scheduleMap?.let {
-            val bookingData = it["bookingData"] as? Timestamp ?: Timestamp.now()
-            val placeID = it["placeID"] as? String ?: ""
-            val compra = it["compra"] as? String ?: ""
-            val preco = (it["preco"] as? Double ?: 0.0).toFloat()
+    private fun extractScheduleData(document: DocumentSnapshot): List<Schedule> {
+        // Acessando o campo 'schedule' e garantindo que é uma lista de maps
+        val schedulesList = document.get("schedule") as? List<Map<String, Any>> ?: return emptyList()
 
-            Schedule(bookingData, placeID, compra, preco)
+        return schedulesList.map { scheduleMap ->
+            val placeID = placeID
+            val availability = (scheduleMap["availability"] as? Number)?.toInt() ?: 0
+            val price = (scheduleMap["price"] as? Number)?.toDouble() ?: 0.0
+            val datetime = scheduleMap["datetime"] as? String ?: ""
+
+            Schedule(placeID, availability, price, datetime)
         }
     }
+
 
     private fun showPlaceInfos(place: Place) {
         with(binding) {

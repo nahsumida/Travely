@@ -36,6 +36,7 @@ import com.google.firebase.firestore.GeoPoint
 import com.isabellatressino.travely.databinding.ActivityMapBinding
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentSnapshot
 import com.isabellatressino.travely.BitmapHelper
 import com.isabellatressino.travely.R
 import com.isabellatressino.travely.models.Place
@@ -287,34 +288,19 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     val type = document.getString("type") ?: ""
                     val rate = document.getDouble("rating") ?: 0.0
 
-                    // Verifica se businessHours é um Map e trata corretamente
                     val businessHoursMap =
                         document.get("businessHours") as? Map<String, List<String>> ?: emptyMap()
 
-                    // Converte o Map em um formato que você deseja usar
                     val businessHoursArray = businessHoursMap.map { entry ->
                         entry.key to entry.value.toTypedArray()
-                    }.toMap() // Isso cria um Map<String, Array<String>>
+                    }.toMap()
 
                     val geopoint = document.getGeoPoint("geopoint")
                     val profiles = (document.get("profiles") as? List<String>)?.toTypedArray()
                     val picture = document.getString("picture") ?: ""
 
                     // Extração dos dados do schedule
-                    val scheduleMap = document.get("schedule") as? Map<String, Any>
-
-                    // Verifica se o schedule existe e extrai os dados
-                    val schedule = if (scheduleMap != null) {
-                        val bookingData =
-                            scheduleMap["bookingData"] as? Timestamp ?: Timestamp.now()
-                        val placeID = scheduleMap["placeID"] as? String ?: ""
-                        val compra = scheduleMap["compra"] as? String ?: ""
-                        val preco = (scheduleMap["preco"] as? Double ?: 0.0).toFloat()
-
-                        Schedule(bookingData, placeID, compra, preco)
-                    } else {
-                        null
-                    }
+                    val schedule = extractScheduleData(document) ?: emptyList()
 
                     if (geopoint != null) {
                         val place = Place(
@@ -328,7 +314,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                             geopoint,
                             profiles ?: emptyArray(),
                             picture,
-                            schedule ?: Schedule(Timestamp.now(), "", "", 0.0f)
+                            schedule
                         )
                         places.add(place)
                     }
@@ -344,6 +330,22 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     Toast.LENGTH_SHORT
                 ).show()
             }
+    }
+
+    private fun extractScheduleData(document: DocumentSnapshot): List<Schedule> {
+        // Acessando o campo 'schedule' e garantindo que é uma lista de maps
+        val schedulesList =
+            document.get("schedule") as? List<Map<String, Any>> ?: return emptyList()
+
+        return schedulesList.map { scheduleMap ->
+            // Usando operadores seguros para evitar NullPointerExceptions
+            val placeID = scheduleMap["placeID"] as? String ?: ""
+            val availability = scheduleMap["availability"] as? Int ?: 0
+            val price = scheduleMap["price"] as? Double ?: 0.0
+            val datetime = scheduleMap["datetime"] as? String ?: ""
+
+            Schedule(placeID, availability, price, datetime)
+        }
     }
 
     /**
