@@ -22,6 +22,9 @@
             android:name=".activity.QrCodeActivity"
             android:exported="false" />
         <activity
+            android:name=".activity.ConfirmActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.PaymentActivity"
             android:exported="false" />
         <activity
