@@ -1,0 +1,664 @@
+package com.isabellatressino.travely.activity
+
+import android.os.Bundle
+import android.util.Log
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import com.isabellatressino.travely.R
+import com.isabellatressino.travely.adapters.DaysAdapter
+import com.isabellatressino.travely.adapters.TimeAdapter
+import com.isabellatressino.travely.databinding.ActivityPlaceInfoBinding
+import com.isabellatressino.travely.models.Place
+import com.isabellatressino.travely.models.Schedule
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
+
+val TAG2 = "ADAPTER TIME"
+
+class PlaceInfoActivity : AppCompatActivity() {
+
+    private val binding by lazy { ActivityPlaceInfoBinding.inflate(layoutInflater) }
+    private val firestore by lazy { FirebaseFirestore.getInstance() }
+    private val calendar by lazy { Calendar.getInstance() }
+
+    private lateinit var adapterDays: DaysAdapter
+    private lateinit var adapterTime: TimeAdapter
+    private lateinit var place: Place
+    private lateinit var placeType: String
+    private lateinit var placeID: String
+
+    private var scheduleDate: String? = null
+    private var scheduleTime: String? = null
+
+    private var selectedMonth: Int = 0
+    private var selectedYear: Int = 0
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(binding.root)
+
+        setupRecyclerViewDays()
+        setupSpinner()
+
+        val placeIdIntent = intent.getStringExtra("PLACE_ID")
+        if (placeIdIntent != null) {
+            showLoading(true)
+            loadPlaceById(placeIdIntent)
+            placeID = placeIdIntent
+        }
+
+        binding.btnBack.setOnClickListener {
+            finish()
+        }
+
+        binding.btnSchedule.setOnClickListener {
+            addSchedule()
+        }
+
+        binding.btnSchedule.isEnabled = false
+    }
+
+    private fun addSchedule() {
+        Toast.makeText(this, "confirmado, prox activity", Toast.LENGTH_SHORT).show()
+    }
+
+
+    private fun updateDateSchedule(day: String, month: String, year: String) {
+        scheduleDate = "$year-$month-$day"
+        updateButtonState()
+    }
+
+    private fun updateTimeSchedule(time: String) {
+        scheduleTime = time
+        updateButtonState()
+    }
+
+    private fun updateButtonState() {
+        binding.btnSchedule.isEnabled =
+            !scheduleDate.isNullOrEmpty() && !scheduleTime.isNullOrEmpty() && scheduleTime != "Fechado"
+    }
+
+    private fun setupRecyclerViewDays() {
+        adapterDays = DaysAdapter(mutableListOf()).apply {
+            onDaySelected = { data ->
+                val (day, weekDay, month, year) = data.split("-")
+                updateDateSchedule(day, month, year)
+                setupRecyclerViewTime(weekDay.replace(".", ""))
+            }
+        }
+
+        binding.recyclerviewDays.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.recyclerviewDays.adapter = adapterDays
+    }
+
+    private fun setupRecyclerViewTime(selectedDayOfWeek: String) {
+        binding.recyclerviewTime.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+
+        val dayOfWeekMap = mapOf(
+            "seg" to "Mon", "ter" to "Tue", "qua" to "Wed",
+            "qui" to "Thu", "sex" to "Fri", "sáb" to "Sat", "dom" to "Sun"
+        )
+
+        var day: String? = null
+        var month: String? = null
+        var year: String? = null
+
+        adapterDays.onDaySelected = { data ->
+            val (selectedDay, weekDay, selectedMonth, selectedYear) = data.split("-")
+            day = selectedDay
+            month = selectedMonth
+            year = selectedYear
+        }
+
+        val formattedDay = dayOfWeekMap[selectedDayOfWeek] ?: ""
+        val timeList: List<String>
+
+        if (placeType == "reserva") {
+            // Caso seja do tipo "reserva", gera intervalos de horários com base no horário de abertura e fechamento
+            val businessHours = place.businessHours[formattedDay]
+            timeList = businessHours?.takeIf { it.size >= 2 }?.let {
+                generateTimeSlots(it[0], it[1])
+            } ?: listOf("Fechado")
+        } else if (placeType == "compra") {
+            val listSchedules = place.schedule.toList()
+            val list = mutableListOf<String>()
+            for (schedule in listSchedules) {
+                val tag = "TESTE3"
+
+                val daySchedule = schedule.getDay()
+                val monthSchedule = schedule.getMonth()
+                val yearSchedule = schedule.getYear()
+
+
+//                Log.d(tag, "Data do agendamento: ${schedule.toString()}")
+//                Log.d(tag, "schedule - ${schedule.getDay()}/${schedule.getMonth()}/${schedule.getYear()}")
+//                Log.d(tag, "retorno da recycler - $day/$month/$year")
+
+
+                if (day == daySchedule && month == monthSchedule && year == yearSchedule) {
+                    val timeAndDate = schedule.getHourMinute()
+                    list.add(timeAndDate)
+                }
+            }
+            timeList = list
+        } else {
+            timeList = listOf("Fechado")
+        }
+
+        if (::adapterTime.isInitialized) {
+            adapterTime.updateTimeList(timeList)
+        } else {
+            adapterTime = TimeAdapter(timeList.toMutableList())
+            binding.recyclerviewTime.adapter = adapterTime
+        }
+
+        adapterTime.onTimeSelect = { time ->
+            updateTimeSchedule(time)
+        }
+    }
+
+    private fun setupSpinner() {
+        val spinnerItems = getNextSixMonths()
+        binding.spinner.adapter =
+            ArrayAdapter(this, android.R.layout.simple_spinner_item, spinnerItems).apply {
+                setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            }
+
+        binding.spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>,
+                view: View,
+                position: Int,
+                id: Long
+            ) {
+                val (month, year) = parseSelectedMonth(
+                    parent.getItemAtPosition(position).toString()
+                )
+                selectedMonth = month
+                selectedYear = year
+                adapterDays.resetSelection()
+                scheduleDate = null
+                updateButtonState()
+                adapterDays.updateDays(getDaysOfMonth(month, year))
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
+    }
+
+    private fun parseSelectedMonth(selectedItem: String): Pair<Int, Int> {
+        val (monthName, yearStr) = selectedItem.split(" ")
+        val month = listOf(
+            "JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO",
+            "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"
+        )
+            .indexOf(monthName.uppercase())
+        return month to yearStr.toInt()
+    }
+
+    private fun getDaysOfMonth(month: Int, year: Int): List<String> {
+        val days = mutableListOf<String>()
+        calendar.set(year, month, 1)
+
+        val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+        val dayOfWeekFormat = SimpleDateFormat("EEE", Locale("pt", "BR"))
+
+        val currentDay = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+        val currentMonth = Calendar.getInstance().get(Calendar.MONTH)
+
+        for (day in 1..daysInMonth) {
+            calendar.set(year, month, day)
+            val dayOfWeek = dayOfWeekFormat.format(calendar.time)
+            if (month == currentMonth) {
+                if (day >= currentDay) {
+                    // Adiciona o dia, dia da semana e o mês
+                    days.add(String.format("%02d-%s-%02d-%04d", day, dayOfWeek, month + 1, year))
+                }
+            } else {
+                days.add(String.format("%02d-%s-%02d-%04d", day, dayOfWeek, month + 1, year))
+            }
+        }
+        return days
+    }
+
+    private fun getNextSixMonths(): List<String> {
+        return (0..5).map {
+            SimpleDateFormat("MMMM yyyy", Locale("pt", "BR")).format(calendar.time).uppercase()
+                .also {
+                    calendar.add(Calendar.MONTH, 1)
+                }
+        }
+    }
+
+    private fun loadAvailableTimes(){
+        if(placeType == "")
+    }
+
+    private fun generateTimeSlots(openingTime: String, closingTime: String): List<String> {
+        val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+        val openCal = Calendar.getInstance().apply { time = dateFormat.parse(openingTime) }
+        val closeCal = Calendar.getInstance().apply { time = dateFormat.parse(closingTime) }
+
+        return buildList {
+            while (openCal.before(closeCal) || openCal == closeCal) {
+                add(dateFormat.format(openCal.time))
+                openCal.add(Calendar.MINUTE, 30)
+            }
+        }
+    }
+
+    private fun loadPlaceById(idPlace: String) {
+        firestore.collection("places").document(idPlace).get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val loadedPlace = extractPlaceData(document)
+                    if (loadedPlace != null) {
+                        // Armazena o place carregado na variável de instância
+                        placeType = loadedPlace.type
+                        place = loadedPlace
+                        showPlaceInfos(place)
+
+                        val dayOfWeekFormat = SimpleDateFormat("EEE", Locale("pt", "BR"))
+                        val todayDayOfWeek = dayOfWeekFormat.format(calendar.time)
+
+                        setupRecyclerViewTime(todayDayOfWeek.replace(".", ""))
+                    }
+                } else {
+                    showError("Documento não encontrado")
+                }
+            }
+            .addOnFailureListener { exception ->
+                showError("Erro ao carregar documento: ${exception.message}")
+            }
+    }
+
+
+    private fun extractPlaceData(document: DocumentSnapshot): Place? {
+        val id = document.getString("id") ?: ""
+        val name = document.getString("name") ?: ""
+        val address = document.getString("address") ?: ""
+        val description = document.getString("description") ?: ""
+        val type = document.getString("type") ?: ""
+        val rate = document.getDouble("rating") ?: 0.0
+
+        val businessHoursMap =
+            document.get("businessHours") as? Map<String, List<String>> ?: emptyMap()
+
+        val businessHoursArray = businessHoursMap.map { entry ->
+            entry.key to entry.value.toTypedArray()
+        }.toMap()
+
+        val geopoint = document.getGeoPoint("geopoint")
+        val profiles = (document.get("profiles") as? List<String>)?.toTypedArray()
+        val picture = document.getString("picture") ?: ""
+
+        // Extração dos dados do schedule
+        val schedule = extractScheduleData(document) ?: emptyList()
+
+        return if (geopoint != null) {
+            Place(
+                id,
+                name,
+                address,
+                description,
+                type,
+                rate,
+                businessHoursArray,
+                geopoint,
+                profiles ?: emptyArray(),
+                picture,
+                schedule
+            )
+        } else {
+            null
+        }
+    }
+
+    private fun extractScheduleData(document: DocumentSnapshot): List<Schedule> {
+        // Acessando o campo 'schedule' e garantindo que é uma lista de maps
+        val schedulesList =
+            document.get("schedule") as? List<Map<String, Any>> ?: return emptyList()
+
+        return schedulesList.map { scheduleMap ->
+            val placeID = placeID
+            val availability = (scheduleMap["availability"] as? Number)?.toInt() ?: 0
+            val price = (scheduleMap["price"] as? Number)?.toDouble() ?: 0.0
+            val datetime = scheduleMap["datetime"] as? String ?: ""
+
+            Schedule(placeID, availability, price, datetime)
+        }
+    }
+
+
+    private fun showPlaceInfos(place: Place) {
+        with(binding) {
+            tvName.text = place.name
+            tvAddress.text = place.address
+            tvRating.text = place.rate.toString()
+            setStars(place.rate)
+            tvDescription.text = place.description
+        }
+
+        setPlaceImage(place)
+    }
+
+    private fun setPlaceImage(place: Place) {
+        val iconResource = getProfileIconResource(place.profiles)
+        binding.imgType.setImageResource(iconResource)
+
+        if (place.picture.isNotEmpty()) {
+            loadImageFromStorage(place.picture)
+        } else {
+            binding.imgPlace.setImageResource(R.drawable.image_unavailable)
+            showLoading(false)
+        }
+    }
+
+    private fun getProfileIconResource(profiles: Array<String>): Int {
+        return if (profiles.isNotEmpty()) {
+            when (profiles[0]) {
+                "compras" -> R.drawable.profileshopp
+                "gastronomico" -> R.drawable.profilefood
+                "cultural" -> R.drawable.profileculture
+                "aventureiro" -> R.drawable.profileadventure
+                "negocios" -> R.drawable.profilebusiness
+                "descanso" -> R.drawable.profilerelax
+                else -> R.drawable.profile_unavailable
+            }
+        } else {
+            R.drawable.profile_unavailable
+        }
+    }
+
+    private fun loadImageFromStorage(imageUrl: String) {
+        val storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(imageUrl)
+        storageReference.downloadUrl.addOnSuccessListener { uri ->
+            Glide.with(this)
+                .load(uri)
+                .into(binding.imgPlace)
+            showLoading(false)
+        }.addOnFailureListener { exception ->
+            Log.e("ImageLoadError", "Error loading image: ${exception.message}")
+            binding.imgPlace.setImageResource(R.drawable.image_unavailable)
+            showLoading(false)
+        }
+    }
+
+    private fun setStars(rating: Double, maxStars: Int = 5) {
+        val starLayout = findViewById<LinearLayout>(R.id.starLayout)
+        starLayout.removeAllViews()
+
+        val filledStar = R.drawable.star_filled
+        val halfStar = R.drawable.star_half
+        val emptyStar = R.drawable.star_empty
+
+        val fullStars = rating.toInt()
+        val decimalPart = rating - fullStars
+
+        repeat(fullStars) {
+            starLayout.addView(createStarImageView(filledStar))
+        }
+
+        if (decimalPart >= 0.5) {
+            starLayout.addView(createStarImageView(halfStar))
+        }
+
+        val remainingStars = maxStars - fullStars - if (decimalPart >= 0.5) 1 else 0
+        repeat(remainingStars) {
+            starLayout.addView(createStarImageView(emptyStar))
+        }
+    }
+
+    private fun createStarImageView(resource: Int): ImageView {
+        return ImageView(this).apply {
+            setImageResource(resource)
+            layoutParams = LinearLayout.LayoutParams(36, 36)
+        }
+    }
+
+    private fun showLoading(isLoading: Boolean) {
+        binding.layoutProgressbar.visibility = if (isLoading) View.VISIBLE else View.GONE
+    }
+
+    private fun showError(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        showLoading(false)
+    }
+}
+
+
+
+////////////////////////////
+package com.isabellatressino.travely.adapters
+
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.RecyclerView
+import com.isabellatressino.travely.R
+
+class TimeAdapter(private var times: MutableList<String>) :
+    RecyclerView.Adapter<TimeAdapter.TimeItemViewHolder>() {
+
+    private var selectedPosition = -1
+    var onTimeSelect: ((String) -> Unit)? = null
+
+    inner class TimeItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val textView: TextView = itemView.findViewById(R.id.tv_time)
+        val cardView: CardView = itemView.findViewById(R.id.cv_time)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TimeItemViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        val itemView = inflater.inflate(R.layout.recyclerview_times, parent, false)
+        return TimeItemViewHolder(itemView)
+    }
+
+    override fun getItemCount(): Int {
+        return times.size
+    }
+
+    override fun onBindViewHolder(holder: TimeItemViewHolder, position: Int) {
+        holder.textView.text = times[position]
+
+        if (position == selectedPosition) {
+            holder.cardView.setCardBackgroundColor(
+                ContextCompat.getColor(holder.itemView.context, R.color.purple_haze)
+            )
+            holder.textView.setTextColor(
+                ContextCompat.getColor(
+                    holder.itemView.context,
+                    R.color.white
+                )
+            )
+        } else {
+            holder.cardView.setCardBackgroundColor(
+                ContextCompat.getColor(holder.itemView.context, R.color.white)
+            )
+            holder.textView.setTextColor(
+                ContextCompat.getColor(
+                    holder.itemView.context,
+                    R.color.black
+                )
+            )
+        }
+
+        holder.itemView.setOnClickListener {
+            // Atualiza a posição do item selecionado
+            val previousPosition = selectedPosition
+            selectedPosition = holder.adapterPosition
+
+            // Notifica apenas os itens afetados
+            notifyItemChanged(previousPosition)
+            notifyItemChanged(selectedPosition)
+
+            onTimeSelect?.invoke(times[selectedPosition])
+        }
+
+    }
+
+    fun updateTimeList(newTimeList: List<String>) {
+        times.clear()
+        times.addAll(newTimeList)
+        notifyDataSetChanged()
+    }
+
+    fun resetSelection() {
+        selectedPosition = -1
+        notifyDataSetChanged()
+    }
+}
+
+
+
+//////////////////////////////
+package com.isabellatressino.travely.adapters
+
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.RecyclerView
+import com.isabellatressino.travely.R
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
+
+class DaysAdapter(
+    private var days: MutableList<String>,
+) : RecyclerView.Adapter<DaysAdapter.DaysItemViewHolder>() {
+
+    private var selectedPosition = -1
+    var onDaySelected: ((String) -> Unit)? = null
+
+    inner class DaysItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val dayTextView: TextView = itemView.findViewById(R.id.tv_day)
+        val dayOfWeekTextView: TextView = itemView.findViewById(R.id.tv_day_of_week)
+        val cardView: CardView = itemView.findViewById(R.id.cardViewDate)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DaysItemViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        val itemView = inflater.inflate(R.layout.recycler_view_dates, parent, false)
+        return DaysItemViewHolder(itemView)
+    }
+
+    override fun onBindViewHolder(holder: DaysItemViewHolder, position: Int) {
+        val dayWithWeekday = days[position]
+        val (day, weekDay, month,year) = dayWithWeekday.split("-")
+        val dayWithMonth = getCurrentDayAndMonth()
+        val (currentDay, currentMonth) = dayWithMonth.split("-")
+
+        holder.dayTextView.text = day
+        holder.dayOfWeekTextView.text = weekDay.replace(".", "")
+
+        // Define a cor do item baseado na seleção ou se é o dia atual
+        if (position == selectedPosition) {
+            holder.cardView.setCardBackgroundColor(
+                ContextCompat.getColor(holder.itemView.context, R.color.purple_haze)
+            )
+            holder.dayTextView.setTextColor(
+                ContextCompat.getColor(
+                    holder.itemView.context,
+                    R.color.white
+                )
+            )
+            holder.dayOfWeekTextView.setTextColor(
+                ContextCompat.getColor(
+                    holder.itemView.context,
+                    R.color.white
+                )
+            )
+        } else if (day == currentDay && month == currentMonth) {
+            holder.cardView.setCardBackgroundColor(
+                ContextCompat.getColor(holder.itemView.context, R.color.lime_green)
+            )
+            holder.dayTextView.setTextColor(
+                ContextCompat.getColor(
+                    holder.itemView.context,
+                    R.color.white
+                )
+            )
+            holder.dayOfWeekTextView.setTextColor(
+                ContextCompat.getColor(
+                    holder.itemView.context,
+                    R.color.white
+                )
+            )
+        } else {
+            holder.cardView.setCardBackgroundColor(
+                ContextCompat.getColor(holder.itemView.context, R.color.white)
+            )
+            holder.dayTextView.setTextColor(
+                ContextCompat.getColor(
+                    holder.itemView.context,
+                    R.color.black
+                )
+            )
+            holder.dayOfWeekTextView.setTextColor(
+                ContextCompat.getColor(
+                    holder.itemView.context,
+                    R.color.black
+                )
+            )
+        }
+
+        holder.itemView.setOnClickListener {
+            // Atualiza a posição do item selecionado
+            val previousPosition = selectedPosition
+            selectedPosition = holder.adapterPosition
+
+            // Notifica apenas os itens afetados
+            notifyItemChanged(previousPosition)
+            notifyItemChanged(selectedPosition)
+
+            // Chama o callback onDaySelected para enviar o dia da semana selecionado
+            onDaySelected?.invoke("$day-$weekDay-$month-$year")
+        }
+
+    }
+
+    override fun getItemCount(): Int = days.size
+
+    // Método para atualizar os dias
+    fun updateDays(newDays: List<String>) {
+        days.clear()
+        days.addAll(newDays)
+        Log.d("DaysUpdate", "Dias novos: $newDays")
+        notifyDataSetChanged()
+        Log.d("TESTE1","$newDays")
+    }
+
+    fun resetSelection() {
+        selectedPosition = -1
+        notifyDataSetChanged()
+    }
+
+
+    // Pega o dia e o mes atual
+    private fun getCurrentDayAndMonth(): String {
+        val calendar = Calendar.getInstance()
+        return SimpleDateFormat("dd-MM", Locale.getDefault()).format(calendar.time)
+    }
+}

@@ -113,9 +113,7 @@ class DaysAdapter(
     fun updateDays(newDays: List<String>) {
         days.clear()
         days.addAll(newDays)
-        Log.d("DaysUpdate", "Dias novos: $newDays")
         notifyDataSetChanged()
-        Log.d("TESTE1","$newDays")
     }
 
     fun resetSelection() {

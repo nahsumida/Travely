@@ -22,10 +22,12 @@ import com.isabellatressino.travely.databinding.ActivityPlaceInfoBinding
 import com.isabellatressino.travely.models.Place
 import com.isabellatressino.travely.models.Schedule
 import java.text.SimpleDateFormat
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Locale
 
-val TAG2 = "ADAPTER TIME"
+val tag = "TESTEADAPTER"
 
 class PlaceInfoActivity : AppCompatActivity() {
 
@@ -49,8 +51,11 @@ class PlaceInfoActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        setupRecyclerViewDays()
+        Log.d(tag, "oi")
+
         setupSpinner()
+        setupRecyclerViewDays()
+
 
         val placeIdIntent = intent.getStringExtra("PLACE_ID")
         if (placeIdIntent != null) {
@@ -59,99 +64,16 @@ class PlaceInfoActivity : AppCompatActivity() {
             placeID = placeIdIntent
         }
 
+
         binding.btnBack.setOnClickListener {
             finish()
         }
 
-        binding.btnSchedule.setOnClickListener {
-            addSchedule()
-        }
+
 
         binding.btnSchedule.isEnabled = false
     }
 
-    private fun addSchedule() {
-        Toast.makeText(this, "confirmado, prox activity", Toast.LENGTH_SHORT).show()
-    }
-
-
-    private fun updateDateSchedule(day: String, month: String, year: String) {
-        scheduleDate = "$year-$month-$day"
-        updateButtonState()
-    }
-
-    private fun updateTimeSchedule(time: String) {
-        scheduleTime = time
-        updateButtonState()
-    }
-
-    private fun updateButtonState() {
-        binding.btnSchedule.isEnabled =
-            !scheduleDate.isNullOrEmpty() && !scheduleTime.isNullOrEmpty() && scheduleTime != "Fechado"
-    }
-
-    private fun setupRecyclerViewDays() {
-        adapterDays = DaysAdapter(mutableListOf()).apply {
-            onDaySelected = { data ->
-                val (day, weekDay, month, year) = data.split("-")
-                updateDateSchedule(day, month, year)
-                setupRecyclerViewTime(weekDay.replace(".", ""))
-            }
-        }
-
-        binding.recyclerviewDays.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        binding.recyclerviewDays.adapter = adapterDays
-    }
-
-    private fun setupRecyclerViewTime(selectedDayOfWeek: String) {
-        binding.recyclerviewTime.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-
-        val dayOfWeekMap = mapOf(
-            "seg" to "Mon", "ter" to "Tue", "qua" to "Wed",
-            "qui" to "Thu", "sex" to "Fri", "sáb" to "Sat", "dom" to "Sun"
-        )
-
-        val formattedDay = dayOfWeekMap[selectedDayOfWeek] ?: ""
-        val timeList: List<String>
-
-        if (placeType == "reserva") {
-            // Caso seja do tipo "reserva", gera intervalos de horários com base no horário de abertura e fechamento
-            val businessHours = place.businessHours[formattedDay]
-            timeList = businessHours?.takeIf { it.size >= 2 }?.let {
-                generateTimeSlots(it[0], it[1])
-            } ?: listOf("Fechado")
-        } else if (placeType == "compra") {
-            val listSchedules = place.schedule.toList()
-            val list = mutableListOf<String>()
-            for (schedule in listSchedules) {
-                val tag = "TESTE3"
-                Log.d(tag,"Data do agendamento: ${schedule.toString()}")
-                Log.d(tag,schedule.getDay())
-                Log.d(tag,schedule.getMonth())
-                Log.d(tag,schedule.getYear())
-                Log.d(tag,schedule.getHourMinute())
-
-                val timeAndDate = "${schedule.getHourMinute()}-${schedule.getDay()}-${schedule.getMonth()}-${schedule.getYear()}"
-                list.add(timeAndDate)
-            }
-            timeList = list
-        } else {
-            timeList = listOf("Fechado")
-        }
-
-        if (::adapterTime.isInitialized) {
-            adapterTime.updateTimeList(timeList)
-        } else {
-            adapterTime = TimeAdapter(timeList.toMutableList())
-            binding.recyclerviewTime.adapter = adapterTime
-        }
-
-        adapterTime.onTimeSelect = { time ->
-            updateTimeSchedule(time)
-        }
-    }
 
     private fun setupSpinner() {
         val spinnerItems = getNextSixMonths()
@@ -170,15 +92,83 @@ class PlaceInfoActivity : AppCompatActivity() {
                 val (month, year) = parseSelectedMonth(
                     parent.getItemAtPosition(position).toString()
                 )
-                selectedMonth = month
-                selectedYear = year
-                adapterDays.resetSelection()
-                scheduleDate = null
-                updateButtonState()
                 adapterDays.updateDays(getDaysOfMonth(month, year))
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
+    }
+
+    private fun setupRecyclerViewDays() {
+        adapterDays = DaysAdapter(mutableListOf())
+            .apply {
+                onDaySelected = { date ->
+                    val ret = loadAvailableTimes(date)
+                    setupRecyclerViewTime(ret)
+                }
+            }
+
+        binding.recyclerviewDays.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.recyclerviewDays.adapter = adapterDays
+    }
+
+    private fun setupRecyclerViewTime(timeList: List<String>) {
+        binding.recyclerviewTime.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+
+        if (::adapterTime.isInitialized) {
+            adapterTime.updateTimeList(timeList)
+        } else {
+            adapterTime = TimeAdapter(timeList.toMutableList())
+            binding.recyclerviewTime.adapter = adapterTime
+        }
+    }
+
+    private fun loadAvailableTimes(date: String): List<String> {
+        val (day, weekDay, month, year) = date.split("-")
+        val dayOfWeekMap = mapOf(
+            "seg." to "Mon", "ter." to "Tue", "qua." to "Wed",
+            "qui." to "Thu", "sex." to "Fri", "sáb." to "Sat", "dom." to "Sun"
+        )
+
+        val availableTimes = mutableListOf<String>()
+
+        if (place.type == "reserva") {
+            val dayOfWeekFormated = dayOfWeekMap[weekDay]
+            val businessHours = place.businessHours[dayOfWeekFormated]
+            if (businessHours != null) {
+                if (businessHours.size >= 2) {
+                    val times = generateHalfHourIntervals(businessHours[0], businessHours[1])
+                    for (time in times) availableTimes.add(time)
+                } else {
+                    availableTimes.add("Fechado")
+                }
+            }
+        } else if (place.type == "compra") {
+            val thisDate = "$year-$month-$day"
+            val schedulesList = place.schedule
+            for (schedule in schedulesList) {
+                val (scheduleDate, scheduleTime) = schedule.datetime.split("T")
+                if (thisDate == scheduleDate) availableTimes.add(scheduleTime.slice(0..4))
+            }
+        } else {
+            availableTimes.add("Informação indisponível")
+        }
+        Log.d(tag, "availableTimes = $availableTimes")
+        return availableTimes
+    }
+
+    private fun generateHalfHourIntervals(openingTime: String, closingTime: String): List<String> {
+        val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+        val openCal = Calendar.getInstance().apply { time = dateFormat.parse(openingTime) }
+        val closeCal = Calendar.getInstance().apply { time = dateFormat.parse(closingTime) }
+
+        return buildList {
+            while (openCal.before(closeCal) || openCal == closeCal) {
+                add(dateFormat.format(openCal.time))
+                openCal.add(Calendar.MINUTE, 30)
+            }
         }
     }
 
@@ -190,6 +180,15 @@ class PlaceInfoActivity : AppCompatActivity() {
         )
             .indexOf(monthName.uppercase())
         return month to yearStr.toInt()
+    }
+
+    private fun getNextSixMonths(): List<String> {
+        return (0..5).map {
+            SimpleDateFormat("MMMM yyyy", Locale("pt", "BR")).format(calendar.time).uppercase()
+                .also {
+                    calendar.add(Calendar.MONTH, 1)
+                }
+        }
     }
 
     private fun getDaysOfMonth(month: Int, year: Int): List<String> {
@@ -207,36 +206,21 @@ class PlaceInfoActivity : AppCompatActivity() {
             val dayOfWeek = dayOfWeekFormat.format(calendar.time)
             if (month == currentMonth) {
                 if (day >= currentDay) {
-                    // Adiciona o dia, dia da semana e o mês
-                    days.add(String.format("%02d-%s-%02d-%04d", day, dayOfWeek, month + 1, year))
+                    days.add(
+                        String.format(
+                            "%02d-%s-%02d-%04d",
+                            day,
+                            dayOfWeek,
+                            month + 1,
+                            year
+                        )
+                    )
                 }
             } else {
                 days.add(String.format("%02d-%s-%02d-%04d", day, dayOfWeek, month + 1, year))
             }
         }
         return days
-    }
-
-    private fun getNextSixMonths(): List<String> {
-        return (0..5).map {
-            SimpleDateFormat("MMMM yyyy", Locale("pt", "BR")).format(calendar.time).uppercase()
-                .also {
-                    calendar.add(Calendar.MONTH, 1)
-                }
-        }
-    }
-
-    private fun generateTimeSlots(openingTime: String, closingTime: String): List<String> {
-        val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-        val openCal = Calendar.getInstance().apply { time = dateFormat.parse(openingTime) }
-        val closeCal = Calendar.getInstance().apply { time = dateFormat.parse(closingTime) }
-
-        return buildList {
-            while (openCal.before(closeCal) || openCal == closeCal) {
-                add(dateFormat.format(openCal.time))
-                openCal.add(Calendar.MINUTE, 30)
-            }
-        }
     }
 
     private fun loadPlaceById(idPlace: String) {
@@ -246,14 +230,13 @@ class PlaceInfoActivity : AppCompatActivity() {
                     val loadedPlace = extractPlaceData(document)
                     if (loadedPlace != null) {
                         // Armazena o place carregado na variável de instância
-                        placeType = loadedPlace.type
                         place = loadedPlace
                         showPlaceInfos(place)
 
                         val dayOfWeekFormat = SimpleDateFormat("EEE", Locale("pt", "BR"))
                         val todayDayOfWeek = dayOfWeekFormat.format(calendar.time)
 
-                        setupRecyclerViewTime(todayDayOfWeek.replace(".", ""))
+//                        setupRecyclerViewTime(todayDayOfWeek.replace(".", ""))
                     }
                 } else {
                     showError("Documento não encontrado")
@@ -308,7 +291,8 @@ class PlaceInfoActivity : AppCompatActivity() {
 
     private fun extractScheduleData(document: DocumentSnapshot): List<Schedule> {
         // Acessando o campo 'schedule' e garantindo que é uma lista de maps
-        val schedulesList = document.get("schedule") as? List<Map<String, Any>> ?: return emptyList()
+        val schedulesList =
+            document.get("schedule") as? List<Map<String, Any>> ?: return emptyList()
 
         return schedulesList.map { scheduleMap ->
             val placeID = placeID
