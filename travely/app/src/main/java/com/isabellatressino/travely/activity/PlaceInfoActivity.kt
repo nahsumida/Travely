@@ -22,6 +22,7 @@ import com.isabellatressino.travely.databinding.ActivityPlaceInfoBinding
 import com.isabellatressino.travely.models.Place
 import com.isabellatressino.travely.models.Schedule
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
@@ -38,24 +39,17 @@ class PlaceInfoActivity : AppCompatActivity() {
     private lateinit var adapterDays: DaysAdapter
     private lateinit var adapterTime: TimeAdapter
     private lateinit var place: Place
-    private lateinit var placeType: String
     private lateinit var placeID: String
 
-    private var scheduleDate: String? = null
-    private var scheduleTime: String? = null
-
-    private var selectedMonth: Int = 0
-    private var selectedYear: Int = 0
+    private var scheduleTime = ""
+    private var scheduleDate = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        Log.d(tag, "oi")
-
         setupSpinner()
         setupRecyclerViewDays()
-
 
         val placeIdIntent = intent.getStringExtra("PLACE_ID")
         if (placeIdIntent != null) {
@@ -64,14 +58,34 @@ class PlaceInfoActivity : AppCompatActivity() {
             placeID = placeIdIntent
         }
 
-
         binding.btnBack.setOnClickListener {
             finish()
         }
 
-
-
         binding.btnSchedule.isEnabled = false
+
+        binding.btnSchedule.setOnClickListener {
+            addSchedule()
+        }
+
+    }
+
+    /**
+     * OBS:: Para quem for fazer o servidor
+     *
+     * Ao clicar no dia e no horario disponível, o adapter já faz um callback e retorna a data e horario selecionados
+     * a data tem o formato dia-diaDaSemanaAbreviado-mes-ano
+     * o horario tem o formato hora-minuto
+     * exemplo de log: 07-qui.-11-2024 , 07:30
+     */
+    private fun addSchedule() {
+        Toast.makeText(this, "confirmado, prox activity", Toast.LENGTH_SHORT).show()
+        Log.d("TESTEADAPTER","$scheduleDate , $scheduleTime")
+    }
+
+    private fun updateButtonState() {
+        binding.btnSchedule.isEnabled =
+            scheduleDate.isNotEmpty() && scheduleTime.isNotEmpty()
     }
 
 
@@ -92,6 +106,9 @@ class PlaceInfoActivity : AppCompatActivity() {
                 val (month, year) = parseSelectedMonth(
                     parent.getItemAtPosition(position).toString()
                 )
+                adapterDays.resetSelection()
+                scheduleDate = ""
+                updateButtonState()
                 adapterDays.updateDays(getDaysOfMonth(month, year))
             }
 
@@ -103,8 +120,12 @@ class PlaceInfoActivity : AppCompatActivity() {
         adapterDays = DaysAdapter(mutableListOf())
             .apply {
                 onDaySelected = { date ->
+                    adapterTime.resetSelection()
+                    scheduleTime = ""
                     val ret = loadAvailableTimes(date)
                     setupRecyclerViewTime(ret)
+                    scheduleDate = date
+                    updateButtonState()
                 }
             }
 
@@ -123,6 +144,17 @@ class PlaceInfoActivity : AppCompatActivity() {
             adapterTime = TimeAdapter(timeList.toMutableList())
             binding.recyclerviewTime.adapter = adapterTime
         }
+
+        adapterTime.onTimeSelected = { time ->
+            scheduleTime = time
+            updateButtonState()
+        }
+    }
+
+    private fun getCurrentDateInCustomFormat(): String {
+        val today = LocalDate.now()
+        val formatter = DateTimeFormatter.ofPattern("dd-eee-MM-yyyy", Locale("pt", "BR"))
+        return today.format(formatter)
     }
 
     private fun loadAvailableTimes(date: String): List<String> {
@@ -150,12 +182,14 @@ class PlaceInfoActivity : AppCompatActivity() {
             val schedulesList = place.schedule
             for (schedule in schedulesList) {
                 val (scheduleDate, scheduleTime) = schedule.datetime.split("T")
-                if (thisDate == scheduleDate) availableTimes.add(scheduleTime.slice(0..4))
+                if (thisDate == scheduleDate) {
+                    availableTimes.add(scheduleTime.slice(0..4))
+                }
             }
+            if (availableTimes.isEmpty()) availableTimes.add("Nenhum horário disponível")
         } else {
             availableTimes.add("Informação indisponível")
         }
-        Log.d(tag, "availableTimes = $availableTimes")
         return availableTimes
     }
 
@@ -233,10 +267,9 @@ class PlaceInfoActivity : AppCompatActivity() {
                         place = loadedPlace
                         showPlaceInfos(place)
 
-                        val dayOfWeekFormat = SimpleDateFormat("EEE", Locale("pt", "BR"))
-                        val todayDayOfWeek = dayOfWeekFormat.format(calendar.time)
+                        val ret = loadAvailableTimes(getCurrentDateInCustomFormat())
+                        setupRecyclerViewTime(ret)
 
-//                        setupRecyclerViewTime(todayDayOfWeek.replace(".", ""))
                     }
                 } else {
                     showError("Documento não encontrado")

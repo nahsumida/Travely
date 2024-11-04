@@ -13,6 +13,10 @@ import com.isabellatressino.travely.R
 class TimeAdapter(private var times: MutableList<String>) :
     RecyclerView.Adapter<TimeAdapter.TimeItemViewHolder>() {
 
+    private var selectedPosition = -1
+    var onTimeSelected: ((String) -> Unit)? = null
+
+
     inner class TimeItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val textView: TextView = itemView.findViewById(R.id.tv_time)
         val cardView: CardView = itemView.findViewById(R.id.cv_time)
@@ -29,7 +33,50 @@ class TimeAdapter(private var times: MutableList<String>) :
     }
 
     override fun onBindViewHolder(holder: TimeItemViewHolder, position: Int) {
-        holder.textView.text = times[position]
+        val time = times[position]
+        holder.textView.text = time
+
+        if (position == selectedPosition && time != "Nenhum horário disponível" && time != "Fechado" && time != "Informação indisponível") {
+            holder.cardView.setCardBackgroundColor(
+                ContextCompat.getColor(holder.itemView.context, R.color.purple_haze)
+            )
+            holder.textView.setTextColor(
+                ContextCompat.getColor(
+                    holder.itemView.context,
+                    R.color.white
+                )
+            )
+        } else {
+            holder.cardView.setCardBackgroundColor(
+                ContextCompat.getColor(holder.itemView.context, R.color.white)
+            )
+            holder.textView.setTextColor(
+                ContextCompat.getColor(
+                    holder.itemView.context,
+                    R.color.black
+                )
+            )
+        }
+
+
+        holder.itemView.setOnClickListener {
+            if (time != "Nenhum horário disponível" && time != "Fechado" && time != "Informação indisponível"){
+                val previousPosition = selectedPosition
+                selectedPosition = holder.adapterPosition
+
+                notifyItemChanged(previousPosition)
+                notifyItemChanged(selectedPosition)
+
+                onTimeSelected?.invoke(time)
+            }
+        }
+
+
+    }
+
+    fun resetSelection() {
+        selectedPosition = -1
+        notifyDataSetChanged()
     }
 
     fun updateTimeList(newTimeList: List<String>) {
