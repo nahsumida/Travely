@@ -72,9 +72,7 @@ class PlaceInfoActivity : AppCompatActivity() {
      * OBS:: Para quem for fazer o servidor
      *
      * Ao clicar no dia e no horario disponível, o adapter já faz um callback e retorna a data e horario selecionados
-     * a data tem o formato dia-diaDaSemanaAbreviado-mes-ano
-     * o horario tem o formato hora-minuto
-     * exemplo de log: 07-qui.-11-2024 , 07:30
+     * formato da val schedule = 2024-11-24T15:00:00Z
      */
     private fun addSchedule() {
         val schedule = "${scheduleDate.slice(0..9)}T$scheduleTime:00Z"
@@ -155,8 +153,8 @@ class PlaceInfoActivity : AppCompatActivity() {
     private fun setupSpinner() {
         val spinnerItems = getNextSixMonths()
         binding.spinner.adapter =
-            ArrayAdapter(this, android.R.layout.simple_spinner_item, spinnerItems).apply {
-                setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            ArrayAdapter(this, R.layout.spinner_item, spinnerItems).apply {
+                setDropDownViewResource(R.layout.spinner_dropdown_item)
             }
 
         binding.spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
