@@ -102,7 +102,8 @@ class DaysAdapter(
             notifyItemChanged(selectedPosition)
 
             // Chama o callback onDaySelected para enviar o dia da semana selecionado
-            onDaySelected?.invoke("$day-$weekDay-$month-$year")
+            //onDaySelected?.invoke("$day-$weekDay-$month-$year")
+            onDaySelected?.invoke("$year-$month-$day-$weekDay")
         }
 
     }

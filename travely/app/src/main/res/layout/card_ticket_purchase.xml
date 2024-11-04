@@ -1,9 +1,10 @@
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="16dp"
+    android:visibility="gone"
+    android:id="@+id/card_main"
     app:cardCornerRadius="8dp"
     app:cardElevation="4dp">
 
@@ -14,100 +15,96 @@
 
         <!-- Título -->
         <TextView
-            android:id="@+id/tvTitulo"
+            android:id="@+id/tv_title_ingress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Compra de Ingresso"
             android:textAppearance="?attr/textAppearanceSubtitle1"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Preço e Taxa -->
         <TextView
-            android:id="@+id/tvPrecoTaxa"
+            android:id="@+id/tv_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="R$ 20,00 ( + R$ 2,00 taxa )"
             android:textAppearance="?attr/textAppearanceBody2"
+            app:layout_constraintBottom_toTopOf="@id/tv_label_total"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvTitulo"
-            app:layout_constraintBottom_toTopOf="@id/tvTotal"/>
+            app:layout_constraintTop_toBottomOf="@id/tv_title_ingress" />
 
         <!-- Total -->
         <TextView
-            android:id="@+id/tvTotal"
+            android:id="@+id/tv_label_total"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:text="Total"
             android:textColor="@color/grey"
-            app:layout_constraintBottom_toTopOf="@id/tvPrecoTotal"
+            app:layout_constraintBottom_toTopOf="@id/tv_total_price"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvPrecoTaxa" />
+            app:layout_constraintTop_toBottomOf="@id/tv_price" />
 
         <!-- Preço Total -->
         <TextView
-            android:id="@+id/tvPrecoTotal"
+            android:id="@+id/tv_total_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="R$ 44,00"
-            android:textStyle="bold"
             android:textAppearance="?attr/textAppearanceBody1"
             android:textColor="@android:color/holo_green_dark"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvTotal"/>
+            app:layout_constraintTop_toBottomOf="@id/tv_label_total" />
 
         <!-- Botão de Comprar -->
         <Button
-            android:id="@+id/btnComprar"
+            android:id="@+id/btn_buy"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:tint="@color/purple_haze"
             android:text="COMPRAR"
             android:textColor="@android:color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/tvTotal"
-            app:layout_constraintWidth_percent="0.4" />
+            app:layout_constraintTop_toTopOf="@+id/tv_label_total"
+            app:layout_constraintWidth_percent="0.4"
+            app:tint="@color/purple_haze" />
 
         <!-- Contador de Ingressos -->
         <TextView
-            android:id="@+id/tvQuantidade"
+            android:id="@+id/tv_quantity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="2"
+            android:layout_marginEnd="10dp"
             android:textSize="20sp"
-            app:layout_constraintEnd_toStartOf="@id/btnMais"
-            android:layout_marginEnd="5dp"
-            app:layout_constraintTop_toTopOf="parent"
-            />
+            app:layout_constraintEnd_toStartOf="@id/btnMore"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Botão de Subtrair -->
         <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/btnMenos"
+            android:id="@+id/btnLess"
             android:layout_width="wrap_content"
-            app:layout_constraintBottom_toBottomOf="@id/tvQuantidade"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="5dp"
-            android:src="@drawable/ic_less"
+            android:layout_marginEnd="10dp"
             android:background="@drawable/shape_circle"
-            app:tint="@color/button_color_states"
-            app:layout_constraintTop_toTopOf="@id/tvQuantidade"
-            app:layout_constraintEnd_toStartOf="@id/tvQuantidade"/>
+            android:src="@drawable/ic_less"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_quantity"
+            app:layout_constraintEnd_toStartOf="@id/tv_quantity"
+            app:layout_constraintTop_toTopOf="@id/tv_quantity"
+            app:tint="@color/button_color_states" />
 
         <!-- Botão de Adicionar -->
         <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/btnMais"
+            android:id="@+id/btnMore"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_plus"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="@id/tvQuantidade"
+            android:layout_marginEnd="5dp"
             android:background="@drawable/shape_circle"
-            app:tint="@color/button_color_states"
-            app:layout_constraintTop_toTopOf="@id/tvQuantidade"
-            />
+            android:src="@drawable/ic_plus"
+            app:layout_constraintBottom_toBottomOf="@id/tv_quantity"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_quantity"
+            app:tint="@color/button_color_states" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

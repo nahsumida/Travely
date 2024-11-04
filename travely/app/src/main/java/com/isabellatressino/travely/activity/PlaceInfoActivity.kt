@@ -62,8 +62,6 @@ class PlaceInfoActivity : AppCompatActivity() {
             finish()
         }
 
-        binding.btnSchedule.isEnabled = false
-
         binding.btnSchedule.setOnClickListener {
             addSchedule()
         }
@@ -79,13 +77,78 @@ class PlaceInfoActivity : AppCompatActivity() {
      * exemplo de log: 07-qui.-11-2024 , 07:30
      */
     private fun addSchedule() {
+        val schedule = "${scheduleDate.slice(0..9)}T$scheduleTime:00Z"
         Toast.makeText(this, "confirmado, prox activity", Toast.LENGTH_SHORT).show()
-        Log.d("TESTEADAPTER","$scheduleDate , $scheduleTime")
+        Log.d("TESTEADAPTER", schedule)
     }
 
     private fun updateButtonState() {
         binding.btnSchedule.isEnabled =
             scheduleDate.isNotEmpty() && scheduleTime.isNotEmpty()
+    }
+
+    private fun showCardSchedule(): String {
+        val scheduling = "${scheduleDate.slice(0..9)}T$scheduleTime:00Z"
+        val schedulesList = place.schedule
+        var quantity = 1
+        var totalPrice = 0.0
+
+
+        for (schedule in schedulesList) {
+            if (schedule.datetime == scheduling) {
+                val basePrice = schedule.price
+                val fee = basePrice * 0.1
+
+                binding.card.tvPrice.text =
+                    "R$ ${String.format("%.2f", basePrice).replace(".", ",")} +" +
+                            " ( R$ ${String.format("%.2f", fee).replace(".", ",")} taxa)"
+                binding.card.tvQuantity.text = quantity.toString()
+                binding.card.tvTotalPrice.text =
+                    "R$ ${String.format(" % .2f", (basePrice + fee) * quantity).replace(".", ", ")}"
+
+                binding.card.btnMore.setOnClickListener {
+                    if (quantity < schedule.availability) {
+                        quantity++
+                        binding.card.tvQuantity.text = quantity.toString()
+                        binding.card.tvTotalPrice.text =
+                            "R$ ${
+                                String.format(" % .2f", (basePrice + fee) * quantity)
+                                    .replace(".", ", ")
+                            }"
+
+                        binding.card.btnLess.isEnabled = true
+                    }
+
+                    binding.card.btnMore.isEnabled = quantity < schedule.availability
+                }
+
+                binding.card.btnLess.setOnClickListener {
+                    if (quantity > 1) {
+                        quantity--
+                        binding.card.tvQuantity.text = quantity.toString()
+                        binding.card.tvTotalPrice.text =
+                            "R$ ${
+                                String.format(" % .2f", (basePrice + fee) * quantity)
+                                    .replace(".", ", ")
+                            }"
+
+                        binding.card.btnMore.isEnabled = true
+                    }
+
+                    binding.card.btnLess.isEnabled = quantity > 1
+                }
+
+                binding.card.btnBuy.setOnClickListener {
+                    addSchedule()
+                }
+
+                totalPrice = (basePrice + fee) * quantity
+            }
+        }
+
+        // Aqui retorno os dados em formato de string, tanto para salvar a schedule para o usuário,
+        // quanto para passar no intent para a proxima tela
+        return "placeId:$placeID,price:$totalPrice,quantity(avaiability?):$quantity,datetime:$scheduling"
     }
 
 
@@ -148,17 +211,21 @@ class PlaceInfoActivity : AppCompatActivity() {
         adapterTime.onTimeSelected = { time ->
             scheduleTime = time
             updateButtonState()
+            if (place.type == "compra") {
+                binding.card.cardMain.visibility = View.VISIBLE
+                showCardSchedule()
+            }
         }
     }
 
     private fun getCurrentDateInCustomFormat(): String {
         val today = LocalDate.now()
-        val formatter = DateTimeFormatter.ofPattern("dd-eee-MM-yyyy", Locale("pt", "BR"))
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-eee", Locale("pt", "BR"))
         return today.format(formatter)
     }
 
     private fun loadAvailableTimes(date: String): List<String> {
-        val (day, weekDay, month, year) = date.split("-")
+        val (year, month, day, weekDay) = date.split("-")
         val dayOfWeekMap = mapOf(
             "seg." to "Mon", "ter." to "Tue", "qua." to "Wed",
             "qui." to "Thu", "sex." to "Fri", "sáb." to "Sat", "dom." to "Sun"
@@ -186,7 +253,10 @@ class PlaceInfoActivity : AppCompatActivity() {
                     availableTimes.add(scheduleTime.slice(0..4))
                 }
             }
-            if (availableTimes.isEmpty()) availableTimes.add("Nenhum horário disponível")
+            if (availableTimes.isEmpty()) {
+                availableTimes.add("Nenhum horário disponível")
+                binding.card.cardMain.visibility = View.GONE
+            }
         } else {
             availableTimes.add("Informação indisponível")
         }
@@ -269,6 +339,10 @@ class PlaceInfoActivity : AppCompatActivity() {
 
                         val ret = loadAvailableTimes(getCurrentDateInCustomFormat())
                         setupRecyclerViewTime(ret)
+
+                        if (place.type == "reserva") {
+                            binding.btnSchedule.visibility = View.VISIBLE
+                        }
 
                     }
                 } else {

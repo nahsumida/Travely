@@ -231,6 +231,7 @@
                 android:layout_marginHorizontal="30dp"
                 android:layout_marginVertical="40dp"
                 android:background="@drawable/rounded"
+                android:visibility="gone"
                 android:clickable="true"
                 app:backgroundTint="@color/button_color_states"
                 android:padding="10dp"
@@ -239,6 +240,20 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/recyclerview_time" />
+
+            <include
+                android:id="@+id/card"
+                layout="@layout/card_ticket_purchase"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:elevation="10dp"
+                android:layout_marginHorizontal="30dp"
+                android:layout_marginVertical="40dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/recyclerview_time"
+                 />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
