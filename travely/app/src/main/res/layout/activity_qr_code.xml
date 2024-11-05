@@ -50,6 +50,7 @@
                 android:layout_height="250dp"
                 android:layout_marginTop="60dp"
                 app:cardCornerRadius="20dp"
+                android:backgroundTint="@color/white"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/txt_qrcode">
@@ -83,6 +84,7 @@
                 android:textAlignment="center"
                 android:layout_margin="20dp"
                 android:textSize="15dp"
+                android:textColor="@color/black"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/txt_infoscod" />
@@ -93,6 +95,7 @@
                 android:layout_height="50dp"
                 android:layout_margin="20dp"
                 app:cardCornerRadius="20dp"
+                android:backgroundTint="@color/white"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/txt_cod">
@@ -100,9 +103,10 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/black"
                     android:text="00020126580014travelychavepix@travely.com520400"
                     android:textAlignment="center"
-                    android:layout_marginTop="20dp"/>
+                    android:layout_marginTop="15dp"/>
 
             </androidx.cardview.widget.CardView>
 
@@ -133,7 +137,7 @@
         android:id="@+id/loading_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Carregando, por favor aguarde..."
+        android:text="Finalizando Pagamento, por favor aguarde..."
         android:textColor="#000000"
         android:textSize="16sp"
         android:visibility="gone"
