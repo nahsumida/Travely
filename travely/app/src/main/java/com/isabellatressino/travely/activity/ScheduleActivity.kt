@@ -51,30 +51,30 @@ class ScheduleActivity : AppCompatActivity() {
                     if (schedulesData != null) {
                         schedulesList.clear()
 
-                        for (scheduleData in schedulesData) {
-                            // Verifique se os campos existem e são do tipo correto
-                            val bookingData = scheduleData["bookingDate"] as? Timestamp
-                            val placeID = scheduleData["placeID"] as? String ?: ""
-                            val type = scheduleData["type"] as? String ?: ""
-                            val preco = if (scheduleData["preco"] is Number) {
-                                (scheduleData["preco"] as Number).toFloat()
-                            } else {
-                                0.0f
-                            }
-
-                            val precoteste = scheduleData["preco"]
-                            Log.d(TAG, "Preco original recuperado do Firestore: $precoteste")
-                            Log.d(TAG, "Preco convertido para Float: $preco")
-
-
-                            // Cria um objeto Schedule e o adiciona à lista
-                            if (bookingData != null) {
-                                val schedule = Schedule(bookingData, placeID, type, preco)
-                                schedulesList.add(schedule)
-                            } else {
-                                Log.d(TAG, "Missing bookingData in schedule: $scheduleData")
-                            }
-                        }
+//                        for (scheduleData in schedulesData) {
+//                            // Verifique se os campos existem e são do tipo correto
+//                            val bookingData = scheduleData["bookingDate"] as? Timestamp
+//                            val placeID = scheduleData["placeID"] as? String ?: ""
+//                            val type = scheduleData["type"] as? String ?: ""
+//                            val preco = if (scheduleData["preco"] is Number) {
+//                                (scheduleData["preco"] as Number).toFloat()
+//                            } else {
+//                                0.0f
+//                            }
+//
+//                            val precoteste = scheduleData["preco"]
+//                            Log.d(TAG, "Preco original recuperado do Firestore: $precoteste")
+//                            Log.d(TAG, "Preco convertido para Float: $preco")
+//
+//
+//                            // Cria um objeto Schedule e o adiciona à lista
+//                            if (bookingData != null) {
+//                                val schedule = Schedule(bookingData, placeID, type, preco)
+//                                schedulesList.add(schedule)
+//                            } else {
+//                                Log.d(TAG, "Missing bookingData in schedule: $scheduleData")
+//                            }
+//                        }
 
                         // Notifica o adapter sobre mudanças na lista
                         adapter.notifyDataSetChanged()

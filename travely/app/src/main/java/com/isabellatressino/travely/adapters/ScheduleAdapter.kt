@@ -36,7 +36,8 @@ class ScheduleAdapter(private val schedules: MutableList<Schedule>) :
 
         Log.d("TESTE FIREBASE SCHEDULE", "Binding schedule at position $position: $schedule")
 
-        val timeStamp = schedule.bookingData.toDate()
+        //val timeStamp = schedule.bookingData.toDate()
+        val timeStamp = ""
 
         // Formatação da data
         val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())

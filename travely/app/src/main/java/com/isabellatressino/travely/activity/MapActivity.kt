@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.Manifest
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.graphics.Color
 import android.location.Geocoder
 import android.net.Uri
 import android.util.Log
@@ -35,6 +36,7 @@ import com.google.firebase.firestore.GeoPoint
 import com.isabellatressino.travely.databinding.ActivityMapBinding
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentSnapshot
 import com.isabellatressino.travely.BitmapHelper
 import com.isabellatressino.travely.R
 import com.isabellatressino.travely.models.Place
@@ -99,14 +101,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         //nav
-        btnHome.setOnClickListener{
-            startActivity(Intent(this,MainScreenActivity::class.java))
+        btnHome.setOnClickListener {
+            startActivity(Intent(this, MainScreenActivity::class.java))
         }
-        btnLocal.setOnClickListener{
-            startActivity(Intent(this,MapActivity::class.java))
+        btnLocal.setOnClickListener {
+            startActivity(Intent(this, MapActivity::class.java))
         }
-        btnPerfil.setOnClickListener{
-            startActivity(Intent(this,MainProfileActivity::class.java))
+        btnPerfil.setOnClickListener {
+            startActivity(Intent(this, MainProfileActivity::class.java))
         }
     }
 
@@ -245,7 +247,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         val firebaseUser = auth.currentUser
         val uid = firebaseUser?.uid
 
-        firestore.collection("users").whereEqualTo("authID",uid).get()
+        firestore.collection("users").whereEqualTo("authID", uid).get()
             .addOnSuccessListener { documents ->
                 val user = documents.firstOrNull()
                 if (user != null) {
@@ -258,7 +260,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     Log.w("getUserInfo", "Usuário não encontrado")
                     callback("")
                 }
-            } .addOnFailureListener {
+            }.addOnFailureListener {
                 Log.e("getUserInfo", "Falha ao fazer requisição")
                 Toast.makeText(
                     this, "Falha ao buscar usuário",
@@ -286,34 +288,19 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     val type = document.getString("type") ?: ""
                     val rate = document.getDouble("rating") ?: 0.0
 
-                    // Verifica se businessHours é um Map e trata corretamente
                     val businessHoursMap =
                         document.get("businessHours") as? Map<String, List<String>> ?: emptyMap()
 
-                    // Converte o Map em um formato que você deseja usar
                     val businessHoursArray = businessHoursMap.map { entry ->
                         entry.key to entry.value.toTypedArray()
-                    }.toMap() // Isso cria um Map<String, Array<String>>
+                    }.toMap()
 
                     val geopoint = document.getGeoPoint("geopoint")
                     val profiles = (document.get("profiles") as? List<String>)?.toTypedArray()
                     val picture = document.getString("picture") ?: ""
 
                     // Extração dos dados do schedule
-                    val scheduleMap = document.get("schedule") as? Map<String, Any>
-
-                    // Verifica se o schedule existe e extrai os dados
-                    val schedule = if (scheduleMap != null) {
-                        val bookingData =
-                            scheduleMap["bookingData"] as? Timestamp ?: Timestamp.now()
-                        val placeID = scheduleMap["placeID"] as? String ?: ""
-                        val compra = scheduleMap["compra"] as? String ?: ""
-                        val preco = (scheduleMap["preco"] as? Double ?: 0.0).toFloat()
-
-                        Schedule(bookingData, placeID, compra, preco)
-                    } else {
-                        null
-                    }
+                    val schedule = extractScheduleData(document) ?: emptyList()
 
                     if (geopoint != null) {
                         val place = Place(
@@ -327,7 +314,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                             geopoint,
                             profiles ?: emptyArray(),
                             picture,
-                            schedule ?: Schedule(Timestamp.now(), "", "", 0.0f)
+                            schedule
                         )
                         places.add(place)
                     }
@@ -345,6 +332,22 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
     }
 
+    private fun extractScheduleData(document: DocumentSnapshot): List<Schedule> {
+        // Acessando o campo 'schedule' e garantindo que é uma lista de maps
+        val schedulesList =
+            document.get("schedule") as? List<Map<String, Any>> ?: return emptyList()
+
+        return schedulesList.map { scheduleMap ->
+            // Usando operadores seguros para evitar NullPointerExceptions
+            val placeID = scheduleMap["placeID"] as? String ?: ""
+            val availability = scheduleMap["availability"] as? Int ?: 0
+            val price = scheduleMap["price"] as? Double ?: 0.0
+            val datetime = scheduleMap["datetime"] as? String ?: ""
+
+            Schedule(placeID, availability, price, datetime)
+        }
+    }
+
     /**
      * Adiciona os marcadores no mapa
      *
@@ -354,27 +357,27 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         places.forEach { place ->
             val marker = place.geopoint.let { geoPoint ->
                 val iconResource = if (place.profiles.isNotEmpty()) {
-                       if (place.profiles.contains(userProfile)) {
-                            when (userProfile) {
-                                "compras" -> R.drawable.pin_buy_star
-                                "gastronomico" -> R.drawable.pin_food_star
-                                "cultural" -> R.drawable.pin_culture_star
-                                "aventureiro" -> R.drawable.pin_adventure_star
-                                "negocios" -> R.drawable.pin_business_star
-                                "descanso" -> R.drawable.pin_relax_star
-                                else -> 0
-                            }
-                        } else {
-                            when (place.profiles[0]) {
-                                "compras" -> R.drawable.pin_buy
-                                "gastronomico" -> R.drawable.pin_food
-                                "cultural" -> R.drawable.pin_culture
-                                "aventureiro" -> R.drawable.pin_adventure
-                                "negocios" -> R.drawable.pin_business
-                                "descanso" -> R.drawable.pin_relax
-                                else -> 0
-                            }
+                    if (place.profiles.contains(userProfile)) {
+                        when (userProfile) {
+                            "compras" -> R.drawable.pin_buy_star
+                            "gastronomico" -> R.drawable.pin_food_star
+                            "cultural" -> R.drawable.pin_culture_star
+                            "aventureiro" -> R.drawable.pin_adventure_star
+                            "negocios" -> R.drawable.pin_business_star
+                            "descanso" -> R.drawable.pin_relax_star
+                            else -> 0
                         }
+                    } else {
+                        when (place.profiles[0]) {
+                            "compras" -> R.drawable.pin_buy
+                            "gastronomico" -> R.drawable.pin_food
+                            "cultural" -> R.drawable.pin_culture
+                            "aventureiro" -> R.drawable.pin_adventure
+                            "negocios" -> R.drawable.pin_business
+                            "descanso" -> R.drawable.pin_relax
+                            else -> 0
+                        }
+                    }
                 } else {
                     R.drawable.location_pin
                 }
@@ -475,6 +478,16 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 .alpha(1f)
                 .setDuration(200)
                 .start()
+        }
+
+        if (place.isOpen()) {
+            binding.tvStatus.text = "Aberto"
+            binding.tvOpenClosed.text = "Fecha às ${place.getCloseTime()}"
+            binding.tvStatus.setTextColor(Color.parseColor("#9BB550"))
+        } else {
+            binding.tvStatus.text = "Fechado"
+            binding.tvOpenClosed.text = "Abre ${place.getNextOpenTime()}"
+            binding.tvStatus.setTextColor(Color.parseColor("#F44336"))
         }
     }
 

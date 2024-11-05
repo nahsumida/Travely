@@ -1,118 +1,414 @@
 package com.isabellatressino.travely.activity
 
-import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
-import com.isabellatressino.travely.databinding.ActivityPlaceInfoBinding
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import com.isabellatressino.travely.R
+import com.isabellatressino.travely.adapters.DaysAdapter
+import com.isabellatressino.travely.adapters.TimeAdapter
+import com.isabellatressino.travely.databinding.ActivityPlaceInfoBinding
 import com.isabellatressino.travely.models.Place
 import com.isabellatressino.travely.models.Schedule
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.util.Calendar
+import java.util.Locale
 
+val tag = "TESTEADAPTER"
 
 class PlaceInfoActivity : AppCompatActivity() {
 
     private val binding by lazy { ActivityPlaceInfoBinding.inflate(layoutInflater) }
-    private lateinit var firestore: FirebaseFirestore
-    private lateinit var storage: FirebaseStorage
+    private val firestore by lazy { FirebaseFirestore.getInstance() }
+    private val calendar by lazy { Calendar.getInstance() }
+
+    private lateinit var adapterDays: DaysAdapter
+    private lateinit var adapterTime: TimeAdapter
+    private lateinit var place: Place
+    private lateinit var placeID: String
+
+    private var scheduleTime = ""
+    private var scheduleDate = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        firestore = FirebaseFirestore.getInstance()
-        storage = FirebaseStorage.getInstance()
+        setupSpinner()
+        setupRecyclerViewDays()
 
-        val placeId = intent.getStringExtra("PLACE_ID")
-        if (placeId != null) {
-            Log.d("IsabellaMAria", placeId)
+        val placeIdIntent = intent.getStringExtra("PLACE_ID")
+        if (placeIdIntent != null) {
             showLoading(true)
-            loadPlaceById(placeId)
+            loadPlaceById(placeIdIntent)
+            placeID = placeIdIntent
         }
 
         binding.btnBack.setOnClickListener {
             finish()
         }
 
+        binding.btnSchedule.setOnClickListener {
+            addSchedule()
+        }
+
+    }
+
+    /**
+     * OBS:: Para quem for fazer o servidor
+     *
+     * Ao clicar no dia e no horario disponível, o adapter já faz um callback e retorna a data e horario selecionados
+     * formato da val schedule = 2024-11-24T15:00:00Z
+     */
+    private fun addSchedule() {
+        val schedule = "${scheduleDate.slice(0..9)}T$scheduleTime:00Z"
+        Toast.makeText(this, "confirmado, prox activity", Toast.LENGTH_SHORT).show()
+        Log.d("TESTEADAPTER", schedule)
+    }
+
+    private fun updateButtonState() {
+        binding.btnSchedule.isEnabled =
+            scheduleDate.isNotEmpty() && scheduleTime.isNotEmpty()
+    }
+
+    private fun showCardSchedule(): String {
+        val scheduling = "${scheduleDate.slice(0..9)}T$scheduleTime:00Z"
+        val schedulesList = place.schedule
+        var quantity = 1
+        var totalPrice = 0.0
+
+
+        for (schedule in schedulesList) {
+            if (schedule.datetime == scheduling) {
+                val basePrice = schedule.price
+                val fee = basePrice * 0.1
+
+                binding.card.tvPrice.text =
+                    "R$ ${String.format("%.2f", basePrice).replace(".", ",")} +" +
+                            " ( R$ ${String.format("%.2f", fee).replace(".", ",")} taxa)"
+                binding.card.tvQuantity.text = quantity.toString()
+                binding.card.tvTotalPrice.text =
+                    "R$ ${String.format(" % .2f", (basePrice + fee) * quantity).replace(".", ", ")}"
+
+                binding.card.btnMore.setOnClickListener {
+                    if (quantity < schedule.availability) {
+                        quantity++
+                        binding.card.tvQuantity.text = quantity.toString()
+                        binding.card.tvTotalPrice.text =
+                            "R$ ${
+                                String.format(" % .2f", (basePrice + fee) * quantity)
+                                    .replace(".", ", ")
+                            }"
+
+                        binding.card.btnLess.isEnabled = true
+                    }
+
+                    binding.card.btnMore.isEnabled = quantity < schedule.availability
+                }
+
+                binding.card.btnLess.setOnClickListener {
+                    if (quantity > 1) {
+                        quantity--
+                        binding.card.tvQuantity.text = quantity.toString()
+                        binding.card.tvTotalPrice.text =
+                            "R$ ${
+                                String.format(" % .2f", (basePrice + fee) * quantity)
+                                    .replace(".", ", ")
+                            }"
+
+                        binding.card.btnMore.isEnabled = true
+                    }
+
+                    binding.card.btnLess.isEnabled = quantity > 1
+                }
+
+                binding.card.btnBuy.setOnClickListener {
+                    addSchedule()
+                }
+
+                totalPrice = (basePrice + fee) * quantity
+            }
+        }
+
+        // Aqui retorno os dados em formato de string, tanto para salvar a schedule para o usuário,
+        // quanto para passar no intent para a proxima tela
+        return "placeId:$placeID,price:$totalPrice,quantity(avaiability?):$quantity,datetime:$scheduling"
+    }
+
+
+    private fun setupSpinner() {
+        val spinnerItems = getNextSixMonths()
+        binding.spinner.adapter =
+            ArrayAdapter(this, R.layout.spinner_item, spinnerItems).apply {
+                setDropDownViewResource(R.layout.spinner_dropdown_item)
+            }
+
+        binding.spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>,
+                view: View,
+                position: Int,
+                id: Long
+            ) {
+                val (month, year) = parseSelectedMonth(
+                    parent.getItemAtPosition(position).toString()
+                )
+                adapterDays.resetSelection()
+                scheduleDate = ""
+                updateButtonState()
+                adapterDays.updateDays(getDaysOfMonth(month, year))
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
+    }
+
+    private fun setupRecyclerViewDays() {
+        adapterDays = DaysAdapter(mutableListOf())
+            .apply {
+                onDaySelected = { date ->
+                    adapterTime.resetSelection()
+                    scheduleTime = ""
+                    val ret = loadAvailableTimes(date)
+                    setupRecyclerViewTime(ret)
+                    scheduleDate = date
+                    updateButtonState()
+                }
+            }
+
+        binding.recyclerviewDays.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.recyclerviewDays.adapter = adapterDays
+    }
+
+    private fun setupRecyclerViewTime(timeList: List<String>) {
+        binding.recyclerviewTime.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+
+        if (::adapterTime.isInitialized) {
+            adapterTime.updateTimeList(timeList)
+        } else {
+            adapterTime = TimeAdapter(timeList.toMutableList())
+            binding.recyclerviewTime.adapter = adapterTime
+        }
+
+        adapterTime.onTimeSelected = { time ->
+            scheduleTime = time
+            updateButtonState()
+            if (place.type == "compra") {
+                binding.card.cardMain.visibility = View.VISIBLE
+                showCardSchedule()
+            }
+        }
+    }
+
+    private fun getCurrentDateInCustomFormat(): String {
+        val today = LocalDate.now()
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-eee", Locale("pt", "BR"))
+        return today.format(formatter)
+    }
+
+    private fun loadAvailableTimes(date: String): List<String> {
+        val (year, month, day, weekDay) = date.split("-")
+        val dayOfWeekMap = mapOf(
+            "seg." to "Mon", "ter." to "Tue", "qua." to "Wed",
+            "qui." to "Thu", "sex." to "Fri", "sáb." to "Sat", "dom." to "Sun"
+        )
+
+        val availableTimes = mutableListOf<String>()
+
+        if (place.type == "reserva") {
+            val dayOfWeekFormated = dayOfWeekMap[weekDay]
+            val businessHours = place.businessHours[dayOfWeekFormated]
+            if (businessHours != null) {
+                if (businessHours.size >= 2) {
+                    val times = generateHalfHourIntervals(businessHours[0], businessHours[1])
+                    for (time in times) availableTimes.add(time)
+                } else {
+                    availableTimes.add("Fechado")
+                }
+            }
+        } else if (place.type == "compra") {
+            val thisDate = "$year-$month-$day"
+            val schedulesList = place.schedule
+            for (schedule in schedulesList) {
+                val (scheduleDate, scheduleTime) = schedule.datetime.split("T")
+                if (thisDate == scheduleDate) {
+                    availableTimes.add(scheduleTime.slice(0..4))
+                }
+            }
+            if (availableTimes.isEmpty()) {
+                availableTimes.add("Nenhum horário disponível")
+                binding.card.cardMain.visibility = View.GONE
+            }
+        } else {
+            availableTimes.add("Informação indisponível")
+        }
+        return availableTimes
+    }
+
+    private fun generateHalfHourIntervals(openingTime: String, closingTime: String): List<String> {
+        val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+        val openCal = Calendar.getInstance().apply { time = dateFormat.parse(openingTime) }
+        val closeCal = Calendar.getInstance().apply { time = dateFormat.parse(closingTime) }
+
+        return buildList {
+            while (openCal.before(closeCal) || openCal == closeCal) {
+                add(dateFormat.format(openCal.time))
+                openCal.add(Calendar.MINUTE, 30)
+            }
+        }
+    }
+
+    private fun parseSelectedMonth(selectedItem: String): Pair<Int, Int> {
+        val (monthName, yearStr) = selectedItem.split(" ")
+        val month = listOf(
+            "JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO",
+            "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"
+        )
+            .indexOf(monthName.uppercase())
+        return month to yearStr.toInt()
+    }
+
+    private fun getNextSixMonths(): List<String> {
+        return (0..5).map {
+            SimpleDateFormat("MMMM yyyy", Locale("pt", "BR")).format(calendar.time).uppercase()
+                .also {
+                    calendar.add(Calendar.MONTH, 1)
+                }
+        }
+    }
+
+    private fun getDaysOfMonth(month: Int, year: Int): List<String> {
+        val days = mutableListOf<String>()
+        calendar.set(year, month, 1)
+
+        val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+        val dayOfWeekFormat = SimpleDateFormat("EEE", Locale("pt", "BR"))
+
+        val currentDay = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+        val currentMonth = Calendar.getInstance().get(Calendar.MONTH)
+
+        for (day in 1..daysInMonth) {
+            calendar.set(year, month, day)
+            val dayOfWeek = dayOfWeekFormat.format(calendar.time)
+            if (month == currentMonth) {
+                if (day >= currentDay) {
+                    days.add(
+                        String.format(
+                            "%02d-%s-%02d-%04d",
+                            day,
+                            dayOfWeek,
+                            month + 1,
+                            year
+                        )
+                    )
+                }
+            } else {
+                days.add(String.format("%02d-%s-%02d-%04d", day, dayOfWeek, month + 1, year))
+            }
+        }
+        return days
     }
 
     private fun loadPlaceById(idPlace: String) {
-        val placesCollection = firestore.collection("places")
-
-        placesCollection.document(idPlace).get()
+        firestore.collection("places").document(idPlace).get()
             .addOnSuccessListener { document ->
                 if (document.exists()) {
-                    val id = document.getString("id") ?: ""
-                    val name = document.getString("name") ?: ""
-                    val address = document.getString("address") ?: ""
-                    val description = document.getString("description") ?: ""
-                    val type = document.getString("type") ?: ""
-                    val rate = document.getDouble("rating") ?: 0.0
-
-                    val businessHoursMap =
-                        document.get("businessHours") as? Map<String, List<String>> ?: emptyMap()
-
-                    val businessHoursArray = businessHoursMap.map { entry ->
-                        entry.key to entry.value.toTypedArray()
-                    }.toMap()
-
-                    val geopoint = document.getGeoPoint("geopoint")
-                    val profiles = (document.get("profiles") as? List<String>)?.toTypedArray()
-                    val picture = document.getString("picture") ?: ""
-
-                    // Extração dos dados do schedule
-                    val scheduleMap = document.get("schedule") as? Map<String, Any>
-
-                    // Verifica se o schedule existe e extrai os dados
-                    val schedule = if (scheduleMap != null) {
-                        val bookingData =
-                            scheduleMap["bookingData"] as? Timestamp ?: Timestamp.now()
-                        val placeID = scheduleMap["placeID"] as? String ?: ""
-                        val compra = scheduleMap["compra"] as? String ?: ""
-                        val preco = (scheduleMap["preco"] as? Double ?: 0.0).toFloat()
-
-                        Schedule(bookingData, placeID, compra, preco)
-                    } else {
-                        null
-                    }
-
-                    if (geopoint != null) {
-                        val place = Place(
-                            id,
-                            name,
-                            address,
-                            description,
-                            type,
-                            rate,
-                            businessHoursArray,
-                            geopoint,
-                            profiles ?: emptyArray(),
-                            picture,
-                            schedule ?: Schedule(Timestamp.now(), "", "", 0.0f)
-                        )
-
+                    val loadedPlace = extractPlaceData(document)
+                    if (loadedPlace != null) {
+                        // Armazena o place carregado na variável de instância
+                        place = loadedPlace
                         showPlaceInfos(place)
+
+                        val ret = loadAvailableTimes(getCurrentDateInCustomFormat())
+                        setupRecyclerViewTime(ret)
+
+                        if (place.type == "reserva") {
+                            binding.btnSchedule.visibility = View.VISIBLE
+                        }
+
                     }
                 } else {
-                    Toast.makeText(this, "Documento não encontrado", Toast.LENGTH_SHORT).show()
+                    showError("Documento não encontrado")
                 }
             }
             .addOnFailureListener { exception ->
-                Toast.makeText(
-                    this,
-                    "Erro ao carregar documento: ${exception.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
+                showError("Erro ao carregar documento: ${exception.message}")
             }
     }
+
+
+    private fun extractPlaceData(document: DocumentSnapshot): Place? {
+        val id = document.getString("id") ?: ""
+        val name = document.getString("name") ?: ""
+        val address = document.getString("address") ?: ""
+        val description = document.getString("description") ?: ""
+        val type = document.getString("type") ?: ""
+        val rate = document.getDouble("rating") ?: 0.0
+
+        val businessHoursMap =
+            document.get("businessHours") as? Map<String, List<String>> ?: emptyMap()
+
+        val businessHoursArray = businessHoursMap.map { entry ->
+            entry.key to entry.value.toTypedArray()
+        }.toMap()
+
+        val geopoint = document.getGeoPoint("geopoint")
+        val profiles = (document.get("profiles") as? List<String>)?.toTypedArray()
+        val picture = document.getString("picture") ?: ""
+
+        // Extração dos dados do schedule
+        val schedule = extractScheduleData(document) ?: emptyList()
+
+        return if (geopoint != null) {
+            Place(
+                id,
+                name,
+                address,
+                description,
+                type,
+                rate,
+                businessHoursArray,
+                geopoint,
+                profiles ?: emptyArray(),
+                picture,
+                schedule
+            )
+        } else {
+            null
+        }
+    }
+
+    private fun extractScheduleData(document: DocumentSnapshot): List<Schedule> {
+        // Acessando o campo 'schedule' e garantindo que é uma lista de maps
+        val schedulesList =
+            document.get("schedule") as? List<Map<String, Any>> ?: return emptyList()
+
+        return schedulesList.map { scheduleMap ->
+            val placeID = placeID
+            val availability = (scheduleMap["availability"] as? Number)?.toInt() ?: 0
+            val price = (scheduleMap["price"] as? Number)?.toDouble() ?: 0.0
+            val datetime = scheduleMap["datetime"] as? String ?: ""
+
+            Schedule(placeID, availability, price, datetime)
+        }
+    }
+
 
     private fun showPlaceInfos(place: Place) {
         with(binding) {
@@ -123,8 +419,24 @@ class PlaceInfoActivity : AppCompatActivity() {
             tvDescription.text = place.description
         }
 
-        val iconResource = if (place.profiles.isNotEmpty()) {
-            when (place.profiles[0]) {
+        setPlaceImage(place)
+    }
+
+    private fun setPlaceImage(place: Place) {
+        val iconResource = getProfileIconResource(place.profiles)
+        binding.imgType.setImageResource(iconResource)
+
+        if (place.picture.isNotEmpty()) {
+            loadImageFromStorage(place.picture)
+        } else {
+            binding.imgPlace.setImageResource(R.drawable.image_unavailable)
+            showLoading(false)
+        }
+    }
+
+    private fun getProfileIconResource(profiles: Array<String>): Int {
+        return if (profiles.isNotEmpty()) {
+            when (profiles[0]) {
                 "compras" -> R.drawable.profileshopp
                 "gastronomico" -> R.drawable.profilefood
                 "cultural" -> R.drawable.profileculture
@@ -136,34 +448,19 @@ class PlaceInfoActivity : AppCompatActivity() {
         } else {
             R.drawable.profile_unavailable
         }
+    }
 
-        binding.imgType.setImageResource(iconResource)
-
-        if (place.picture.isNotEmpty()) {
-            val storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(place.picture)
-            storageReference.downloadUrl.addOnSuccessListener { uri ->
-                Glide.with(this)
-                    .load(uri)
-                    .into(binding.imgPlace)
-                showLoading(false)
-            }.addOnFailureListener { exception ->
-                Log.e("ImageLoadError", "Error loading image: ${exception.message}")
-                binding.imgPlace.setImageResource(R.drawable.image_unavailable)
-                showLoading(false)
-            }
-        } else {
+    private fun loadImageFromStorage(imageUrl: String) {
+        val storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(imageUrl)
+        storageReference.downloadUrl.addOnSuccessListener { uri ->
+            Glide.with(this)
+                .load(uri)
+                .into(binding.imgPlace)
+            showLoading(false)
+        }.addOnFailureListener { exception ->
+            Log.e("ImageLoadError", "Error loading image: ${exception.message}")
             binding.imgPlace.setImageResource(R.drawable.image_unavailable)
             showLoading(false)
-        }
-
-        if (place.isOpen()) {
-            binding.tvStatus.text = "Aberto"
-            binding.tvOpenClosed.text = "Fecha às ${place.getCloseTime()}"
-            binding.tvStatus.setTextColor(Color.parseColor("#9BB550"))
-        } else {
-            binding.tvStatus.text = "Fechado"
-            binding.tvOpenClosed.text = "Abre ${place.getNextOpenTime()}"
-            binding.tvStatus.setTextColor(Color.parseColor("#F44336"))
         }
     }
 
@@ -175,58 +472,36 @@ class PlaceInfoActivity : AppCompatActivity() {
         val halfStar = R.drawable.star_half
         val emptyStar = R.drawable.star_empty
 
-
         val fullStars = rating.toInt()
         val decimalPart = rating - fullStars
 
-        for (i in 1..fullStars) {
-            val star = ImageView(this)
-            star.setImageResource(filledStar)
-            val params = LinearLayout.LayoutParams(36, 36)
-            star.layoutParams = params
-            starLayout.addView(star)
+        repeat(fullStars) {
+            starLayout.addView(createStarImageView(filledStar))
         }
 
         if (decimalPart >= 0.5) {
-            val star = ImageView(this)
-            star.setImageResource(halfStar)
-            val params = LinearLayout.LayoutParams(36, 36)
-            star.layoutParams = params
-            starLayout.addView(star)
+            starLayout.addView(createStarImageView(halfStar))
         }
 
         val remainingStars = maxStars - fullStars - if (decimalPart >= 0.5) 1 else 0
-        for (i in 1..remainingStars) {
-            val star = ImageView(this)
-            star.setImageResource(emptyStar)
-            val params = LinearLayout.LayoutParams(36, 36)
-            star.layoutParams = params
-            starLayout.addView(star)
+        repeat(remainingStars) {
+            starLayout.addView(createStarImageView(emptyStar))
+        }
+    }
+
+    private fun createStarImageView(resource: Int): ImageView {
+        return ImageView(this).apply {
+            setImageResource(resource)
+            layoutParams = LinearLayout.LayoutParams(36, 36)
         }
     }
 
     private fun showLoading(isLoading: Boolean) {
-        if (isLoading) {
-            with(binding) {
-                progressBar.visibility = View.VISIBLE
-                tvLoading.visibility = View.VISIBLE
-                btnBack.visibility = View.GONE
-                imgType.visibility = View.GONE
-                cvImage.visibility = View.GONE
-                cvInfos.visibility = View.GONE
-                btnSchedule.visibility = View.GONE
-            }
-        } else {
-            with(binding) {
-                progressBar.visibility = View.GONE
-                tvLoading.visibility = View.GONE
-                btnBack.visibility = View.VISIBLE
-                imgType.visibility = View.VISIBLE
-                cvImage.visibility = View.VISIBLE
-                cvInfos.visibility = View.VISIBLE
-                btnSchedule.visibility = View.VISIBLE
-            }
-        }
+        binding.layoutProgressbar.visibility = if (isLoading) View.VISIBLE else View.GONE
     }
 
+    private fun showError(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        showLoading(false)
+    }
 }
