@@ -174,13 +174,17 @@ class ScheduleActivity : AppCompatActivity() {
     }
 
     private fun loadUserSchedules() {
+        val firebaseUser = auth.currentUser
+        val uid = firebaseUser?.uid
+        //firestore.collection("users").whereEqualTo("authID",uid).get()
         firestore
             .collection("users")
-            .document(auth.currentUser?.uid.toString())
+            .whereEqualTo("authID",uid)
             .get()
-            .addOnSuccessListener { document ->
-                if (document != null && document.exists()) {
-                    schedulesList = extractScheduleData(document) ?: emptyList()
+            .addOnSuccessListener { documents ->
+                val user = documents.firstOrNull()
+                if (user != null) {
+                    schedulesList = extractScheduleData(user) ?: emptyList()
                     Log.d(TAG, "$schedulesList")
                 } else {
                     Log.d(TAG, "Document does not exist")
