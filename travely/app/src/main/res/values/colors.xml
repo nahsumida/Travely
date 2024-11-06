@@ -11,4 +11,5 @@
 
     <color name="purple_haze_enabled">#869168A0</color>
     <color name="purple_haze_pressed">#8435A1</color>
+    <color name="grey_transparent">#7A868686</color>
 </resources>

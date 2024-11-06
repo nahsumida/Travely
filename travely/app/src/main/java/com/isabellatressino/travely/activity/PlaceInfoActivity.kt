@@ -127,7 +127,7 @@ class PlaceInfoActivity : AppCompatActivity() {
                         binding.card.tvTotalPrice.text =
                             "R$ ${
                                 String.format(" % .2f", (basePrice + fee) * quantity)
-                                    .replace(".", ", ")
+                                    .replace(".", ",")
                             }"
 
                         binding.card.btnMore.isEnabled = true

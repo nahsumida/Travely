@@ -90,8 +90,7 @@ class MainScreenActivity : AppCompatActivity() {
      */
     private fun getUserInfo(callback: (String) -> Unit) {
         val firebaseUser = auth.currentUser
-        //val uid = firebaseUser?.uid
-        val uid = "EO3e4XD46yW6WMiNlYU2Xdehjo32"
+        val uid = firebaseUser?.uid
         val tvName = binding.tvName
         val tvProfile = binding.tvProfile
 
