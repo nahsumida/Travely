@@ -17,6 +17,8 @@ class ConfirmActivity : AppCompatActivity() {
         binding = ActivityConfirmBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+
+        //botão menu
         binding.btnMenu.setOnClickListener {
             val intent = Intent(this, MainScreenActivity::class.java)
             startActivity(intent)
