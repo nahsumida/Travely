@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.isabellatressino.travely.R
@@ -151,20 +152,8 @@ class MainScreenActivity : AppCompatActivity() {
                     val picture = document.getString("picture") ?: ""
 
                     // Extração dos dados do schedule
-                    val scheduleMap = document.get("schedule") as? Map<String, Any>
+                    val schedule = extractScheduleData(document) ?: emptyList()
 
-                    // Verifica se o schedule existe e extrai os dados
-                    val schedule = if (scheduleMap != null) {
-                        val bookingData =
-                            scheduleMap["bookingData"] as? Timestamp ?: Timestamp.now()
-                        val placeID = scheduleMap["placeID"] as? String ?: ""
-                        val compra = scheduleMap["compra"] as? String ?: ""
-                        val preco = (scheduleMap["preco"] as? Double ?: 0.0).toFloat()
-
-                        Schedule(bookingData, placeID, compra, preco)
-                    } else {
-                        null
-                    }
                     if (geopoint != null) {
                         val place = Place(
                             id,
@@ -177,11 +166,10 @@ class MainScreenActivity : AppCompatActivity() {
                             geopoint,
                             profiles ?: emptyArray(),
                             picture,
-                            schedule ?: Schedule(Timestamp.now(), "", "", 0.0f)
-
+                            schedule
                         )
                         // Limitar quantidade de locais sugeridos ao usuário
-                        if (places.size < 6 ){
+                        if (places.size < 6) {
                             places.add(place)
                         }
                     }
@@ -198,6 +186,23 @@ class MainScreenActivity : AppCompatActivity() {
                 markTaskComplete()
             }
     }
+
+    private fun extractScheduleData(document: DocumentSnapshot): List<Schedule> {
+        // Acessando o campo 'schedule' e garantindo que é uma lista de maps
+        val schedulesList =
+            document.get("schedule") as? List<Map<String, Any>> ?: return emptyList()
+
+        return schedulesList.map { scheduleMap ->
+            // Usando operadores seguros para evitar NullPointerExceptions
+            val placeID = scheduleMap["placeID"] as? String ?: ""
+            val availability = scheduleMap["availability"] as? Int ?: 0
+            val price = scheduleMap["price"] as? Double ?: 0.0
+            val datetime = scheduleMap["datetime"] as? String ?: ""
+
+            Schedule(placeID, availability, price, datetime)
+        }
+    }
+
 
     private fun formatName(name: String): String {
         val nameParts = name.split(" ")

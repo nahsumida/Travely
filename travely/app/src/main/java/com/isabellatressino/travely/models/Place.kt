@@ -18,7 +18,7 @@ class Place(
     val geopoint: GeoPoint,
     val profiles: Array<String>,
     val picture: String,
-    val schedule: Schedule
+    val schedule: List<Schedule>
 ) {
 
     // Função para verificar se o local está aberto no momento

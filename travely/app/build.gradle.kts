@@ -51,6 +51,7 @@ dependencies {
     implementation(libs.firebase.functions.ktx)
     implementation(libs.firebase.auth)
     implementation(libs.play.services.location)
+    implementation(libs.androidx.cardview)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -68,6 +69,9 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.12.0")
     implementation("com.github.bumptech.glide:compiler:4.12.0")
 
+
+    // https://github.com/santalu/maskara - biblioteca mascaras
+    implementation("com.github.santalu:maskara:1.0.0")
 
 
 }
