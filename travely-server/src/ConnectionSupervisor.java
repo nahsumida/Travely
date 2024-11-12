@@ -3,7 +3,6 @@ import java.net.*;
 import java.util.*;
 
 public class ConnectionSupervisor extends Thread{
-    private double              value=0;
     private User            user;
     private Socket              connection;
     private ArrayList<User> users;
@@ -101,10 +100,20 @@ public class ConnectionSupervisor extends Thread{
                 if (comunicado==null)
                     return;
 
-                else if (comunicado instanceof ReservationRequest)
+                else if (comunicado instanceof BookingRequest)
                 {
                     //implementar aqui o pedido de reserva
                    // this.user.reserve();
+                    Schedule schedule = new Schedule();
+
+                   var placeId = "";
+                   var datetime = "";
+                    try {
+                        schedule.getSchedule(placeId, datetime);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
                 }
                 else if (comunicado instanceof PaymentRequest)
                 {

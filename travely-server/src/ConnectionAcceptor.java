@@ -5,7 +5,7 @@ public class ConnectionAcceptor extends Thread {
     private ArrayList<User> users;
 
     public ConnectionAcceptor
-            (String port, ArrayList<User> users)//, Baralho baralho)
+            (String port, ArrayList<User> users)
             throws Exception
     {
         if (port==null)
@@ -25,7 +25,6 @@ public class ConnectionAcceptor extends Thread {
             throw new Exception ("Usuarios ausentes");
 
         this.users = users;
-        //this.baralho = baralho;
     }
 
     public void run ()
@@ -42,7 +41,7 @@ public class ConnectionAcceptor extends Thread {
                 continue;
             }
 
-            ConnectionSupervisor supervisoraDeConexao=null;
+            ConnectionSupervisor supervisoraDeConexao = null;
             try
             {
                 supervisoraDeConexao =
