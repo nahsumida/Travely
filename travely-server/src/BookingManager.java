@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class ReservationManager {
+public class BookingManager {
     public static String DEFAULT_PORT = "3000";
 
     public static void main (String[] args)
@@ -11,15 +11,14 @@ public class ReservationManager {
             return;
         }
 
-        String port = ReservationManager.DEFAULT_PORT;
+        String port = BookingManager.DEFAULT_PORT;
 
         if (args.length==1)
             port = args[0];
 
-        ArrayList<User> users =
-                new ArrayList<>();
+        ArrayList<User> users = new ArrayList<User>();
 
-        ConnectionAcceptor aceitadoraDeConexao=null;
+        ConnectionAcceptor aceitadoraDeConexao = null;
         try
         {
             aceitadoraDeConexao = new ConnectionAcceptor (port, users);
