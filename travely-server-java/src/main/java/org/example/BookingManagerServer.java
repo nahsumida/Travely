@@ -8,7 +8,7 @@ public class BookingManagerServer {
 
     public static void main(String[] args) {
         try (ServerSocket serverSocket = new ServerSocket(6666)) {
-            System.out.println("Servidor de reservas iniciado na porta 12345...");
+            System.out.println("Servidor de reservas iniciado na porta 6666...");
 
             while (true) {
                 Socket clientSocket = serverSocket.accept();

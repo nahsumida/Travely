@@ -29,8 +29,6 @@ class CreditCardActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-
-
         with(binding) {
             etCardNumber.addTextChangedListener(createTextWatcher(tvCardNumber))
             etCardName.addTextChangedListener(createTextWatcher(tvCardName))

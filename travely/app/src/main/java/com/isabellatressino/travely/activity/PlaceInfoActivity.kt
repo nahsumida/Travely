@@ -1,6 +1,5 @@
 package com.isabellatressino.travely.activity
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -22,6 +21,13 @@ import com.isabellatressino.travely.adapters.TimeAdapter
 import com.isabellatressino.travely.databinding.ActivityPlaceInfoBinding
 import com.isabellatressino.travely.models.Place
 import com.isabellatressino.travely.models.Schedule
+import BookingManagerClientKT
+import android.content.Intent
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalTime
@@ -32,6 +38,9 @@ import java.util.Locale
 val tag = "TESTEADAPTER"
 
 class PlaceInfoActivity : AppCompatActivity() {
+    private lateinit var auth: FirebaseAuth;
+
+    private val client = BookingManagerClientKT()
 
     private val binding by lazy { ActivityPlaceInfoBinding.inflate(layoutInflater) }
     private val firestore by lazy { FirebaseFirestore.getInstance() }
@@ -82,8 +91,23 @@ class PlaceInfoActivity : AppCompatActivity() {
      * formato da val schedule = 2024-11-24T15:00:00Z
      */
     private fun addSchedule() {
+        auth = FirebaseAuth.getInstance()
+
+        val authID = auth.currentUser
         val schedule = "${scheduleDate.slice(0..9)}T$scheduleTime:00Z"
+
         Toast.makeText(this, "confirmado, prox activity", Toast.LENGTH_SHORT).show()
+
+        if (place.type == "reserva"){
+            if (authID != null) {
+                sendBookingRequest(authID.uid, placeID , schedule, 1) // pre
+            }
+        } else {
+            val intent = Intent(this@PlaceInfoActivity, ConfirmActivity::class.java)
+            startActivity(intent)
+        }
+
+
         Log.d("TESTEADAPTER", schedule)
     }
 
@@ -97,7 +121,6 @@ class PlaceInfoActivity : AppCompatActivity() {
         val schedulesList = place.schedule
         var quantity = 1
         var totalPrice = 0.0
-
 
         for (schedule in schedulesList) {
             if (schedule.datetime == scheduling) {
@@ -415,7 +438,6 @@ class PlaceInfoActivity : AppCompatActivity() {
         }
     }
 
-
     private fun showPlaceInfos(place: Place) {
         with(binding) {
             tvName.text = place.name
@@ -509,5 +531,27 @@ class PlaceInfoActivity : AppCompatActivity() {
     private fun showError(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
         showLoading(false)
+    }
+
+    private fun sendBookingRequest(authID: String, placeID: String, datetime: String, amount: Int) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val result = client.sendBookingRequest(authID, placeID, datetime, amount)
+
+            withContext(Dispatchers.Main) {
+                // Exibe o Toast e navega para a próxima Activity se a resposta for sucesso
+                if (result.contains("SUCESSO")) {
+                    Toast.makeText(this@PlaceInfoActivity, "Reserva realizada com sucesso!", Toast.LENGTH_LONG).show()
+
+                    // Navega para a próxima Activity
+                    val intent = Intent(this@PlaceInfoActivity, ConfirmActivity::class.java)
+                    startActivity(intent)
+                 //   finish() // Opcional: fecha a Activity atual
+
+                } else {
+                    // Exibe um Toast com a mensagem de erro
+                    Toast.makeText(this@PlaceInfoActivity, result, Toast.LENGTH_LONG).show()
+                }
+            }
+        }
     }
 }
