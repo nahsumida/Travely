@@ -15,10 +15,15 @@ import com.isabellatressino.travely.models.Schedule
 class ScheduleAdapter(private val schedules: MutableList<Schedule>) :
     RecyclerView.Adapter<ScheduleAdapter.CardItemViewHolder>() {
 
+    private var selectedPosition = -1
+
     inner class CardItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val placeName: TextView = itemView.findViewById(R.id.tvPlaceName)
-        val date: TextView = itemView.findViewById(R.id.tvDate)
-        val time: TextView = itemView.findViewById(R.id.tvTime)
+        val tvType: TextView = itemView.findViewById(R.id.tv_type)
+        val tvPlaceName: TextView = itemView.findViewById(R.id.tv_place_name)
+        val tvPlaceAddress: TextView = itemView.findViewById(R.id.tv_place_address)
+        val tvScheduleTime: TextView = itemView.findViewById(R.id.tv_schedule_time)
+        val tvScheduleQuantity: TextView = itemView.findViewById(R.id.tv_schedule_quantity)
+        val tvSchedulePrice: TextView = itemView.findViewById(R.id.tv_schedule_price)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardItemViewHolder {
@@ -33,41 +38,60 @@ class ScheduleAdapter(private val schedules: MutableList<Schedule>) :
 
     override fun onBindViewHolder(holder: CardItemViewHolder, position: Int) {
         val schedule = schedules[position]
+        val (scheduleDate, scheduleTime) = schedule.datetime.split("T")
+        Log.d("ScheduleAdapter", "$schedule")
 
-        Log.d("TESTE FIREBASE SCHEDULE", "Binding schedule at position $position: $schedule")
+        loadPlaceNameFromFirestore(schedule.placeID) { ret ->
 
-        val timeStamp = schedule.bookingData.toDate()
+            holder.tvPlaceName.text = ret.name
+            holder.tvPlaceAddress.text = ret.address
+            holder.tvScheduleTime.text = scheduleTime.slice(0..4)
 
-        // Formatação da data
-        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        val formattedDate = dateFormat.format(timeStamp)
-
-        // Formatação do horário
-        val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-        val formattedTime = timeFormat.format(timeStamp)
-
-        // Atribuindo valores às views
-        holder.date.text = "Data: $formattedDate"
-        holder.time.text = "Horário: $formattedTime"
-
-        // Carrega o nome do local de forma assíncrona
-        loadPlaceNameFromFirestore(schedule.placeID) { name ->
-            holder.placeName.text = name
+            if (ret.type == "compra") {
+                holder.tvType.text = "Ingresso"
+                holder.tvScheduleQuantity.text =
+                    "${schedule.availability} " + if (schedule.availability == 1) "pessoa" else "pessoas"
+                holder.tvSchedulePrice.text =
+                    "R$ ${String.format(" % .2f", schedule.price).replace(".", ",")}"
+            } else if (ret.type == "reserva") {
+                holder.tvType.text = "Agendamento"
+                holder.tvScheduleQuantity.text = ""
+                holder.tvSchedulePrice.text = ""
+            }
         }
+
+
     }
 
-    private fun loadPlaceNameFromFirestore(placeId: String, callback: (String) -> Unit) {
+    fun cleamList() {
+        schedules.clear()
+        notifyDataSetChanged()
+    }
+
+    fun updateSchedules(newSchedules: List<Schedule>) {
+        schedules.clear()
+        schedules.addAll(newSchedules)
+        notifyDataSetChanged()
+    }
+
+    private fun loadPlaceNameFromFirestore(placeId: String, callback: (PlaceSchedule) -> Unit) {
         val firestore = FirebaseFirestore.getInstance()
 
         firestore.collection("places").document(placeId).get()
             .addOnSuccessListener { document ->
                 val name = document.getString("name") ?: ""
-                callback(name) // Passa o nome recuperado para a callback
+                val address = document.getString("address") ?: ""
+                val type = document.getString("type") ?: ""
+                callback(PlaceSchedule(name, address, type))
             }
             .addOnFailureListener {
                 Log.d("TESTE FIREBASE SCHEDULE", "Não foi possivel obter as informações do banco")
-                callback("Nome não encontrado")
             }
     }
-
 }
+
+data class PlaceSchedule(
+    val name: String,
+    val address: String,
+    val type: String
+)

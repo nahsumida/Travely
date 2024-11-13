@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".activity.CreditCardActivity">
+
+    <ImageButton
+        android:id="@+id/btn_close"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:background="@null"
+        android:scaleType="centerCrop"
+        android:src="@drawable/icon_close"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/iv_card_back"
+        android:layout_width="250dp"
+        android:layout_height="150dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/shape_card_back"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/iv_card_front"
+        app:layout_constraintTop_toBottomOf="@id/btn_close" />
+
+    <TextView
+        android:id="@+id/tv_cvv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
+        android:layout_marginEnd="20dp"
+        android:text="000"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="@id/iv_card_back"
+        app:layout_constraintTop_toTopOf="@id/iv_card_back" />
+
+    <View
+        android:id="@+id/iv_card_front"
+        android:layout_width="250dp"
+        android:layout_height="150dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/shape_card_front"
+        android:elevation="10dp"
+        app:layout_constraintEnd_toEndOf="@id/iv_card_back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/iv_card_back" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="30dp"
+        android:elevation="11dp"
+        android:src="@drawable/icon_chip"
+        app:layout_constraintStart_toStartOf="@id/iv_card_front"
+        app:layout_constraintTop_toTopOf="@id/iv_card_front" />
+
+    <TextView
+        android:id="@+id/tv_card_number"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
+        android:elevation="11dp"
+        android:gravity="center"
+        android:text="0000 0000 0000 0000"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="@id/iv_card_front"
+        app:layout_constraintStart_toStartOf="@id/iv_card_front"
+        app:layout_constraintTop_toTopOf="@id/iv_card_front" />
+
+    <TextView
+        android:id="@+id/tv_card_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="5dp"
+        android:elevation="11dp"
+        android:text="Nome no cartão"
+        android:textAllCaps="true"
+        android:textColor="@color/white"
+        android:textSize="10sp"
+        app:layout_constraintEnd_toStartOf="@id/tv_card_expiration_date"
+        app:layout_constraintStart_toStartOf="@id/iv_card_front"
+        app:layout_constraintTop_toBottomOf="@id/tv_card_number" />
+
+    <TextView
+        android:id="@+id/tv_card_expiration_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="20dp"
+        android:elevation="11dp"
+        android:text="10/10"
+        android:textColor="@color/white"
+        android:textSize="10sp"
+        app:layout_constraintEnd_toEndOf="@id/iv_card_front"
+        app:layout_constraintTop_toBottomOf="@id/tv_card_number" />
+
+    <TextView
+        android:id="@+id/tv_label_card_number"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="42dp"
+        android:layout_marginTop="50dp"
+        android:text="Numero do cartão"
+        android:textColor="@color/grey"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/iv_card_front" />
+
+    <com.santalu.maskara.widget.MaskEditText
+        android:id="@+id/et_card_number"
+        style="@style/Inputs"
+        android:layout_marginHorizontal="40dp"
+        android:hint="ex.: 0000 0000 0000 0000"
+        android:inputType="number"
+        android:textColor="@color/grey"
+        android:textColorHint="@color/light_grey"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_label_card_number"
+        app:mask="____ ____ ____ ____"
+        app:maskCharacter="_"
+        app:maskStyle="normal" />
+
+    <TextView
+        android:id="@+id/tv_label_card_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="42dp"
+        android:layout_marginTop="15dp"
+        android:text="Nome"
+        android:textColor="@color/grey"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/et_card_number" />
+
+    <EditText
+        android:id="@+id/et_card_name"
+        style="@style/Inputs"
+        android:layout_marginHorizontal="40dp"
+        android:hint="Nome como consta no cartão"
+        android:inputType="textCapCharacters"
+        android:maxLength="20"
+        android:textColor="@color/grey"
+        android:textColorHint="@color/light_grey"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_label_card_name" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.6" />
+
+    <TextView
+        android:id="@+id/tv_label_expiration_date"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="42dp"
+        android:layout_marginTop="15dp"
+        android:text="Data de Expiração"
+        android:textColor="@color/grey"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/et_card_name" />
+
+    <com.santalu.maskara.widget.MaskEditText
+        android:id="@+id/et_expiration_date"
+        style="@style/Inputs"
+        android:layout_marginHorizontal="40dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="15dp"
+        android:hint="MM/AA"
+        android:inputType="number"
+        android:textColor="@color/grey"
+        android:textColorHint="@color/light_grey"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toStartOf="@id/guideline3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_label_expiration_date"
+        app:mask="__/__"
+        app:maskCharacter="_"
+        app:maskStyle="normal" />
+
+    <TextView
+        android:id="@+id/tv_label_cvv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="17dp"
+        android:layout_marginTop="15dp"
+        android:text="CVV"
+        android:textColor="@color/grey"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guideline3"
+        app:layout_constraintTop_toBottomOf="@id/et_card_name" />
+
+    <EditText
+        android:id="@+id/et_cvv"
+        style="@style/Inputs"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="40dp"
+        android:hint="000"
+        android:inputType="number"
+        android:maxLength="3"
+        android:textColor="@color/grey"
+        android:textColorHint="@color/light_grey"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guideline3"
+        app:layout_constraintTop_toBottomOf="@id/tv_label_cvv" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_confirm"
+        style="@style/Button"
+        android:layout_marginHorizontal="40dp"
+        android:text="Confirmar"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/et_expiration_date"
+        app:rippleColor="@color/lime_green" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
