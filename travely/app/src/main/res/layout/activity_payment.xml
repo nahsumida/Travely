@@ -20,7 +20,6 @@
         android:id="@+id/top_background"
         android:layout_width="0dp"
         android:layout_height="180dp"
-        android:background="@color/purple_500"
         android:elevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -34,10 +33,10 @@
         android:layout_marginTop="20dp"
         android:background="@null"
         android:src="@drawable/icon_back"
-        android:tint="@color/black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:elevation="5dp" />
+        android:elevation="5dp"
+        app:tint="@color/black" />
 
     <TextView
         android:id="@+id/tv_reserva"
