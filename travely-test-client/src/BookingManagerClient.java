@@ -12,7 +12,7 @@ public class BookingManagerClient {
         String authID = "grAvCnSRzOOSi814teqiBo7F00C2"; // Exemplo de authID
         String placeID = "BDxWmMnb099UedcmlzeW"; // Exemplo de placeID
         String datetime = "2024-11-12T09:00:00Z"; // Exemplo de datetime
-        Integer amount = 1; // Exemplo de amount
+        Integer amount = 12; // Exemplo de amount
 
         try (Socket socket = new Socket(SERVER_IP, SERVER_PORT);
              PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);

@@ -74,12 +74,6 @@ class PlaceInfoActivity : AppCompatActivity() {
 
         binding.btnSchedule.setOnClickListener {
             addSchedule()
-            if (place.type == "reserva") {
-                val intent = Intent(this, ConfirmActivity::class.java)
-            } else {
-                val intent = Intent(this, QrCodeActivity::class.java)
-            }
-            startActivity(intent)
         }
 
     }
@@ -95,8 +89,6 @@ class PlaceInfoActivity : AppCompatActivity() {
 
         val authID = auth.currentUser
         val schedule = "${scheduleDate.slice(0..9)}T$scheduleTime:00Z"
-
-        Toast.makeText(this, "confirmado, prox activity", Toast.LENGTH_SHORT).show()
 
         if (place.type == "reserva"){
             if (authID != null) {
@@ -166,12 +158,23 @@ class PlaceInfoActivity : AppCompatActivity() {
                 }
 
                 binding.card.btnBuy.setOnClickListener {
-                    addSchedule()
+                   // addSchedule()
+                    val intent = Intent(this, QrCodeActivity::class.java)
+                    intent.putExtra("placeID", placeID)
+                    intent.putExtra("date", scheduling)
+                    intent.putExtra("amount", quantity)
+                    startActivity(intent)
                 }
 
                 totalPrice = (basePrice + fee) * quantity
             }
         }
+
+        /*val intent = Intent(this, QrCodeActivity::class.java)
+         intent.putExtra("placeID", placeID)
+         intent.putExtra("date", scheduling)
+         intent.putExtra("amount", quantity)
+        startActivity(intent)*/
 
         // Aqui retorno os dados em formato de string, tanto para salvar a schedule para o usuário,
         // quanto para passar no intent para a proxima tela

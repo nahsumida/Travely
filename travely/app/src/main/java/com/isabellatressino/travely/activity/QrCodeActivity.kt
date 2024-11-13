@@ -39,18 +39,23 @@ class QrCodeActivity : AppCompatActivity() {
 
             auth = FirebaseAuth.getInstance()
 
-            val authID = auth.currentUser
             val placeID = intent.getStringExtra("placeID")
             val date = intent.getStringExtra("date")
-            val amount = intent.getStringExtra("amount")
+            var amount = intent.getStringExtra("amount")
 
-            if (authID != null) {
+            val authUser = auth.currentUser
+            if (authUser != null) {
+                val authID = authUser.uid
                 if (placeID != null) {
                     if (date != null) {
-                        sendBookingRequest(authID.uid, placeID , date, amount!!.toInt())
+                        if (amount == null){
+                            amount = "1"
+                        }
+                        sendBookingRequest(authID, placeID , date, amount.toInt())
                     }
                 }
             }
+
 
             Handler(Looper.getMainLooper()).postDelayed({
                 val intent = Intent(this,ConfirmActivity::class.java)

@@ -9,7 +9,7 @@ import kotlinx.coroutines.withContext
 class BookingManagerClientKT{
 
     companion object {
-        private const val SERVER_IP = "localhost" // IP do servidor
+        private const val SERVER_IP = "10.0.2.2" // IP do servidor
         private const val SERVER_PORT = 6666 // Porta do servidor
     }
 
