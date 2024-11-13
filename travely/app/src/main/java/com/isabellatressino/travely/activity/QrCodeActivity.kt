@@ -24,13 +24,12 @@ class QrCodeActivity : AppCompatActivity() {
             binding.progressBar.visibility = View.VISIBLE
             binding.loadingMessage.visibility = View.VISIBLE
 
-            /* hander progress bar -> tela confirmação
             Handler(Looper.getMainLooper()).postDelayed({
-                val intent = Intent(this,activity::class.java)
+                val intent = Intent(this,ConfirmActivity::class.java)
                 startActivity(intent)
                 finish()
             }, 3000)
-             */
+
         }
 
         binding.btnClose.setOnClickListener{
