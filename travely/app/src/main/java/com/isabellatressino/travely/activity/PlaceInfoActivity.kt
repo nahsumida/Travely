@@ -1,5 +1,6 @@
 package com.isabellatressino.travely.activity
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -64,6 +65,12 @@ class PlaceInfoActivity : AppCompatActivity() {
 
         binding.btnSchedule.setOnClickListener {
             addSchedule()
+            if (place.type == "reserva") {
+                val intent = Intent(this, ConfirmActivity::class.java)
+            } else {
+                val intent = Intent(this, QrCodeActivity::class.java)
+            }
+            startActivity(intent)
         }
 
     }
@@ -129,7 +136,6 @@ class PlaceInfoActivity : AppCompatActivity() {
                                 String.format(" % .2f", (basePrice + fee) * quantity)
                                     .replace(".", ",")
                             }"
-
                         binding.card.btnMore.isEnabled = true
                     }
 
