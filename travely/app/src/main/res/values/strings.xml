@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Travely</string>
+    <string name="reserva_confimada">Reserva efetuada com sucesso!\n As informações da sua reserva foram enviadas para seu endereço de email.</string>
 </resources>
