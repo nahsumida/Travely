@@ -16,9 +16,9 @@ class ScheduleAdapter(private val schedules: MutableList<Schedule>) :
     RecyclerView.Adapter<ScheduleAdapter.CardItemViewHolder>() {
 
     inner class CardItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val placeName: TextView = itemView.findViewById(R.id.tvPlaceName)
-        val date: TextView = itemView.findViewById(R.id.tvDate)
-        val time: TextView = itemView.findViewById(R.id.tvTime)
+        //val placeName: TextView = itemView.findViewById(R.id.tvPlaceName)
+        // val date: TextView = itemView.findViewById(R.id.tvDate)
+        //val time: TextView = itemView.findViewById(R.id.tvTime)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardItemViewHolder {
@@ -47,12 +47,12 @@ class ScheduleAdapter(private val schedules: MutableList<Schedule>) :
         val formattedTime = timeFormat.format(timeStamp)
 
         // Atribuindo valores às views
-        holder.date.text = "Data: $formattedDate"
-        holder.time.text = "Horário: $formattedTime"
+        //holder.date.text = "Data: $formattedDate"
+        //holder.time.text = "Horário: $formattedTime"
 
         // Carrega o nome do local de forma assíncrona
         loadPlaceNameFromFirestore(schedule.placeID) { name ->
-            holder.placeName.text = name
+           // holder.placeName.text = name
         }
     }
 
