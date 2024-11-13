@@ -4,8 +4,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-public class Main {
-
+public class BookingManagerClient {
     private static final String SERVER_IP = "localhost"; // IP do servidor
     private static final int SERVER_PORT = 6666; // Porta do servidor
 
