@@ -1,5 +1,6 @@
 package com.isabellatressino.travely.activity
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -135,7 +136,7 @@ class PlaceInfoActivity : AppCompatActivity() {
                                 String.format(" % .2f", (basePrice + fee) * quantity)
                                     .replace(".", ",")
                             }"
-
+f
                         binding.card.btnMore.isEnabled = true
                     }
 
