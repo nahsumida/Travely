@@ -64,6 +64,12 @@ class PlaceInfoActivity : AppCompatActivity() {
 
         binding.btnSchedule.setOnClickListener {
             addSchedule()
+            if (place.type == "reserva") {
+                val intent = Intent(this, ConfirmActivity::class.java)
+            } else {
+                val intent = Intent(this, QrCodeActivity::class.java)
+            }
+            startActivity(intent)
         }
 
     }
