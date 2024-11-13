@@ -25,6 +25,9 @@
             android:name=".activity.CreditCardActivity"
             android:exported="false" />
         <activity
+            android:name=".activity.ConfirmActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.MapActivity"
             android:exported="false" />
         <activity
