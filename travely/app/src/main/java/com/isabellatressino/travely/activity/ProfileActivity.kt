@@ -147,7 +147,8 @@ class ProfileActivity : AppCompatActivity() {
                         ).show()
                         Handler(Looper.getMainLooper()).postDelayed({
                             // Redirecionar para a tela de Login
-                            val iRegister = Intent(this@ProfileActivity, RegisterActivity::class.java)
+                            val iRegister =
+                                Intent(this@ProfileActivity, RegisterActivity::class.java)
                             startActivity(iRegister)
                             finish()
                         }, 2500L)
@@ -166,28 +167,39 @@ class ProfileActivity : AppCompatActivity() {
     // Função para atualizar campo 'authID' do usuário no Firestore
     private fun updateUID(user: User, docId: String) {
         firebase = FirebaseFirestore.getInstance()
-        val userUpdate = hashMapOf(
-            "authID" to user.authID
-        )
 
-        // Atualizar campo authID com o id do usuário criado no Auth
-        firebase.collection("users").document(docId)
-            .update(userUpdate as Map<String, Any>)
-            .addOnSuccessListener {
-                Log.d("updateUID","Sucesso ao atualizar campo authID.")
-                Log.d("Cadastro User", "User adicionado com ID: ${docId}")
-                //Toast.makeText(this, "User cadastrado com sucesso", Toast.LENGTH_SHORT
-                //).show()
-                // deslogar o usuário
-                auth.signOut()
+        firebase.collection("users").document(docId).get()
+            .addOnSuccessListener { document ->
+                if (document.exists() && document.getString("authID").isNullOrEmpty()) {
+                    val userUpdate = hashMapOf(
+                        "authID" to user.authID
+                    )
 
-                // Redirecionar para a tela de Login
-                val iLogin = Intent(this@ProfileActivity, LoginActivity::class.java)
-                startActivity(iLogin)
+                    // Atualizar campo authID com o id do usuário criado no Auth
+                    firebase.collection("users").document(docId)
+                        .update(userUpdate as Map<String, Any>)
+                        .addOnSuccessListener {
+                            Log.d("updateUID", "Sucesso ao atualizar campo authID.")
+                            Log.d("Cadastro User", "User adicionado com ID: $docId")
+                            // deslogar o usuário
+                            auth.signOut()
+
+                            // Redirecionar para a tela de Login
+                            val iLogin = Intent(this@ProfileActivity, LoginActivity::class.java)
+                            startActivity(iLogin)
+                        }
+                        .addOnFailureListener { e: Exception ->
+                            Log.w("updateUID", "Erro ao atualizar authID no db", e)
+                        }
+                } else {
+                    Log.e(
+                        "updateUID",
+                        "authID já existe para este documento. Atualização cancelada."
+                    )
+                }
             }
-            .addOnFailureListener { e: Exception ->
-                Log.w("updateUID", "Erro ao atualizar authID no db", e)
+            .addOnFailureListener { e ->
+                Log.w("updateUID", "Erro ao buscar documento no Firestore", e)
             }
-
     }
 }
