@@ -21,6 +21,8 @@
                             <entry key="assetSourceType" value="FILE" />
                             <entry key="outputName" value="icon_clock" />
                             <entry key="sourceFile" value="C:\Users\Izabelle\Downloads\nav_home.svg" />
+                            <entry key="outputName" value="qrcode_f_cil" />
+                            <entry key="sourceFile" value="C:\Users\Izabelle\Downloads\QRCode_Fácil.svg" />
                           </map>
                         </option>
                       </PersistentState>
