@@ -37,9 +37,9 @@ class ConfirmActivity : AppCompatActivity() {
             val schedule = schedules.firstOrNull()
             schedule?.let {
                 binding.card.tvPlaceName.text = it.placeID
-                binding.card.tvScheduleTime.text = it.type
-                binding.card.tvScheduleQuantity.text = it.type
-                binding.card.tvSchedulePrice.text = "R$${it.preco}"
+                //binding.card.tvScheduleTime.text = it.type
+                binding.card.tvScheduleQuantity.text = it.availability.toString()
+                binding.card.tvSchedulePrice.text = "R$${it.price}"
             }
         }
 
@@ -75,7 +75,7 @@ class ConfirmActivity : AppCompatActivity() {
 
         return schedulesList.map { scheduleMap ->
             val placeID = (scheduleMap["placeId"]) as? String ?: ""
-            val availability = (scheduleMap["availability"] as? Number)?.toInt() ?: 0
+            val availability = (scheduleMap["amount"] as? Number)?.toInt() ?: 0
             val price = (scheduleMap["price"] as? Number)?.toDouble() ?: 0.0
             val datetime = scheduleMap["datetime"] as? String ?: ""
 
