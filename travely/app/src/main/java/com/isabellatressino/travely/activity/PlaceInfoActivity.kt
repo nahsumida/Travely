@@ -136,7 +136,6 @@ class PlaceInfoActivity : AppCompatActivity() {
                                 String.format(" % .2f", (basePrice + fee) * quantity)
                                     .replace(".", ",")
                             }"
-f
                         binding.card.btnMore.isEnabled = true
                     }
 
