@@ -29,15 +29,7 @@ class BookingManagerClientKT {
                             out.println(amount.toString())
 
                             // Lê a resposta do servidor
-                            val serverResponse = input.readLine()
-
-                            // Verifica a resposta recebida
-                            when {
-                                serverResponse == null -> "Erro: resposta vazia do servidor"
-                                serverResponse.contains("ERRO") -> "Falha ao processar a reserva: $serverResponse"
-                                serverResponse.contains("SUCESSO") -> "Reserva realizada com sucesso!"
-                                else -> "Resposta inesperada do servidor: $serverResponse"
-                            }
+                            input.readLine() ?: "Erro: resposta vazia do servidor"
                         }
                     }
                 }

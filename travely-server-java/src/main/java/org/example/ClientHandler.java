@@ -21,50 +21,31 @@ public class ClientHandler implements Runnable {
 
             String baseUrl = "https://southamerica-east1-travely-pi4.cloudfunctions.net";
 
-            // Lendo informações do cliente
             String authID = in.readLine();
             String placeID = in.readLine();
             String datetime = in.readLine();
-            String amountStr = in.readLine();
-            int amount = Integer.parseInt(amountStr);
+            String amount = in.readLine();
 
             // Chamar função para consultar horários
-            String jsonInputString = String.format("{\"placeID\": \"%s\", \"datetime\": \"%s\"}", placeID, datetime);
-            System.out.println("Consultando disponibilidade com: " + jsonInputString);
-            String response = callFirebaseFunction(baseUrl + "/getPlaceSchedule", jsonInputString);
+            String jsonInputString = STR."{\"placeID\": \"\{placeID}\", \"datetime\": \"\{datetime}\"}";
+            System.out.println(jsonInputString);
+            String response = callFirebaseFunction(STR."\{baseUrl}/getPlaceSchedule", jsonInputString);
 
-            if (response.equals("Erro ao chamar função Firebase")) {
-                out.println("ERRO ao consultar disponibilidade.");
-                return;
-            }
+            PlaceSchedule availableTimesResponse =  processResponse(response);
 
-            PlaceSchedule availableTimesResponse = processResponse(response);
+            // Verificar se há disponibilidade antes de tentar reservar
+            if (availableTimesResponse.getAvailability() >= Integer.parseInt(amount)){
 
-            // Verificar se há disponibilidade
-            if (availableTimesResponse.getAvailability() >= amount) {
-                jsonInputString = String.format(
-                        "{\"authID\": \"%s\", \"schedule\": {\"amount\": %d, \"placeID\": \"%s\", \"datetime\": \"%s\"}}",
-                        authID, amount, placeID, datetime);
+                jsonInputString =STR."{\"authID\": \"\{authID}\", \"schedule\": {\"amount\": \"\{Integer.parseInt(amount)}\",  \"placeID\": \"\{placeID}\", \"datetime\": \"\{datetime}\"}}";
+                String bookingResponse = callFirebaseFunction(STR."\{baseUrl}/addReservation",jsonInputString);
 
-                String bookingResponse = callFirebaseFunction(baseUrl + "/addReservation", jsonInputString);
-
-                // Verificar resposta da tentativa de reserva
-                if (bookingResponse.equals("Erro ao chamar função Firebase")) {
-                    out.println("ERRO ao realizar reserva.");
-                } else {
-                    out.println("Reserva realizada com SUCESSO!");
-                }
+                out.println(bookingResponse);
             } else {
-                out.println("ERRO Horário não disponível para reserva.");
+                out.println("Horário não disponível para reserva.");
             }
 
         } catch (IOException e) {
             e.printStackTrace();
-            try (PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)) {
-                out.println("ERRO no servidor: " + e.getMessage());
-            } catch (IOException ioException) {
-                ioException.printStackTrace();
-            }
         }
     }
 
@@ -91,9 +72,7 @@ public class ClientHandler implements Runnable {
             System.out.println("Response code: " + responseCode);
 
             BufferedReader in = new BufferedReader(new InputStreamReader(
-                    responseCode >= 200 && responseCode < 400 ?
-                            connection.getInputStream() : connection.getErrorStream(),
-                    StandardCharsets.UTF_8));
+                    connection.getInputStream(), StandardCharsets.UTF_8));
             String inputLine;
             while((inputLine = in.readLine()) != null){
                 response.append(inputLine);
@@ -107,7 +86,7 @@ public class ClientHandler implements Runnable {
         return response.toString();
     }
 
-    private PlaceSchedule processResponse(String jsonResponse) {
+    public PlaceSchedule processResponse(String jsonResponse) {
         Gson gson = new Gson();
         PlaceSchedule placeSchedule = gson.fromJson(jsonResponse, PlaceSchedule.class);
 
