@@ -16,36 +16,52 @@ public class ClientHandler implements Runnable {
 
     @Override
     public void run() {
+        System.out.println("Nova thread iniciada para o cliente: " + clientSocket.getInetAddress().getHostAddress());
+
         try (BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
              PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)) {
 
             String baseUrl = "https://southamerica-east1-travely-pi4.cloudfunctions.net";
 
+            // Receber dados do cliente
             String authID = in.readLine();
             String placeID = in.readLine();
             String datetime = in.readLine();
             String amount = in.readLine();
 
+            System.out.println("Dados recebidos: authID=" + authID + ", placeID=" + placeID +
+                    ", datetime=" + datetime + ", amount=" + amount);
+
             // Chamar função para consultar horários
-            String jsonInputString = STR."{\"placeID\": \"\{placeID}\", \"datetime\": \"\{datetime}\"}";
-            System.out.println(jsonInputString);
-            String response = callFirebaseFunction(STR."\{baseUrl}/getPlaceSchedule", jsonInputString);
+            String jsonInputString = String.format("{\"placeID\": \"%s\", \"datetime\": \"%s\"}", placeID, datetime);
+            String response = callFirebaseFunction(baseUrl + "/getPlaceSchedule", jsonInputString);
 
-            PlaceSchedule availableTimesResponse =  processResponse(response);
+            PlaceSchedule availableTimesResponse = processResponse(response);
 
-            // Verificar se há disponibilidade antes de tentar reservar
-            if (availableTimesResponse.getAvailability() >= Integer.parseInt(amount)){
-
-                jsonInputString =STR."{\"authID\": \"\{authID}\", \"schedule\": {\"amount\": \"\{Integer.parseInt(amount)}\",  \"placeID\": \"\{placeID}\", \"datetime\": \"\{datetime}\"}}";
-                String bookingResponse = callFirebaseFunction(STR."\{baseUrl}/addReservation",jsonInputString);
+            // Verificar disponibilidade
+            if (availableTimesResponse.getAvailability() >= Integer.parseInt(amount)) {
+                jsonInputString = String.format("{\"authID\": \"%s\", \"schedule\": {\"amount\": %d, \"placeID\": \"%s\", \"datetime\": \"%s\"}}",
+                        authID, Integer.parseInt(amount), placeID, datetime);
+                String bookingResponse = callFirebaseFunction(baseUrl + "/addReservation", jsonInputString);
 
                 out.println(bookingResponse);
+                System.out.println("Reserva realizada com sucesso: " + bookingResponse);
             } else {
-                out.println("Horário não disponível para reserva.");
+                String errorMsg = "Horário não disponível para reserva.";
+                out.println(errorMsg);
+                System.out.println(errorMsg);
             }
 
-        } catch (IOException e) {
+        } catch (Exception e) {
+            System.err.println("Erro ao processar o cliente: " + e.getMessage());
             e.printStackTrace();
+        } finally {
+            try {
+                clientSocket.close();
+                System.out.println("Conexão com cliente encerrada.");
+            } catch (IOException e) {
+                System.err.println("Erro ao fechar o socket: " + e.getMessage());
+            }
         }
     }
 
@@ -71,15 +87,15 @@ public class ClientHandler implements Runnable {
             int responseCode = connection.getResponseCode();
             System.out.println("Response code: " + responseCode);
 
-            BufferedReader in = new BufferedReader(new InputStreamReader(
-                    connection.getInputStream(), StandardCharsets.UTF_8));
-            String inputLine;
-            while((inputLine = in.readLine()) != null){
-                response.append(inputLine);
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+                String inputLine;
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
             }
-            in.close();
-            System.out.println("Response: " + response.toString());
-        } catch(IOException e){
+            System.out.println("Response: " + response);
+        } catch (IOException e) {
+            System.err.println("Erro ao chamar função Firebase: " + e.getMessage());
             e.printStackTrace();
             return "Erro ao chamar função Firebase";
         }
