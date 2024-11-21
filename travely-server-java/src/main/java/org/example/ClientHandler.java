@@ -33,14 +33,15 @@ public class ClientHandler implements Runnable {
                     ", datetime=" + datetime + ", amount=" + amount);
 
             // Chamar função para consultar horários
-            String jsonInputString = String.format("{\"placeID\": \"%s\", \"datetime\": \"%s\"}", placeID, datetime);
+            String jsonInputString = "{\"placeID\": \"" + placeID + "\", \"datetime\": \"" + datetime + "\"}";
+            System.out.println(jsonInputString);
             String response = callFirebaseFunction(baseUrl + "/getPlaceSchedule", jsonInputString);
+            PlaceSchedule availableTimesResponse =  processResponse(response);
 
-            PlaceSchedule availableTimesResponse = processResponse(response);
-
-            // Verificar disponibilidade
+            // Verificar se há disponibilidade antes de tentar reservar
             if (availableTimesResponse.getAvailability() >= Integer.parseInt(amount)) {
-                jsonInputString = String.format("{\"authID\": \"%s\", \"schedule\": {\"amount\": %d, \"placeID\": \"%s\", \"datetime\": \"%s\"}}",
+                // Usando String.format() para formatar a string
+                jsonInputString = String.format("{\"authID\": \"%s\", \"schedule\": {\"amount\": \"%d\", \"placeID\": \"%s\", \"datetime\": \"%s\"}}",
                         authID, Integer.parseInt(amount), placeID, datetime);
                 String bookingResponse = callFirebaseFunction(baseUrl + "/addReservation", jsonInputString);
 
