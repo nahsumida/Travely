@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
@@ -10,53 +11,118 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:background="@color/white"
         android:layout_height="wrap_content"
+        android:background="@color/white"
         android:padding="16dp">
 
-        <!-- Nome do parque -->
         <TextView
-            android:id="@+id/tvPlaceName"
+            android:id="@+id/tv_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ingresso"
+            android:textColor="@color/purple_haze"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/btn_more"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_more"
+            app:layout_constraintBottom_toBottomOf="@id/tv_type"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_type"
+            app:tint="@color/light_grey" />
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="10dp"
+            android:background="@color/grey_transparent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_type" />
+
+        <TextView
+            android:id="@+id/tv_place_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Parque Dom Pedro"
-            android:textColor="@color/black"
-            app:layout_constraintEnd_toStartOf="@id/imgMoreOptions"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <!-- Data da reserva -->
-        <TextView
-            android:id="@+id/tvDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:text="Data: 10/10/2024"
-            android:textColor="@color/grey"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvPlaceName" />
-
-        <!-- Horário da reserva -->
-        <TextView
-            android:id="@+id/tvTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:text="Horário: 10:30"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="10dp"
             android:textColor="@color/grey"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvPlaceName" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider" />
 
-        <!-- Ícone de opções (três pontos) -->
+        <TextView
+            android:id="@+id/tv_place_address"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:textColor="@color/light_grey"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/tv_place_name"
+            app:layout_constraintTop_toBottomOf="@id/tv_place_name" />
+
         <ImageView
-            android:id="@+id/imgMoreOptions"
+            android:id="@+id/iv_clock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:contentDescription="Mais opções"
-            android:src="@drawable/icon_more"
+            android:layout_marginTop="15dp"
+            android:src="@drawable/icon_clock"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_place_address"
+            app:tint="@color/grey" />
+
+        <TextView
+            android:id="@+id/tv_schedule_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:textColor="@color/grey"
+            app:layout_constraintBottom_toBottomOf="@id/iv_clock"
+            app:layout_constraintStart_toEndOf="@id/iv_clock"
+            app:layout_constraintTop_toTopOf="@id/iv_clock" />
+
+        <TextView
+            android:id="@+id/tv_schedule_quantity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:textColor="@color/grey"
+            app:layout_constraintBottom_toBottomOf="@id/iv_clock"
+            app:layout_constraintEnd_toStartOf="@+id/guideline6"
+            app:layout_constraintStart_toEndOf="@id/guideline5"
+            app:layout_constraintTop_toTopOf="@id/iv_clock" />
+
+        <TextView
+            android:id="@+id/tv_schedule_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:text="R$ 40,00"
+            android:textColor="@color/grey"
+            app:layout_constraintBottom_toBottomOf="@id/iv_clock"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_marginEnd="5dp"
+            app:layout_constraintTop_toTopOf="@id/iv_clock" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.3333333" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.66666666" />
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

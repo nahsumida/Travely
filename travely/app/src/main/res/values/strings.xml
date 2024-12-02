@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Travely</string>
+    <string name="reserva_confimada">Reserva efetuada com sucesso!\n As informações da sua reserva foram enviadas para seu endereço de email.</string>
+    <string name="credit_card_option">Cartão de Crédito</string>
+    <string name="pix_option">Pix</string>
+    <string name="payment_method">Método de Pagamento</string>
 </resources>
