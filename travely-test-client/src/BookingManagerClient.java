@@ -13,6 +13,13 @@ public class BookingManagerClient {
         String placeID = "BDxWmMnb099UedcmlzeW"; // Exemplo de placeID
         String datetime = "2024-11-12T09:00:00Z"; // Exemplo de datetime
         Integer amount = 12; // Exemplo de amount
+/*
+        Digite o authID: kAit3w3dYoUET23fIZQAp0byy9g1
+        Digite o placeID: BDxWmMnb099UedcmlzeWgrAvCnSRzOOSi814teqiBo7F00/C2BDxWmMnb099UedcmlzeW&&&
+
+        Digite a data e hora (formato: yyyy-MM-ddTHH:mm:ssZ):  2024-11-13T09:00:00Z
+        Digite o amount: 5
+        Resposta do servidor: null*/
 
         try (Socket socket = new Socket(SERVER_IP, SERVER_PORT);
              PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
@@ -25,6 +32,8 @@ public class BookingManagerClient {
             out.println(amount);
 
             // Lê a resposta do servidor
+            String status = in.readLine();
+            System.out.println(status);
             String response = in.readLine();
             System.out.println("Resposta do servidor: " + response);
 

@@ -26,6 +26,10 @@ class ConfirmActivity : AppCompatActivity() {
         firestore = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
 
+        val placeID = intent.getStringExtra("placeID")
+        val date = intent.getStringExtra("date")
+        var price = intent.getStringExtra("price")
+
         //botão menu
         binding.btnMenu.setOnClickListener {
             val intent = Intent(this, MainScreenActivity::class.java)
@@ -33,6 +37,11 @@ class ConfirmActivity : AppCompatActivity() {
             finish()
         }
 
+        binding.card.tvPlaceName.text = placeID
+        binding.card.tvScheduleTime.text = date
+        //binding.card.tvScheduleQuantity.text = it.availability.toString()
+        binding.card.tvSchedulePrice.text = "R$${price}"
+/*
         loadUserSchedules { schedules ->
             val schedule = schedules.firstOrNull()
             schedule?.let {
@@ -42,7 +51,7 @@ class ConfirmActivity : AppCompatActivity() {
                 binding.card.tvSchedulePrice.text = "R$${it.price}"
             }
         }
-
+*/
 
     }
 

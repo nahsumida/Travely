@@ -74,15 +74,20 @@ class QrCodeActivity : AppCompatActivity() {
     private fun sendBookingRequest(authID: String, placeID: String, datetime: String, amount: Int) {
         CoroutineScope(Dispatchers.IO).launch {
             val result = client.sendBookingRequest(authID, placeID, datetime, amount)
+            val list: List<String> = listOf(*result.split(",").toTypedArray())
 
             withContext(Dispatchers.Main) {
                 // Exibe o Toast e navega para a próxima Activity se a resposta for sucesso
-                if (result.contains("SUCESSO")) {
+                if (list.contains("SUCESSO")) {
                     Toast.makeText(this@QrCodeActivity, "Reserva realizada com sucesso!", Toast.LENGTH_LONG).show()
 
                     // Navega para a próxima Activity
                     val intent = Intent(this@QrCodeActivity, ConfirmActivity::class.java)
                     startActivity(intent)
+                    intent.putExtra("placeID", list[1])
+                    intent.putExtra("date", list[2])
+                    intent.putExtra("price", list[3])
+
                     finish() // Opcional: fecha a Activity atual
 
                 } else {

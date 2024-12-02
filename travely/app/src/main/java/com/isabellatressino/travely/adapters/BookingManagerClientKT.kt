@@ -14,7 +14,7 @@ class BookingManagerClientKT{
     }
 
     // Função para enviar dados de reserva para o servidor
-    suspend fun sendBookingRequest(authID: String, placeID: String, datetime: String, amount: Int): String {
+    suspend fun sendBookingRequest(authID: String, placeID: String, datetime: String, amount: Int): String  {
         return withContext(Dispatchers.IO) { // Garante execução em uma thread de IO
             try {
                 // Estabelece conexão com o servidor
@@ -29,7 +29,16 @@ class BookingManagerClientKT{
                             out.println(amount.toString())
 
                             // Lê a resposta do servidor
-                            input.readLine() ?: "Erro: resposta vazia do servidor"
+                            val status = input.readLine() ?: "Erro: resposta vazia do servidor"
+                            if (status != "FALHA"){
+                                val placeID = input.readLine()
+                                val date = input.readLine() ?: "Erro: resposta vazia do servidor"
+                                val price = input.readLine() ?: "Erro: resposta vazia do servidor"
+
+                                status + "," + placeID + "," + date + "," + price
+                            }
+
+                            "Erro: resposta vazia do servidor"
                         }
                     }
                 }
