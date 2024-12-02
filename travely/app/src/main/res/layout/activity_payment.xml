@@ -84,6 +84,7 @@
             android:padding="16dp">
 
             <TextView
+                android:id="@+id/tv_place_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Parque Dom Pedro"
@@ -92,25 +93,25 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/tv_booking_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="10/10/2024    10:30"
                 android:textSize="14sp"
                 android:textColor="@android:color/black"
                 android:layout_marginTop="4dp" />
 
             <TextView
+                android:id="@+id/tv_ticket_amount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="3 Ingressos"
                 android:textSize="14sp"
                 android:textColor="@android:color/black"
                 android:layout_marginTop="4dp" />
 
             <TextView
+                android:id="@+id/tv_total_price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="R$ 450,00"
                 android:textSize="16sp"
                 android:textColor="@android:color/holo_green_dark"
                 android:layout_gravity="end"
@@ -139,7 +140,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Método de Pagamento"
+                android:text="@string/payment_method"
                 android:textSize="16sp"
                 android:textColor="@android:color/black"
                 android:textStyle="bold" />
@@ -154,9 +155,8 @@
                     android:id="@+id/rb_cartao"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Cartão de Crédito"
-                    android:textSize="14sp"
-                android:layoutDirection="ltr" />
+                    android:text="@string/credit_card_option"
+                    android:textSize="14sp" />
 
                 <View
                     android:layout_width="match_parent"
@@ -168,9 +168,8 @@
                     android:id="@+id/rb_pix"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Pix"
-                    android:textSize="14sp"
-                android:layoutDirection="ltr" />
+                    android:text="@string/pix_option"
+                    android:textSize="14sp" />
             </RadioGroup>
         </LinearLayout>
     </androidx.cardview.widget.CardView>

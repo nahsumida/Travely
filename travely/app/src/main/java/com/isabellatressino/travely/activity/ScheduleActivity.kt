@@ -134,7 +134,8 @@ class ScheduleActivity : AppCompatActivity() {
         adapterDays = DaysAdapter(mutableListOf())
             .apply {
                 onDaySelected = { date ->
-                    adapterSchedules.updateSchedules(loadSchedulesByDate(date))
+                    val schedules = loadSchedulesByDate(date)
+                    adapterSchedules.updateSchedules(schedules)
                     Log.d(TAG, "dia selecionado $date")
                 }
             }
@@ -146,6 +147,14 @@ class ScheduleActivity : AppCompatActivity() {
 
     private fun loadSchedulesByDate(date: String): List<Schedule> {
         val ret = mutableListOf<Schedule>()
+        if (!::schedulesList.isInitialized) {
+            Log.w(TAG, "schedulesList não foi inicializada")
+            runOnUiThread {
+                binding.tvNoSchedules.visibility = View.VISIBLE
+                binding.recyclerviewSchedules.visibility = View.GONE
+            }
+            return ret
+        }
         val (year, month, day, weekDay) = date.split("-")
         val formattedDate = "$year-$month-$day"
 
@@ -155,7 +164,15 @@ class ScheduleActivity : AppCompatActivity() {
                 ret.add(schedule)
             }
         }
-
+        runOnUiThread {
+            if (ret.isEmpty()) {
+                binding.tvNoSchedules.visibility = View.VISIBLE
+                binding.recyclerviewSchedules.visibility = View.GONE
+            } else {
+                binding.tvNoSchedules.visibility = View.GONE
+                binding.recyclerviewSchedules.visibility = View.VISIBLE
+            }
+        }
         Log.d(TAG, "$ret")
         return ret
     }
@@ -174,6 +191,7 @@ class ScheduleActivity : AppCompatActivity() {
     }
 
     private fun loadUserSchedules() {
+        schedulesList = emptyList()
         val firebaseUser = auth.currentUser
         val uid = firebaseUser?.uid
         //firestore.collection("users").whereEqualTo("authID",uid).get()

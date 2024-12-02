@@ -37,10 +37,13 @@ class ConfirmActivity : AppCompatActivity() {
             finish()
         }
 
+        /* comentario temporario
         binding.card.tvPlaceName.text = placeID
         binding.card.tvScheduleTime.text = date
         //binding.card.tvScheduleQuantity.text = it.availability.toString()
         binding.card.tvSchedulePrice.text = "R$${price}"
+        */
+
 /*
         loadUserSchedules { schedules ->
             val schedule = schedules.firstOrNull()

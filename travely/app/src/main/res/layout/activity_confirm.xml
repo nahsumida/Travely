@@ -79,6 +79,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/txt_confirm1" />
 
+            <!--
             <include
                 android:id="@+id/card"
                 layout="@layout/recyclerview_schedule"
@@ -90,7 +91,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/txt_confirm2" />
-
+            -->
             <Button
                 android:id="@+id/btn_menu"
                 android:layout_width="0dp"

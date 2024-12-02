@@ -1,11 +1,10 @@
 package com.isabellatressino.travely.models
 
-
+import android.os.Parcelable
 import com.google.firebase.firestore.GeoPoint
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
-
 
 class Place(
     val id: String,
