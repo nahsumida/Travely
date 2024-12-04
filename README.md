@@ -70,7 +70,7 @@ GOOGLE_MAPS_API_KEY=sua_chave
 ## Equipe
 
 - [Emilly Ferro Bó](https://github.com/emillyfb21) RA: 23001239
-- [Isabella Maria Tressino Bruno](https://github.com/jessicakushidaa) RA: 23013050
+- [Isabella Maria Tressino Bruno](https://github.com/isabellatressino) RA: 23013050
 - [Izabelle de Oliveira Silva](https://github.com/IzabelleOliveira) RA: 23001444
 - [Jéssica Silva Kushida](https://github.com/jessicakushidaa) RA: 23012069
 - [Natália Naomi Sumida RA](https://github.com/nahsumida): 23008255
