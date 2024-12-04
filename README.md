@@ -10,9 +10,9 @@ Travely é um aplicativo de turismo desenvolvido para oferecer uma experiência 
     - Escolha seu perfil de viagem
 
         <p>
-            <img src="screenshots/inicial.jpg" alt="Interface inicial" width="100">  
-            <img src="screenshots/cadastro.jpg" alt="Interface de cadastro" width="100">
-            <img src="screenshots/perfil.jpg" alt="Interface de seleção de perfil" width="100">
+            <img src="screenshots/inicial.jpg" alt="Interface inicial" width="200">  
+            <img src="screenshots/cadastro.jpg" alt="Interface de cadastro" width="200">
+            <img src="screenshots/perfil.jpg" alt="Interface de seleção de perfil" width="200">
         </p>
 
 2.  **Exploração no Mapa**
@@ -20,22 +20,22 @@ Travely é um aplicativo de turismo desenvolvido para oferecer uma experiência 
     - Clique em um local para obter informações detalhadas ou navegar até o local diretamente via integração com Google Maps.
 
         <p>
-            <img src="screenshots/mapa.jpg" alt="Interface do mapa" width="100">
+            <img src="screenshots/mapa.jpg" alt="Interface do mapa" width="200">
         </p>
 
 3.  **Compra de Ingressos**
     - Reserve ingressos para atrações ou eventos diretamente pelo aplicativo.
 
         <p>
-            <img src="screenshots/reserva1.jpg" alt="Interface de reserva" width="100">
-            <img src="screenshots/reserva2.jpg" alt="Interface de reserva" width="100">
+            <img src="screenshots/reserva1.jpg" alt="Interface de reserva" width="200">
+            <img src="screenshots/reserva2.jpg" alt="Interface de reserva" width="200">
         </p>
 
 4.  **Agenda**
     - Salve os locais que deseja visitar na agenda e organize seus passeios.
 
         <p>
-            <img src="screenshots/agenda.jpg" alt="Interface da agenda" width="100">
+            <img src="screenshots/agenda.jpg" alt="Interface da agenda" width="200">
         </p>
 
 ## Como Usar
