@@ -26,23 +26,12 @@ class MainProfileActivity : AppCompatActivity() {
         binding = ActivityMainProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
-        val tvNome = findViewById<TextView>(R.id.tv_nome)
-        val tvNomeCompleto = findViewById<TextView>(R.id.tv_nome_completo)
-        val tvEmail = findViewById<TextView>(R.id.tv_email)
-        val tvTipoPerfil = findViewById<TextView>(R.id.tv_tipo_perfil)
-        val btnSair = findViewById<Button>(R.id.btn_logout)
-        val btnHome = findViewById<ImageButton>(R.id.btn_home)
-        val btnLocal = findViewById<ImageButton>(R.id.btn_local)
-        val btnPerfil = findViewById<ImageButton>(R.id.btn_profile)
-        val btnReservas = findViewById<Button>(R.id.btn_reservas)
-
         getUserInfo { user ->
-            carregarDadosUsuario(tvNome, tvNomeCompleto, tvEmail, tvTipoPerfil, user!!)
+            carregarDadosUsuario(binding.tvName, binding.tvEmail, user!!)
         }
 
         //logout
-        btnSair.setOnClickListener{
+        binding.btnLogout.setOnClickListener{
             FirebaseAuth.getInstance().signOut()
 
             val intent = Intent(this, LoginActivity::class.java)
@@ -52,18 +41,18 @@ class MainProfileActivity : AppCompatActivity() {
         }
 
         //reservas
-        btnReservas.setOnClickListener{
+        binding.btnSchedules.setOnClickListener{
             startActivity(Intent(this,ScheduleActivity::class.java))
         }
 
         //nav
-        btnHome.setOnClickListener{
+        binding.navBar.btnHome.setOnClickListener{
             startActivity(Intent(this,MainScreenActivity::class.java))
         }
-        btnLocal.setOnClickListener{
+        binding.navBar.btnLocal.setOnClickListener{
             startActivity(Intent(this,MapActivity::class.java))
         }
-        btnPerfil.setOnClickListener{
+        binding.navBar.btnProfile.setOnClickListener{
             startActivity(Intent(this,MainProfileActivity::class.java))
         }
     }
@@ -92,7 +81,7 @@ class MainProfileActivity : AppCompatActivity() {
                             phone = "",
                             email = email!!,
                             password = "",
-                            authID = userId, //AuthID será gerado após sucesso no registro no db
+                            authID = userId,
                             schedule = null,
                             profile = profile,
                         )
@@ -114,9 +103,7 @@ class MainProfileActivity : AppCompatActivity() {
 
     private fun carregarDadosUsuario(
         tvNome: TextView,
-        tvNomeCompleto: TextView,
         tvEmail: TextView,
-        tvTipoPerfil: TextView,
         user: User
     ) {
         val db = FirebaseFirestore.getInstance()
@@ -129,15 +116,12 @@ class MainProfileActivity : AppCompatActivity() {
                 .get()
                 .addOnSuccessListener { document ->
                     if (document != null) {
-                        val nome = user.cpf
-                        val nomeCompleto = user.name
+                        val nome = user.name
                         val email = currentUser.email
-                        val tipoPerfil = user.profile
 
                         tvNome.text = nome
-                        tvNomeCompleto.text = "Nome completo: $nomeCompleto"
-                        tvEmail.text = "Email: $email"
-                        tvTipoPerfil.text = "Perfil: $tipoPerfil"
+                        tvEmail.text = email
+
                     } else {
                         Log.d("Firestore", "Nenhum documento encontrado")
                     }
