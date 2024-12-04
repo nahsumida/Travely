@@ -24,6 +24,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Locale
+import java.util.TimeZone
 
 val TAG = "TESTE FIREBASE SCHEDULE"
 
@@ -42,14 +43,12 @@ class ScheduleActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-
-        Log.d(TAG, "oi")
-
-
         setupSpinner()
         setupRecyclerViewDays()
         setupRecyclerViewSchedules()
         loadUserSchedules()
+
+        // 15 de novembro de 2024 às 06:00:00 UTC-3
     }
 
     private fun setupSpinner() {
@@ -213,18 +212,48 @@ class ScheduleActivity : AppCompatActivity() {
             }
     }
 
+//    private fun extractScheduleData(document: DocumentSnapshot): List<Schedule> {
+//        val schedulesList =
+//            document.get("schedule") as? List<Map<String, Any>> ?: return emptyList()
+//
+//        return schedulesList.map { scheduleMap ->
+//            val placeID = (scheduleMap["placeId"]) as? String ?: ""
+//            val amount = (scheduleMap["amount"] as? Number)?.toInt() ?: 0
+//            val price = (scheduleMap["price"] as? Number)?.toDouble() ?: 0.0
+//            val datetime = scheduleMap["datetime"] as? String ?: ""
+//
+//            Schedule(placeID, amount, price, datetime)
+//        }
+//    }
+
     private fun extractScheduleData(document: DocumentSnapshot): List<Schedule> {
         val schedulesList =
             document.get("schedule") as? List<Map<String, Any>> ?: return emptyList()
 
-        return schedulesList.map { scheduleMap ->
-            val placeID = (scheduleMap["placeId"]) as? String ?: ""
-            val availability = (scheduleMap["availability"] as? Number)?.toInt() ?: 0
-            val price = (scheduleMap["price"] as? Number)?.toDouble() ?: 0.0
-            val datetime = scheduleMap["datetime"] as? String ?: ""
+        // Formato de saída (ISO 8601)
+        val outputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
+        outputFormat.timeZone = TimeZone.getTimeZone("UTC") // Garante UTC no formato de saída
 
-            Schedule(placeID, availability, price, datetime)
+        val ret = schedulesList.map { scheduleMap ->
+            val placeID = (scheduleMap["placeID"]) as? String ?: ""
+            val amount = (scheduleMap["amount"] as? Number)?.toInt() ?: 0
+            val price = (scheduleMap["price"] as? Number)?.toDouble() ?: 0.0
+
+            // Conversão do Timestamp para o formato ISO 8601
+            val datetimeTimestamp = scheduleMap["datetime"] as? Timestamp
+            val datetime = datetimeTimestamp?.toDate()?.let { outputFormat.format(it) } ?: ""
+
+            Schedule(placeID, amount, price, datetime)
         }
+
+        // Log dos dados extraídos
+        ret.forEach { schedule ->
+            Log.d(TAG, "Schedule datetime: ${schedule.datetime}")
+        }
+
+        return ret
     }
+
+
 
 }

@@ -11,152 +11,198 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@color/white"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/nav_bar">
+        android:background="#F8F8F8"
+        app:layout_constraintBottom_toTopOf="@+id/nav_bar"
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:background="@color/white"
             android:layout_height="wrap_content"
+            android:background="#F8F8F8"
             tools:ignore="MissingConstraints">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:elevation="10dp"
+                android:layout_marginEnd="15dp"
+                android:layout_marginTop="15dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:src="@drawable/icon_more"
+                app:tint="#F8F8F8"/>
+
 
             <ImageView
                 android:id="@+id/background_img"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:src="@drawable/background_purple"
+                android:layout_height="200dp"
                 android:scaleType="centerCrop"
+                android:src="@drawable/background_purple"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <Button
-                android:id="@+id/btn_logout"
-                android:layout_width="0dp"
-                android:layout_height="50dp"
-                android:shadowRadius="20"
-                android:layout_marginHorizontal="30dp"
-                android:layout_marginTop="10dp"
-                android:text="Sair"
-                android:textColor="@color/black"
-                android:backgroundTint="@color/white"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/user_img"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="150dp"
+                android:layout_marginTop="135dp"
                 android:elevation="10dp"
                 android:src="@drawable/image_profile_user"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/card_view_name"
+            <ImageView
+                android:layout_width="25dp"
+                android:layout_marginEnd="10dp"
+                android:elevation="10dp"
+                android:layout_height="25dp"
+                android:src="@drawable/ic_edit"
+                app:layout_constraintBottom_toBottomOf="@id/user_img"
+                app:layout_constraintEnd_toEndOf="@id/user_img"
+                android:scaleType="centerInside"
+                android:background="@drawable/shape_edit"
+                app:tint="@color/grey" />
+
+
+            <TextView
+                android:id="@+id/tv_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="30dp"
+                android:layout_marginTop="20dp"
+                android:text="Isabella Maria Tressino Bruno"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/user_img" />
+
+            <TextView
+                android:id="@+id/tv_email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="30dp"
+                android:layout_marginTop="5dp"
+                android:text="aoijdoa@gmail.com"
+                android:textColor="@color/grey"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_name" />
+
+            <LinearLayout
+                android:id="@+id/container_cards"
                 android:layout_width="0dp"
-                android:layout_height="60dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="30dp"
                 android:layout_marginTop="50dp"
-                android:layout_marginHorizontal="30dp"
-                app:cardCornerRadius="20dp"
-                android:background="@color/white"
+                android:orientation="vertical"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/user_img">
+                app:layout_constraintTop_toBottomOf="@id/tv_email">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:background="@color/white"
-                    android:layout_height="match_parent">
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/CardProfile"
+                    app:shapeAppearanceOverlay="@style/CustomCardShapeTop">
 
-                    <TextView
-                        android:id="@+id/tv_nome"
+                    <LinearLayout style="@style/CardLinearLayoutProfile">
+
+                        <TextView
+                            style="@style/TextViewProfileInfos"
+                            android:text="Informações da conta" />
+
+                        <ImageView style="@style/ImageViewProfileInfos" />
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <View style="@style/LineProfile" />
+
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/CardProfile"
+                    app:cardCornerRadius="0dp">
+
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginTop="20dp"
-                        android:textColor="@color/black"
-                        android:textSize="20dp"
-                        android:textAlignment="center"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        android:layout_height="wrap_content"
+                        android:background="@color/white"
+                        android:orientation="horizontal"
+                        android:padding="16dp">
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </androidx.cardview.widget.CardView>
+                        <TextView
+                            style="@style/TextViewProfileInfos"
+                            android:layout_weight="1"
+                            android:text="Alterar dados de cadastro" />
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/card_view_info"
-                android:background="@color/white"
+                        <ImageView style="@style/ImageViewProfileInfos" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <View style="@style/LineProfile" />
+
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/CardProfile"
+                    app:cardCornerRadius="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/white"
+                        android:orientation="horizontal"
+                        android:padding="16dp">
+
+                        <TextView
+                            style="@style/TextViewProfileInfos"
+                            android:layout_weight="1"
+                            android:text="Preferências" />
+
+                        <ImageView style="@style/ImageViewProfileInfos" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <View style="@style/LineProfile" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/btn_schedules"
+                    style="@style/CardProfile"
+                    app:shapeAppearanceOverlay="@style/CustomCardShapeBottom">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/white"
+                        android:orientation="horizontal"
+                        android:padding="16dp">
+
+                        <TextView
+                            style="@style/TextViewProfileInfos"
+                            android:layout_weight="1"
+                            android:text="Minhas Reservas" />
+
+                        <ImageView style="@style/ImageViewProfileInfos" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_logout"
                 android:layout_width="0dp"
-                android:layout_height="220dp"
-                android:layout_marginTop="70dp"
-                android:layout_marginHorizontal="30dp"
-                app:cardCornerRadius="20dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/card_view_name">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:background="@color/white"
-                    android:layout_height="wrap_content"
-                    android:padding="35dp">
-
-                    <TextView
-                        android:id="@+id/tv_nome_completo"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/black"
-                        android:textStyle="bold"
-                        android:textSize="15dp"
-                        android:layout_marginTop="30dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:id="@+id/tv_email"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="30dp"
-                        android:textColor="@color/black"
-                        android:textStyle="bold"
-                        android:textSize="15dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/tv_nome_completo" />
-
-                    <TextView
-                        android:id="@+id/tv_tipo_perfil"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/black"
-                        android:layout_marginTop="30dp"
-                        android:textStyle="bold"
-                        android:textSize="15dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/tv_email" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </androidx.cardview.widget.CardView>
-
-            <Button
-                android:id="@+id/btn_reservas"
-                android:layout_width="0dp"
-                android:layout_height="60dp"
-                android:layout_marginHorizontal="30dp"
-                android:shadowRadius="20"
-                android:textColor="@color/white"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
                 android:layout_marginBottom="30dp"
-                android:layout_marginTop="60dp"
-                android:text="Minhas Reservas"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/card_view_info" />
+                android:background="@drawable/shape_button_stroke"
+                android:text="Sair"
+                android:textSize="16sp"
+                android:textColor="@color/purple_haze"
+                app:backgroundTint="@color/white"
+                app:backgroundTintMode="multiply"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/container_cards"
+                app:layout_constraintStart_toStartOf="@id/container_cards"
+                app:layout_constraintTop_toBottomOf="@id/container_cards" />
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
