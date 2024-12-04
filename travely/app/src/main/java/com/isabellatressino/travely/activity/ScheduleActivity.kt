@@ -212,20 +212,6 @@ class ScheduleActivity : AppCompatActivity() {
             }
     }
 
-//    private fun extractScheduleData(document: DocumentSnapshot): List<Schedule> {
-//        val schedulesList =
-//            document.get("schedule") as? List<Map<String, Any>> ?: return emptyList()
-//
-//        return schedulesList.map { scheduleMap ->
-//            val placeID = (scheduleMap["placeId"]) as? String ?: ""
-//            val amount = (scheduleMap["amount"] as? Number)?.toInt() ?: 0
-//            val price = (scheduleMap["price"] as? Number)?.toDouble() ?: 0.0
-//            val datetime = scheduleMap["datetime"] as? String ?: ""
-//
-//            Schedule(placeID, amount, price, datetime)
-//        }
-//    }
-
     private fun extractScheduleData(document: DocumentSnapshot): List<Schedule> {
         val schedulesList =
             document.get("schedule") as? List<Map<String, Any>> ?: return emptyList()
