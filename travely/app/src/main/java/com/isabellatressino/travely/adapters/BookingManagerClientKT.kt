@@ -5,11 +5,13 @@ import java.io.PrintWriter
 import java.net.Socket
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import com.google.gson.Gson
+import com.isabellatressino.travely.models.BookingResponse
 
 class BookingManagerClientKT{
 
     companion object {
-        private const val SERVER_IP = "10.0.2.2" // IP do servidor
+        private const val SERVER_IP = "192.168.10.37" // IP do servidor
         private const val SERVER_PORT = 6666 // Porta do servidor
     }
 
@@ -28,17 +30,27 @@ class BookingManagerClientKT{
                             out.println(datetime)
                             out.println(amount.toString())
 
-                            // Lê a resposta do servidor
-                            val status = input.readLine() ?: "Erro: resposta vazia do servidor"
-                            if (status != "FALHA"){
-                                val placeID = input.readLine()
-                                val date = input.readLine() ?: "Erro: resposta vazia do servidor"
-                                val price = input.readLine() ?: "Erro: resposta vazia do servidor"
-
-                                status + "," + placeID + "," + date + "," + price
+                            // Lê a resposta do servidor como JSON
+                            var responseJson: String? = null
+                            try {
+                                responseJson = input.readLine()
+                            } catch (e: Exception) {
+                                if (responseJson.isNullOrEmpty()) {
+                                    throw e
+                                }
                             }
 
-                            "Erro: resposta vazia do servidor"
+                            if (responseJson.isNullOrEmpty()) {
+                                return@withContext "Erro: resposta vazia do servidor"
+                            }
+                            val gson = Gson()
+                            val response = gson.fromJson(responseJson, BookingResponse::class.java)
+
+                            if (response.status == "SUCESSO") {
+                                "Reserva bem-sucedida: ${response.message}"
+                            } else {
+                                "Erro: ${response.message}"
+                            }
                         }
                     }
                 }

@@ -44,11 +44,15 @@ public class ClientHandler implements Runnable {
                 jsonInputString = String.format("{\"authID\": \"%s\", \"schedule\": {\"amount\": \"%d\", \"placeID\": \"%s\", \"datetime\": \"%s\"}}",
                         authID, Integer.parseInt(amount), placeID, datetime);
                 String bookingResponse = callFirebaseFunction(baseUrl + "/addReservation", jsonInputString);
-
-                out.println(bookingResponse);
+                Gson gson = new Gson();
+                String jsonResponse = String.format(
+                        "{\"status\": \"SUCESSO\", \"message\": %s}",
+                        gson.toJson(bookingResponse)
+                );
+                out.println(jsonResponse);
                 System.out.println("Reserva realizada com sucesso: " + bookingResponse);
             } else {
-                String errorMsg = "Horário não disponível para reserva.";
+                String errorMsg = "{\"status\": \"ERRO\", \"message\": \"Horário não disponível para reserva.\"}";
                 out.println(errorMsg);
                 System.out.println(errorMsg);
             }
@@ -58,10 +62,13 @@ public class ClientHandler implements Runnable {
             e.printStackTrace();
         } finally {
             try {
+                Thread.sleep(100); // atraso para garantir envio e leitura completos antes de finalizar conexão
                 clientSocket.close();
                 System.out.println("Conexão com cliente encerrada.");
             } catch (IOException e) {
                 System.err.println("Erro ao fechar o socket: " + e.getMessage());
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         }
     }

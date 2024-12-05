@@ -72,6 +72,7 @@ dependencies {
 
     // https://github.com/santalu/maskara - biblioteca mascaras
     implementation("com.github.santalu:maskara:1.0.0")
+    implementation(libs.gson)
 
 
 }

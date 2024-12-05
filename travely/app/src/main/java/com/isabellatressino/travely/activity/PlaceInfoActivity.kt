@@ -78,12 +78,6 @@ class PlaceInfoActivity : AppCompatActivity() {
 
     }
 
-    /**
-     * OBS:: Para quem for fazer o servidor
-     *
-     * Ao clicar no dia e no horario disponível, o adapter já faz um callback e retorna a data e horario selecionados
-     * formato da val schedule = 2024-11-24T15:00:00Z
-     */
     private fun addSchedule() {
         auth = FirebaseAuth.getInstance()
 

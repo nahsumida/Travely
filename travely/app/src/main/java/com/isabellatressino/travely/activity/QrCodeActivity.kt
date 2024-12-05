@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import BookingManagerClientKT
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 
 class QrCodeActivity : AppCompatActivity() {
@@ -79,20 +80,24 @@ class QrCodeActivity : AppCompatActivity() {
             withContext(Dispatchers.Main) {
                 // Exibe o Toast e navega para a próxima Activity se a resposta for sucesso
                 if (list.contains("SUCESSO")) {
-                    Toast.makeText(this@QrCodeActivity, "Reserva realizada com sucesso!", Toast.LENGTH_LONG).show()
-
-                    // Navega para a próxima Activity
+                    //Toast.makeText(this@QrCodeActivity, "Reserva realizada com sucesso!", Toast.LENGTH_LONG).show()
+                    Log.d("Resposta do Servidor:","SUCESSO")
+                    // Criar intent para ir para tela de confirmação da compra
                     val intent = Intent(this@QrCodeActivity, ConfirmActivity::class.java)
-                    startActivity(intent)
-                    intent.putExtra("placeID", list[1])
-                    intent.putExtra("date", list[2])
-                    intent.putExtra("price", list[3])
 
-                    finish() // Opcional: fecha a Activity atual
+                    if (list.size > 3) {
+                        intent.putExtra("placeID", list[1])
+                        intent.putExtra("date", list[2])
+                        intent.putExtra("price", list[3])
+                    }
+
+                    startActivity(intent)
+                    finish() // fecha a Activity atual
 
                 } else {
                     // Exibe um Toast com a mensagem de erro
-                    Toast.makeText(this@QrCodeActivity, result, Toast.LENGTH_LONG).show()
+                    //Toast.makeText(this@QrCodeActivity, result, Toast.LENGTH_LONG).show()
+                    Log.e("Resposta do Servidor:",result)
                 }
             }
         }
