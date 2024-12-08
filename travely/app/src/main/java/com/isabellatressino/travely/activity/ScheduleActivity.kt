@@ -42,6 +42,10 @@ class ScheduleActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+        // Configuração do botão de voltar
+        binding.btnBack.setOnClickListener {
+            finish() // Finaliza a Activity atual e retorna à anterior
+        }
 
         Log.d(TAG, "oi")
 
