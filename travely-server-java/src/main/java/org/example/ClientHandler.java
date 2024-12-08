@@ -61,11 +61,11 @@ public class ClientHandler implements Runnable {
                 }
             } else {
                 // Usando String.format() para formatar a string
-                jsonInputString = String.format("{\"authID\": \"%s\", \"schedule\": {\"amount\": \"%d\", \"placeID\": \"%s\", \"datetime\": \"%s\"}}",
-                        authID, Integer.parseInt(amount), placeID, datetime);
-                String bookingResponse = callFirebaseFunction(baseUrl + "/addReservation", jsonInputString);
+                jsonInputString = String.format("{\"authID\": \"%s\", \"schedule\": {\"amount\": \"%d\", \"placeID\": \"%s\", \"datetime\": \"%s\"}, \"type\": \"%s\"}",
+                        authID, Integer.parseInt(amount), placeID, datetime, type.toLowerCase());
+                String bookingResponse = callFirebaseFunction("https://addreservation-mauvjkspqa-rj.a.run.app", jsonInputString);
                 if (bookingResponse.contains("Erro")){
-                    String errorMsg = "{\"status\": \"ERRO\", \"message\": \"Horário não disponível para reserva.\"}";
+                    String errorMsg = "{\"status\": \"ERRO\", \"message\": \"Erro ao salvar agendamento.\"}";
                     out.println(errorMsg);
                     System.out.println(errorMsg);
                 } else {

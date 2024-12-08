@@ -34,7 +34,7 @@ class QrCodeActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         bookingHelper = BookingHelper()
-        binding.btncopy.setOnClickListener{
+        binding.btncopy.setOnClickListener {
             binding.pixLayout.visibility = View.GONE
             binding.progressBar.visibility = View.VISIBLE
             binding.loadingMessage.visibility = View.VISIBLE
@@ -50,21 +50,40 @@ class QrCodeActivity : AppCompatActivity() {
                 val authID = authUser.uid
                 if (placeID != null) {
                     if (date != null) {
-                        bookingHelper.requestBooking(this,authID, placeID , date, amount, "compra") {
-                            list ->
-                            val intent = Intent(this@QrCodeActivity, ConfirmActivity::class.java)
+                        bookingHelper.requestBooking(
+                            this, authID, placeID, date, amount, "compra",
+                            onSuccess = { list ->
+                                val intent =
+                                    Intent(this@QrCodeActivity, ConfirmActivity::class.java)
+/*
+// unsused
+                                if (list.size > 3) {
+                                    intent.putExtra("placeID", list[1])
+                                    intent.putExtra("date", list[2])
+                                    intent.putExtra("price", list[3])
+                                }
+*/
+                                Handler(Looper.getMainLooper()).postDelayed({
+                                    startActivity(intent)
+                                    finish()
+                                }, 3000)
+                            },
+                            onError = { list ->
+                                Toast.makeText(
+                                    this, "Falha ao finalizar compra, horario indisponivel",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                val intent =
+                                    Intent(this@QrCodeActivity, PlaceInfoActivity::class.java)
+                                intent.putExtra("PLACE_ID", placeID)
+                                startActivity(intent)
 
-                            if (list.size > 3) {
-                                intent.putExtra("placeID", list[1])
-                                intent.putExtra("date", list[2])
-                                intent.putExtra("price", list[3])
-                            }
-
-                            Handler(Looper.getMainLooper()).postDelayed({
-                               startActivity(intent)
-                                finish()
-                            }, 3000)
-                        }
+                                Handler(Looper.getMainLooper()).postDelayed({
+                                    startActivity(intent)
+                                    finish()
+                                }, 3000)
+                            },
+                        )
                     }
                 }
             }

@@ -90,16 +90,37 @@ class PlaceInfoActivity : AppCompatActivity() {
         if (place.type == "reserva"){
             if (authID != null) {
                 bookingHelper = BookingHelper()
-                bookingHelper.requestBooking(this, authID.uid, placeID , schedule, 1, "reserva") {
-                    list ->
+                bookingHelper.requestBooking(
+                    this, authID.uid, placeID, schedule, 1, "reserva",
+                    onSuccess = {
+                            list ->
 
                         val intent = Intent(this@PlaceInfoActivity, MainScreenActivity::class.java)
-                       // Log.d("BookingSuccess", "Reserva realizada com sucesso. PlaceID: $placeID, Date: $date")
+                        // Log.d("BookingSuccess", "Reserva realizada com sucesso. PlaceID: $placeID, Date: $date")
                         Toast.makeText(this, "Agendamento registrado na sua sessão de 'Reservas'", Toast.LENGTH_LONG).show()
                         Handler(Looper.getMainLooper()).postDelayed({
                             startActivity(intent)
                             finish()
                         }, 3000)
+                    }
+                ) {
+                    list ->
+
+                    val intent = Intent(this@PlaceInfoActivity, MainScreenActivity::class.java)
+                    Log.d("BookingError", " Falha ao realizar reserva.")
+                    Toast.makeText(this, "falha ao registrar agendamento na sua sessão de 'Reservas'", Toast.LENGTH_LONG).show()
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        startActivity(intent)
+                        finish()
+                    }, 3000)
+/*
+                        //val intent = Intent(this@PlaceInfoActivity, MainScreenActivity::class.java)
+                       // Log.d("BookingSuccess", "Reserva realizada com sucesso. PlaceID: $placeID, Date: $date")
+
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            startActivity(intent)
+                            finish()
+                        }, 3000)*/
                 }
             }
         } else {

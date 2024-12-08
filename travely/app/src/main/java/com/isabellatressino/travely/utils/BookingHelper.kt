@@ -22,7 +22,8 @@ class BookingHelper {
          datetime: String,
          amount: Int,
          type: String,
-         onSuccess: (List<String>) -> Unit) {
+         onSuccess: (List<String>) -> Unit,
+         onError: (List<String>) -> Unit) {
         if (lockingRequest) return  // Já há uma requisição em andamento (evita double click)
 
          lockingRequest = true
@@ -37,6 +38,7 @@ class BookingHelper {
                     if (result.contains("sucesso")) {
                         onSuccess(list)
                     } else {
+                        onError(list)
                         Log.e("Resposta do Servidor:", result)
                     }
                 }
