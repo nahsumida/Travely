@@ -16,7 +16,7 @@ class BookingManagerClientKT{
     }
 
     // Função para enviar dados de reserva para o servidor
-    suspend fun sendBookingRequest(authID: String, placeID: String, datetime: String, amount: Int): String  {
+    suspend fun sendBookingRequest(authID: String, placeID: String, datetime: String, amount: Int, type: String): String  {
         return withContext(Dispatchers.IO) { // Garante execução em uma thread de IO
             try {
                 // Estabelece conexão com o servidor
@@ -29,7 +29,13 @@ class BookingManagerClientKT{
                             out.println(placeID)
                             out.println(datetime)
                             out.println(amount.toString())
-
+                            /**
+                             * Aqui!!
+                             */
+                            out.println(type)
+                            /**
+                             *
+                             */
                             // Lê a resposta do servidor como JSON
                             var responseJson: String? = null
                             try {
