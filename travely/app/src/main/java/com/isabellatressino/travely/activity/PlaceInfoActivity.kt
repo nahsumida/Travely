@@ -92,20 +92,15 @@ class PlaceInfoActivity : AppCompatActivity() {
                 bookingHelper = BookingHelper()
                 bookingHelper.requestBooking(this, authID.uid, placeID , schedule, 1, "reserva") {
                     list ->
-                    if (list.size > 2) {
-                        val placeID = list[1]
-                        val date = list[2]
+
                         val intent = Intent(this@PlaceInfoActivity, MainScreenActivity::class.java)
-                        Log.d("BookingSuccess", "Reserva realizada com sucesso. PlaceID: $placeID, Date: $date")
+                       // Log.d("BookingSuccess", "Reserva realizada com sucesso. PlaceID: $placeID, Date: $date")
                         Toast.makeText(this, "Agendamento registrado na sua sessão de 'Reservas'", Toast.LENGTH_LONG).show()
                         Handler(Looper.getMainLooper()).postDelayed({
                             startActivity(intent)
                             finish()
                         }, 3000)
-                    } else {
-                        Log.e("BookingError", "Erro ao obter informações da reserva")
-                    }
-                } // pre
+                }
             }
         } else {
             val intent = Intent(this@PlaceInfoActivity, ConfirmActivity::class.java)

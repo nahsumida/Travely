@@ -61,7 +61,7 @@ class QrCodeActivity : AppCompatActivity() {
                             }
 
                             Handler(Looper.getMainLooper()).postDelayed({
-                                startActivity(intent)
+                               startActivity(intent)
                                 finish()
                             }, 3000)
                         }

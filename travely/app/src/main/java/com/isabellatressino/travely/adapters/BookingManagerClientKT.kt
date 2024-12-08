@@ -11,8 +11,8 @@ import com.isabellatressino.travely.models.BookingResponse
 class BookingManagerClientKT{
 
     companion object {
-        private const val SERVER_IP = "192.168.10.37" // IP do servidor
-        private const val SERVER_PORT = 6666 // Porta do servidor
+        private const val SERVER_IP = "10.0.2.2"//192.168.10.37" // IP do servidor
+        private const val SERVER_PORT = 6667 // Porta do servidor
     }
 
     // Função para enviar dados de reserva para o servidor
@@ -29,13 +29,8 @@ class BookingManagerClientKT{
                             out.println(placeID)
                             out.println(datetime)
                             out.println(amount.toString())
-                            /**
-                             * Aqui!!
-                             */
                             out.println(type)
-                            /**
-                             *
-                             */
+
                             // Lê a resposta do servidor como JSON
                             var responseJson: String? = null
                             try {

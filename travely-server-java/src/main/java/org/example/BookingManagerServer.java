@@ -7,7 +7,7 @@ import java.net.Socket;
 public class BookingManagerServer {
 
     public static void main(String[] args) {
-        try (ServerSocket serverSocket = new ServerSocket(6666)) {
+        try (ServerSocket serverSocket = new ServerSocket(6667)) {
             System.out.println("Servidor de reservas iniciado na porta 6666...");
 
             while (true) {

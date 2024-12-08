@@ -6,7 +6,7 @@ import java.net.Socket;
 
 public class BookingManagerClient {
     private static final String SERVER_IP = "localhost"; // IP do servidor
-    private static final int SERVER_PORT = 6666; // Porta do servidor
+    private static final int SERVER_PORT = 6667; // Porta do servidor
 
     public static void main(String[] args)  {
         String authID = "grAvCnSRzOOSi814teqiBo7F00C2"; // Exemplo de authID
@@ -30,6 +30,7 @@ public class BookingManagerClient {
             out.println(placeID);
             out.println(datetime);
             out.println(amount);
+            out.println("COMPRA");
 
             // Lê a resposta do servidor
             String status = in.readLine();

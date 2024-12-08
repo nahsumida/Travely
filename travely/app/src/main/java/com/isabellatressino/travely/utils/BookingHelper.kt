@@ -34,7 +34,7 @@ class BookingHelper {
 
                 withContext(Dispatchers.Main) {
                     lockingRequest = false
-                    if (list.contains("SUCESSO")) {
+                    if (result.contains("sucesso")) {
                         onSuccess(list)
                     } else {
                         Log.e("Resposta do Servidor:", result)
