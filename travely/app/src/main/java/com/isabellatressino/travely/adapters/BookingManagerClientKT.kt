@@ -5,16 +5,18 @@ import java.io.PrintWriter
 import java.net.Socket
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import com.google.gson.Gson
+import com.isabellatressino.travely.models.BookingResponse
 
 class BookingManagerClientKT{
 
     companion object {
-        private const val SERVER_IP = "10.0.2.2" // IP do servidor
-        private const val SERVER_PORT = 6666 // Porta do servidor
+        private const val SERVER_IP = "10.0.2.2"//192.168.10.37" // IP do servidor
+        private const val SERVER_PORT = 6667 // Porta do servidor
     }
 
     // Função para enviar dados de reserva para o servidor
-    suspend fun sendBookingRequest(authID: String, placeID: String, datetime: String, amount: Int): String  {
+    suspend fun sendBookingRequest(authID: String, placeID: String, datetime: String, amount: Int, type: String): String  {
         return withContext(Dispatchers.IO) { // Garante execução em uma thread de IO
             try {
                 // Estabelece conexão com o servidor
@@ -27,18 +29,29 @@ class BookingManagerClientKT{
                             out.println(placeID)
                             out.println(datetime)
                             out.println(amount.toString())
+                            out.println(type)
 
-                            // Lê a resposta do servidor
-                            val status = input.readLine() ?: "Erro: resposta vazia do servidor"
-                            if (status != "FALHA"){
-                                val placeID = input.readLine()
-                                val date = input.readLine() ?: "Erro: resposta vazia do servidor"
-                                val price = input.readLine() ?: "Erro: resposta vazia do servidor"
-
-                                status + "," + placeID + "," + date + "," + price
+                            // Lê a resposta do servidor como JSON
+                            var responseJson: String? = null
+                            try {
+                                responseJson = input.readLine()
+                            } catch (e: Exception) {
+                                if (responseJson.isNullOrEmpty()) {
+                                    throw e
+                                }
                             }
 
-                            "Erro: resposta vazia do servidor"
+                            if (responseJson.isNullOrEmpty()) {
+                                return@withContext "Erro: resposta vazia do servidor"
+                            }
+                            val gson = Gson()
+                            val response = gson.fromJson(responseJson, BookingResponse::class.java)
+
+                            if (response.status == "SUCESSO") {
+                                "Reserva bem-sucedida: ${response.message}"
+                            } else {
+                                "Erro: ${response.message}"
+                            }
                         }
                     }
                 }

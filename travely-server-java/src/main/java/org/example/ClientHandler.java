@@ -28,40 +28,68 @@ public class ClientHandler implements Runnable {
             String placeID = in.readLine();
             String datetime = in.readLine();
             String amount = in.readLine();
+            String type = in.readLine();
 
-            System.out.println("Dados recebidos: authID=" + authID + ", placeID=" + placeID +
-                    ", datetime=" + datetime + ", amount=" + amount);
+            String jsonInputString;
+            if (type != null && type.toUpperCase().equals("COMPRA")) {
+                System.out.println("Dados recebidos: authID=" + authID + ", placeID=" + placeID +
+                        ", datetime=" + datetime + ", amount=" + amount);
 
-            // Chamar função para consultar horários
-            String jsonInputString = "{\"placeID\": \"" + placeID + "\", \"datetime\": \"" + datetime + "\"}";
-            System.out.println(jsonInputString);
-            String response = callFirebaseFunction(baseUrl + "/getPlaceSchedule", jsonInputString);
-            PlaceSchedule availableTimesResponse =  processResponse(response);
+                // Chamar função para consultar horários
+                jsonInputString = "{\"placeID\": \"" + placeID + "\", \"datetime\": \"" + datetime + "\"}";
+                System.out.println(jsonInputString);
+                String response = callFirebaseFunction(baseUrl + "/getPlaceSchedule", jsonInputString);
+                PlaceSchedule availableTimesResponse = processResponse(response);
 
-            // Verificar se há disponibilidade antes de tentar reservar
-            if (availableTimesResponse.getAvailability() >= Integer.parseInt(amount)) {
-                // Usando String.format() para formatar a string
-                jsonInputString = String.format("{\"authID\": \"%s\", \"schedule\": {\"amount\": \"%d\", \"placeID\": \"%s\", \"datetime\": \"%s\"}}",
-                        authID, Integer.parseInt(amount), placeID, datetime);
-                String bookingResponse = callFirebaseFunction(baseUrl + "/addReservation", jsonInputString);
-
-                out.println(bookingResponse);
-                System.out.println("Reserva realizada com sucesso: " + bookingResponse);
+                // Verificar se há disponibilidade antes de tentar reservar
+                if (availableTimesResponse.getAvailability() >= Integer.parseInt(amount)) {
+                    // Usando String.format() para formatar a string
+                    jsonInputString = String.format("{\"authID\": \"%s\", \"schedule\": {\"amount\": \"%d\", \"placeID\": \"%s\", \"datetime\": \"%s\"}}",
+                            authID, Integer.parseInt(amount), placeID, datetime);
+                    String bookingResponse = callFirebaseFunction(baseUrl + "/addReservation", jsonInputString);
+                    Gson gson = new Gson();
+                    String jsonResponse = String.format(
+                            "{\"status\": \"SUCESSO\", \"message\": %s}",
+                            gson.toJson(bookingResponse)
+                    );
+                    out.println(jsonResponse);
+                    System.out.println("Reserva realizada com sucesso: " + bookingResponse);
+                } else {
+                    String errorMsg = "{\"status\": \"ERRO\", \"message\": \"Horário não disponível para reserva.\"}";
+                    out.println(errorMsg);
+                    System.out.println(errorMsg);
+                }
             } else {
-                String errorMsg = "Horário não disponível para reserva.";
-                out.println(errorMsg);
-                System.out.println(errorMsg);
+                // Usando String.format() para formatar a string
+                jsonInputString = String.format("{\"authID\": \"%s\", \"schedule\": {\"amount\": \"%d\", \"placeID\": \"%s\", \"datetime\": \"%s\"}, \"type\": \"%s\"}",
+                        authID, Integer.parseInt(amount), placeID, datetime, type.toLowerCase());
+                String bookingResponse = callFirebaseFunction("https://addreservation-mauvjkspqa-rj.a.run.app", jsonInputString);
+                if (bookingResponse.contains("Erro")){
+                    String errorMsg = "{\"status\": \"ERRO\", \"message\": \"Erro ao salvar agendamento.\"}";
+                    out.println(errorMsg);
+                    System.out.println(errorMsg);
+                } else {
+                    Gson gson = new Gson();
+                    String jsonResponse = String.format(
+                            "{\"status\": \"SUCESSO\", \"message\": %s}",
+                            gson.toJson(bookingResponse)
+                    );
+                    out.println(jsonResponse);
+                    System.out.println("Reserva realizada com sucesso: " + bookingResponse);
+                }
             }
-
         } catch (Exception e) {
             System.err.println("Erro ao processar o cliente: " + e.getMessage());
             e.printStackTrace();
         } finally {
             try {
+                Thread.sleep(100); // atraso para garantir envio e leitura completos antes de finalizar conexão
                 clientSocket.close();
                 System.out.println("Conexão com cliente encerrada.");
             } catch (IOException e) {
                 System.err.println("Erro ao fechar o socket: " + e.getMessage());
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         }
     }
