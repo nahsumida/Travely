@@ -104,7 +104,6 @@ class QrCodeActivity : AppCompatActivity() {
     }
 
     /*
-    ///// Isso aqui tava funcionando nessa tela
     private fun requestBooking(authID: String, placeID: String, datetime: String, amount: Int) {
         CoroutineScope(Dispatchers.IO).launch {
             val result = client.sendBookingRequest(authID, placeID, datetime, amount)
