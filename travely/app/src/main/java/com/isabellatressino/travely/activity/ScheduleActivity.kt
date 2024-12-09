@@ -19,6 +19,11 @@ import com.isabellatressino.travely.adapters.ScheduleAdapter
 import com.isabellatressino.travely.adapters.TimeAdapter
 import com.isabellatressino.travely.models.Place
 import com.isabellatressino.travely.models.Schedule
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -38,6 +43,7 @@ class ScheduleActivity : AppCompatActivity() {
     private lateinit var adapterDays: DaysAdapter
     private lateinit var adapterSchedules: ScheduleAdapter
     private lateinit var schedulesList: List<Schedule>
+    private val schedulesByDay: MutableMap<String, List<Schedule>> = mutableMapOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,8 +53,6 @@ class ScheduleActivity : AppCompatActivity() {
         setupRecyclerViewDays()
         setupRecyclerViewSchedules()
         loadUserSchedules()
-
-        // 15 de novembro de 2024 às 06:00:00 UTC-3
     }
 
     private fun setupSpinner() {
@@ -133,9 +137,13 @@ class ScheduleActivity : AppCompatActivity() {
         adapterDays = DaysAdapter(mutableListOf())
             .apply {
                 onDaySelected = { date ->
-                    val schedules = loadSchedulesByDate(date)
-                    adapterSchedules.updateSchedules(schedules)
-                    Log.d(TAG, "dia selecionado $date")
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val schedules = loadSchedulesByDate(date)
+                        withContext(Dispatchers.Main) {
+                            adapterSchedules.updateSchedules(schedules)
+                            Log.d(TAG, "dia selecionado $date")
+                        }
+                    }
                 }
             }
 
@@ -144,27 +152,27 @@ class ScheduleActivity : AppCompatActivity() {
         binding.recyclerviewDays.adapter = adapterDays
     }
 
-    private fun loadSchedulesByDate(date: String): List<Schedule> {
+    // Função que carrega os agendamentos do usuário do dia em uma lista, ordenando-a por horário
+    private suspend fun loadSchedulesByDate(date: String): List<Schedule> {
         val ret = mutableListOf<Schedule>()
         if (!::schedulesList.isInitialized) {
             Log.w(TAG, "schedulesList não foi inicializada")
-            runOnUiThread {
+            withContext(Dispatchers.Main) {
                 binding.tvNoSchedules.visibility = View.VISIBLE
                 binding.recyclerviewSchedules.visibility = View.GONE
             }
             return ret
         }
-        val (year, month, day, weekDay) = date.split("-")
+        val cleanedDate = date.replace(".", "")
+        val (year, month, day, _) = cleanedDate.split("-")
         val formattedDate = "$year-$month-$day"
 
-        for (schedule in schedulesList) {
-            val (scheduleDate, scheduleTime) = schedule.datetime.split("T")
-            if (formattedDate == scheduleDate) {
-                ret.add(schedule)
-            }
-        }
-        runOnUiThread {
-            if (ret.isEmpty()) {
+        //Log.d("FORMATACAO", "Data formatada para busca: $formattedDate")
+        // Carregando lista de reservas do dia a partir do cache (map)
+        val sortedSchedule = schedulesByDay[formattedDate] ?: emptyList()
+
+        withContext(Dispatchers.Main) {
+            if (sortedSchedule.isEmpty()) {
                 binding.tvNoSchedules.visibility = View.VISIBLE
                 binding.recyclerviewSchedules.visibility = View.GONE
             } else {
@@ -172,8 +180,8 @@ class ScheduleActivity : AppCompatActivity() {
                 binding.recyclerviewSchedules.visibility = View.VISIBLE
             }
         }
-        Log.d(TAG, "$ret")
-        return ret
+        Log.d(TAG, "$sortedSchedule")
+        return sortedSchedule
     }
 
     private fun setupRecyclerViewSchedules() {
@@ -193,7 +201,45 @@ class ScheduleActivity : AppCompatActivity() {
         schedulesList = emptyList()
         val firebaseUser = auth.currentUser
         val uid = firebaseUser?.uid
-        //firestore.collection("users").whereEqualTo("authID",uid).get()
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val documents = firestore.collection("users")
+                    .whereEqualTo("authID",uid)
+                    .get().await()
+                val user = documents.firstOrNull()
+                if (user != null) {
+                    schedulesList = extractScheduleData(user)
+                    // Preenchendo o Map de reservas por dia
+                    schedulesList.forEach { schedule ->
+                        val (scheduleDate, _) = schedule.datetime.split("T")
+                        if (!schedulesByDay.containsKey(scheduleDate)) {
+                            schedulesByDay[scheduleDate] = mutableListOf()
+                        }
+                        (schedulesByDay[scheduleDate] as MutableList).add(schedule)
+                    }
+                    // Ordenando as listas por dia
+                    schedulesByDay.forEach { (date, schedules) ->
+                        schedulesByDay[date] = schedules.sortedBy { schedule -> schedule.datetime }
+                    }
+                    // Formatando data atual
+                    val todayDisplay = getCurrentDateInCustomFormat()
+                    val todayKeyFormat = todayDisplay.split("-").take(3).joinToString("-")
+                    val todaySchedule = schedulesByDay[todayKeyFormat] ?: emptyList()
+                    // Buscando reservas na data atual
+                    withContext(Dispatchers.Main) {
+                        adapterSchedules.updateSchedules(todaySchedule)
+                        adapterDays.selectDay(todayDisplay)
+                    }
+                    Log.d(TAG, "$schedulesList")
+                } else {
+                    Log.d(TAG, "Document does not exist")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error getting document: ", e)
+            }
+        }
+        /*
         firestore
             .collection("users")
             .whereEqualTo("authID",uid)
@@ -201,7 +247,14 @@ class ScheduleActivity : AppCompatActivity() {
             .addOnSuccessListener { documents ->
                 val user = documents.firstOrNull()
                 if (user != null) {
-                    schedulesList = extractScheduleData(user) ?: emptyList()
+                    schedulesList = extractScheduleData(user)
+                    schedulesList = schedulesList.sortedBy { schedule ->
+                        schedule.datetime
+                    }
+                    val today = getCurrentDateInCustomFormat()
+                    val todaySchedule = loadSchedulesByDate(today)
+                    adapterSchedules.updateSchedules(todaySchedule)
+                    adapterDays.selectDay(today)
                     Log.d(TAG, "$schedulesList")
                 } else {
                     Log.d(TAG, "Document does not exist")
@@ -209,7 +262,7 @@ class ScheduleActivity : AppCompatActivity() {
             }
             .addOnFailureListener { e ->
                 Log.e(TAG, "Error getting document: ", e)
-            }
+            }*/
     }
 
     private fun extractScheduleData(document: DocumentSnapshot): List<Schedule> {
@@ -222,7 +275,7 @@ class ScheduleActivity : AppCompatActivity() {
 
         val ret = schedulesList.map { scheduleMap ->
             val placeID = (scheduleMap["placeID"]) as? String ?: ""
-            val amount = (scheduleMap["amount"] as? Number)?.toInt() ?: 0
+            val amount = scheduleMap["amount"]?.toString()?.toIntOrNull() ?: 0
             val price = (scheduleMap["price"] as? Number)?.toDouble() ?: 0.0
 
             // Conversão do Timestamp para o formato ISO 8601
@@ -239,7 +292,4 @@ class ScheduleActivity : AppCompatActivity() {
 
         return ret
     }
-
-
-
 }

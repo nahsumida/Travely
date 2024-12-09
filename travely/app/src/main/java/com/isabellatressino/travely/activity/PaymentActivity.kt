@@ -13,6 +13,12 @@ class PaymentActivity : AppCompatActivity() {
 
     private val binding by lazy { ActivityPaymentBinding.inflate(layoutInflater) }
 
+    val placeID = intent.getStringExtra("placeID")
+    val date = intent.getStringExtra("date")
+    val amount = intent.getIntExtra("amount", 1)
+    val placeName = intent.getStringExtra("placeName")
+    val totalPrice = intent.getStringExtra("price")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -32,17 +38,25 @@ class PaymentActivity : AppCompatActivity() {
         setupPaymentInfo()
     }
 
+    private fun convertDate(): String {
+        if (date == null) return "Data indisponível"
+        val (scheduleDate, scheduleTime) = date.split("T")
+        val (year, month, day, _) = scheduleDate.split("-")
+        val formattedDate = "$day-$month-$year"
+        return formattedDate
+    }
     /**
      * Configura as informações da reserva no CardView
      */
     private fun setupPaymentInfo() {
+        val formatDate: String = ""
         try {
             // Substituir essas strings por dados reais do banco ou de um intent recebido
             binding.cardInformacoesReserva.apply {
-                binding.tvPlaceName.text = "Parque Dom Pedro"
-                binding.tvBookingDate.text = "10/10/2024    10:30"
-                binding.tvTicketAmount.text = "3 Ingressos"
-                binding.tvTotalPrice.text = "R$ 450,00"
+                binding.tvPlaceName.text = placeName ?: "Nome do local"
+                binding.tvBookingDate.text = convertDate()
+                binding.tvTicketAmount.text = "$amount Ingressos"
+                binding.tvTotalPrice.text = "R$ $totalPrice"
             }
         } catch (e: Exception) {
             Log.e("setupPaymentInfo", "Erro ao carregar informações da reserva", e)

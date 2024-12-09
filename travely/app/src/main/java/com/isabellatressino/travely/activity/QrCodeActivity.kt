@@ -43,7 +43,7 @@ class QrCodeActivity : AppCompatActivity() {
 
             val placeID = intent.getStringExtra("placeID")
             val date = intent.getStringExtra("date")
-            var amount = intent.getStringExtra("amount")?.toIntOrNull() ?: 1
+            val amount = intent.getIntExtra("amount", 1)
 
             val authUser = auth.currentUser
             if (authUser != null) {
@@ -81,7 +81,7 @@ class QrCodeActivity : AppCompatActivity() {
                                 Handler(Looper.getMainLooper()).postDelayed({
                                     startActivity(intent)
                                     finish()
-                                }, 3000)
+                                }, 2000)
                             },
                         )
                     }

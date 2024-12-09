@@ -6,7 +6,7 @@ import java.util.Locale
 
 class Schedule(
     var placeID: String,
-    var availability: Int,
+    var availability: Any,
     var price: Double,
     var datetime: String
 ) {

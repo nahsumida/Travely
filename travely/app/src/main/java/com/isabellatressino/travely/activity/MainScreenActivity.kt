@@ -74,9 +74,9 @@ class MainScreenActivity : AppCompatActivity() {
         showLoading(true)
 
         //nav
-        btnHome.setOnClickListener{
+        /*btnHome.setOnClickListener{
             startActivity(Intent(this,MainScreenActivity::class.java))
-        }
+        }*/
         btnLocal.setOnClickListener{
             startActivity(Intent(this,MapActivity::class.java))
         }

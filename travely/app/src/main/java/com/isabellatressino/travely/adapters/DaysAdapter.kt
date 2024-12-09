@@ -117,6 +117,16 @@ class DaysAdapter(
         notifyDataSetChanged()
     }
 
+    // Seleciona o dia atual
+    fun selectDay(date: String) {
+        val index = days.indexOfFirst { days.contains(date) }
+        if (index != -1) {
+            selectedPosition = index
+            notifyDataSetChanged()
+            onDaySelected?.invoke(days[index])
+        }
+    }
+
     fun resetSelection() {
         selectedPosition = -1
         notifyDataSetChanged()
