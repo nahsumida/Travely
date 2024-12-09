@@ -87,7 +87,7 @@
                 android:id="@+id/tv_place_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Parque Dom Pedro"
+                android:text=""
                 android:textSize="16sp"
                 android:textColor="@android:color/black"
                 android:textStyle="bold" />
