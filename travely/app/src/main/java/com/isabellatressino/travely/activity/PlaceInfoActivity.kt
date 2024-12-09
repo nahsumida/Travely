@@ -94,12 +94,12 @@ class PlaceInfoActivity : AppCompatActivity() {
                     this, authID.uid, placeID, schedule, 1, "reserva",
                     onSuccess = {
                             list ->
-
-                        val intent = Intent(this@PlaceInfoActivity, MainScreenActivity::class.java)
                         // Log.d("BookingSuccess", "Reserva realizada com sucesso. PlaceID: $placeID, Date: $date")
-                        Toast.makeText(this, "Agendamento registrado na sua sessão de 'Reservas'", Toast.LENGTH_LONG).show()
+                        showLoading(true)
                         Handler(Looper.getMainLooper()).postDelayed({
+                            val intent = Intent(this@PlaceInfoActivity, MainScreenActivity::class.java)
                             startActivity(intent)
+                            Toast.makeText(this, "Agendamento registrado na sua sessão de 'Reservas'", Toast.LENGTH_LONG).show()
                             finish()
                         }, 3000)
                     }
@@ -109,6 +109,7 @@ class PlaceInfoActivity : AppCompatActivity() {
                     val intent = Intent(this@PlaceInfoActivity, MainScreenActivity::class.java)
                     Log.d("BookingError", " Falha ao realizar reserva.")
                     Toast.makeText(this, "falha ao registrar agendamento na sua sessão de 'Reservas'", Toast.LENGTH_LONG).show()
+                    showLoading(true)
                     Handler(Looper.getMainLooper()).postDelayed({
                         startActivity(intent)
                         finish()
