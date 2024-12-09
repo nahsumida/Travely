@@ -27,6 +27,16 @@ class LoginActivity : AppCompatActivity() {
 
     private val auth by lazy { FirebaseAuth.getInstance() }
 
+    override fun onStart(){
+        super.onStart()
+
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            val intent = Intent(this@LoginActivity, MainScreenActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -112,7 +122,6 @@ class LoginActivity : AppCompatActivity() {
                         .get()
                         .addOnSuccessListener { querySnapshot ->
                             if (!querySnapshot.isEmpty) {
-                                // Aqui você pode redirecionar para a próxima tela
                                 startActivity(Intent(this, MainScreenActivity::class.java))
                                 finish()
                             } else {

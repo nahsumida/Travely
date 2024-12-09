@@ -139,7 +139,6 @@ class ScheduleActivity : AppCompatActivity() {
                 onDaySelected = { date ->
                     CoroutineScope(Dispatchers.IO).launch {
                         val schedules = loadSchedulesByDate(date)
-                        Log.d(TAG, "dia selecionado $date")
                         withContext(Dispatchers.Main) {
                             adapterSchedules.updateSchedules(schedules)
                             Log.d(TAG, "dia selecionado $date")
@@ -276,7 +275,7 @@ class ScheduleActivity : AppCompatActivity() {
 
         val ret = schedulesList.map { scheduleMap ->
             val placeID = (scheduleMap["placeID"]) as? String ?: ""
-            val amount = (scheduleMap["amount"] as? Number)?.toInt() ?: 0
+            val amount = scheduleMap["amount"]?.toString()?.toIntOrNull() ?: 0
             val price = (scheduleMap["price"] as? Number)?.toDouble() ?: 0.0
 
             // Conversão do Timestamp para o formato ISO 8601

@@ -53,6 +53,7 @@ class PlaceInfoActivity : AppCompatActivity() {
     private lateinit var adapterTime: TimeAdapter
     private lateinit var place: Place
     private lateinit var placeID: String
+    private var quantity = 1
 
     private var scheduleTime = ""
     private var scheduleDate = ""
@@ -141,7 +142,6 @@ class PlaceInfoActivity : AppCompatActivity() {
     private fun showCardSchedule(): String {
         val scheduling = "${scheduleDate.slice(0..9)}T$scheduleTime:00Z"
         val schedulesList = place.schedule
-        var quantity = 1
         var totalPrice = 0.0
 
         for (schedule in schedulesList) {
@@ -156,8 +156,11 @@ class PlaceInfoActivity : AppCompatActivity() {
                 binding.card.tvTotalPrice.text =
                     "R$ ${String.format(" % .2f", (basePrice + fee) * quantity).replace(".", ", ")}"
 
+                totalPrice = (basePrice + fee) * quantity
+
                 binding.card.btnMore.setOnClickListener {
-                    if (quantity < schedule.availability) {
+                    val availability = schedule.availability.toString().toIntOrNull()
+                    if (quantity < availability!!) {
                         quantity++
                         binding.card.tvQuantity.text = quantity.toString()
                         binding.card.tvTotalPrice.text =
@@ -169,7 +172,7 @@ class PlaceInfoActivity : AppCompatActivity() {
                         binding.card.btnLess.isEnabled = true
                     }
 
-                    binding.card.btnMore.isEnabled = quantity < schedule.availability
+                    binding.card.btnMore.isEnabled = quantity < availability
                 }
 
                 binding.card.btnLess.setOnClickListener {
@@ -189,14 +192,15 @@ class PlaceInfoActivity : AppCompatActivity() {
 
                 binding.card.btnBuy.setOnClickListener {
                    // addSchedule()
-                    val intent = Intent(this, QrCodeActivity::class.java)
+                    val intent = Intent(this@PlaceInfoActivity, QrCodeActivity::class.java)
+                    //intent.putExtra("placeName", place.name)
                     intent.putExtra("placeID", placeID)
                     intent.putExtra("date", scheduling)
                     intent.putExtra("amount", quantity)
+                    intent.putExtra("price",totalPrice)
                     startActivity(intent)
                 }
 
-                totalPrice = (basePrice + fee) * quantity
             }
         }
 
@@ -208,7 +212,7 @@ class PlaceInfoActivity : AppCompatActivity() {
 
         // Aqui retorno os dados em formato de string, tanto para salvar a schedule para o usuário,
         // quanto para passar no intent para a proxima tela
-        return "placeId:$placeID,price:$totalPrice,quantity(avaiability?):$quantity,datetime:$scheduling"
+        return "placeId:$placeID,price:$totalPrice,quantity:$quantity,datetime:$scheduling"
     }
 
 

@@ -41,26 +41,28 @@ class ScheduleAdapter(private val schedules: MutableList<Schedule>) :
         val (scheduleDate, scheduleTime) = schedule.datetime.split("T")
         Log.d("ScheduleAdapter", "$schedule")
 
+        holder.tvScheduleTime.text = scheduleTime.slice(0..4)
+        if (schedule.price > 0) {
+            holder.tvSchedulePrice.text = "R$ ${String.format(" %.2f", schedule.price).replace(".", ",")}"
+        }
+
+
         loadPlaceNameFromFirestore(schedule.placeID) { ret ->
 
             holder.tvPlaceName.text = ret.name
             holder.tvPlaceAddress.text = ret.address
-            holder.tvScheduleTime.text = scheduleTime.slice(0..4)
 
             if (ret.type == "compra") {
                 holder.tvType.text = "Ingresso"
-                holder.tvScheduleQuantity.text =
-                    "${schedule.availability} " + if (schedule.availability == 1) "pessoa" else "pessoas"
-                holder.tvSchedulePrice.text =
-                    "R$ ${String.format(" % .2f", schedule.price).replace(".", ",")}"
+                if (schedule.availability is String) (schedule.availability as String).toInt()
+                holder.tvScheduleQuantity.text = "${schedule.availability} " + if (schedule.availability == 1) "pessoa" else "pessoas"
+
             } else if (ret.type == "reserva") {
                 holder.tvType.text = "Agendamento"
                 holder.tvScheduleQuantity.text = ""
                 holder.tvSchedulePrice.text = ""
             }
         }
-
-
     }
 
     fun cleamList() {
