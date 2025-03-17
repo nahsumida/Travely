@@ -49,10 +49,11 @@ class ScheduleActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+
         setupSpinner()
         setupRecyclerViewDays()
-        setupRecyclerViewSchedules()
         loadUserSchedules()
+        setupRecyclerViewSchedules()
     }
 
     private fun setupSpinner() {
@@ -205,12 +206,11 @@ class ScheduleActivity : AppCompatActivity() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val documents = firestore.collection("users")
-                    .whereEqualTo("authID",uid)
+                    .whereEqualTo("authID", uid)
                     .get().await()
                 val user = documents.firstOrNull()
                 if (user != null) {
                     schedulesList = extractScheduleData(user)
-                    // Preenchendo o Map de reservas por dia
                     schedulesList.forEach { schedule ->
                         val (scheduleDate, _) = schedule.datetime.split("T")
                         if (!schedulesByDay.containsKey(scheduleDate)) {
@@ -218,11 +218,10 @@ class ScheduleActivity : AppCompatActivity() {
                         }
                         (schedulesByDay[scheduleDate] as MutableList).add(schedule)
                     }
-                    // Ordenando as listas por dia
                     schedulesByDay.forEach { (date, schedules) ->
                         schedulesByDay[date] = schedules.sortedBy { schedule -> schedule.datetime }
                     }
-                    // Formatando data atual
+
                     val todayDisplay = getCurrentDateInCustomFormat()
                     val todayKeyFormat = todayDisplay.split("-").take(3).joinToString("-")
                     val todaySchedule = schedulesByDay[todayKeyFormat] ?: emptyList()
@@ -230,6 +229,10 @@ class ScheduleActivity : AppCompatActivity() {
                     withContext(Dispatchers.Main) {
                         adapterSchedules.updateSchedules(todaySchedule)
                         adapterDays.selectDay(todayDisplay)
+                        binding.tvNoSchedules.visibility =
+                            if (todaySchedule.isEmpty()) View.VISIBLE else View.GONE
+                        binding.recyclerviewSchedules.visibility =
+                            if (todaySchedule.isEmpty()) View.GONE else View.VISIBLE
                     }
                     Log.d(TAG, "$schedulesList")
                 } else {
@@ -239,30 +242,6 @@ class ScheduleActivity : AppCompatActivity() {
                 Log.e(TAG, "Error getting document: ", e)
             }
         }
-        /*
-        firestore
-            .collection("users")
-            .whereEqualTo("authID",uid)
-            .get()
-            .addOnSuccessListener { documents ->
-                val user = documents.firstOrNull()
-                if (user != null) {
-                    schedulesList = extractScheduleData(user)
-                    schedulesList = schedulesList.sortedBy { schedule ->
-                        schedule.datetime
-                    }
-                    val today = getCurrentDateInCustomFormat()
-                    val todaySchedule = loadSchedulesByDate(today)
-                    adapterSchedules.updateSchedules(todaySchedule)
-                    adapterDays.selectDay(today)
-                    Log.d(TAG, "$schedulesList")
-                } else {
-                    Log.d(TAG, "Document does not exist")
-                }
-            }
-            .addOnFailureListener { e ->
-                Log.e(TAG, "Error getting document: ", e)
-            }*/
     }
 
     private fun extractScheduleData(document: DocumentSnapshot): List<Schedule> {
