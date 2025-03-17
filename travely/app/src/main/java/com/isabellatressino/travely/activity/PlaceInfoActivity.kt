@@ -357,6 +357,10 @@ class PlaceInfoActivity : AppCompatActivity() {
             "qui." to "Thu", "sex." to "Fri", "sáb." to "Sat", "dom." to "Sun"
         )
 
+        val currentDate = LocalDate.now()
+        val selectedDate = LocalDate.of(year.toInt(), month.toInt(), day.toInt())
+        val currentTime = LocalTime.now()
+
         val availableTimes = mutableListOf<String>()
 
         if (place.type == "reserva") {
@@ -365,7 +369,12 @@ class PlaceInfoActivity : AppCompatActivity() {
             if (businessHours != null) {
                 if (businessHours.size >= 2) {
                     val times = generateHalfHourIntervals(businessHours[0], businessHours[1])
-                    for (time in times) availableTimes.add(time)
+
+                    for (time in times) {
+                        if (selectedDate.isAfter(currentDate) || (selectedDate.isEqual(currentDate) && LocalTime.parse(time) > currentTime)) {
+                            availableTimes.add(time)
+                        }
+                    }
                 } else {
                     availableTimes.add("Fechado")
                 }
