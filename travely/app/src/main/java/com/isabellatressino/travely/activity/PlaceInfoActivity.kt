@@ -38,7 +38,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Locale
 
-val tag = "TESTEADAPTER"
+val TAG2 = "TESTEADAPTER"
 
 class PlaceInfoActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth;
@@ -53,6 +53,7 @@ class PlaceInfoActivity : AppCompatActivity() {
     private lateinit var adapterTime: TimeAdapter
     private lateinit var place: Place
     private lateinit var placeID: String
+    private lateinit var firebase: FirebaseFirestore
     private var quantity = 1
 
     private var scheduleTime = ""
@@ -83,56 +84,117 @@ class PlaceInfoActivity : AppCompatActivity() {
     }
 
     private fun addSchedule() {
-        auth = FirebaseAuth.getInstance()
+        val auth = FirebaseAuth.getInstance()
+        val firebase = FirebaseFirestore.getInstance()
+        val authID = auth.currentUser?.uid
 
-        val authID = auth.currentUser
-        val schedule = "${scheduleDate.slice(0..9)}T$scheduleTime:00Z"
+        val scheduleDatetime = "${scheduleDate.slice(0..9)}T$scheduleTime:00Z"
 
-        if (place.type == "reserva"){
-            if (authID != null) {
-                bookingHelper = BookingHelper()
-                bookingHelper.requestBooking(
-                    this, authID.uid, placeID, schedule, 1, "reserva",
-                    onSuccess = {
-                            list ->
-                        // Log.d("BookingSuccess", "Reserva realizada com sucesso. PlaceID: $placeID, Date: $date")
-                        showLoading(true)
-                        Handler(Looper.getMainLooper()).postDelayed({
-                            val intent = Intent(this@PlaceInfoActivity, MainScreenActivity::class.java)
-                            startActivity(intent)
-                            Toast.makeText(this, "Agendamento registrado na sua sessão de 'Reservas'", Toast.LENGTH_LONG).show()
-                            finish()
-                        }, 3000)
+        val schedule = mapOf(
+            "placeID" to placeID,
+            "amount" to 1,
+            "price" to 1,
+            "datetime" to scheduleDatetime
+        )
+
+        if (authID != null) {
+            firebase.collection("users")
+                .whereEqualTo("authID", authID)
+                .get()
+                .addOnSuccessListener { querySnapshot ->
+                    if (!querySnapshot.isEmpty) {
+                        val documentSnapshot = querySnapshot.documents.first()
+
+                        val currentSchedules =
+                            documentSnapshot.get("schedule") as? List<Map<String, Any>>
+                                ?: emptyList()
+
+                        val updatedSchedules = currentSchedules.toMutableList()
+                        updatedSchedules.add(schedule)
+
+                        documentSnapshot.reference.update("schedule", updatedSchedules)
+                            .addOnSuccessListener {
+                                Toast.makeText(
+                                    this,
+                                    "Agendamento salvo com sucesso!",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                startActivity(Intent(this, MainScreenActivity::class.java))
+                                finish()
+                            }.addOnFailureListener { e ->
+                            Toast.makeText(this, "Falha ao salvar agendamento.", Toast.LENGTH_LONG)
+                                .show()
+                            Log.e("Erro", "Erro ao salvar agendamento: ", e)
+                        }
+                    } else {
+                        Toast.makeText(this, "Usuário não encontrado.", Toast.LENGTH_LONG).show()
                     }
-                ) {
-                    list ->
-
-                    val intent = Intent(this@PlaceInfoActivity, MainScreenActivity::class.java)
-                    Log.d("BookingError", " Falha ao realizar reserva.")
-                    Toast.makeText(this, "falha ao registrar agendamento na sua sessão de 'Reservas'", Toast.LENGTH_LONG).show()
-                    showLoading(true)
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        startActivity(intent)
-                        finish()
-                    }, 3000)
-/*
-                        //val intent = Intent(this@PlaceInfoActivity, MainScreenActivity::class.java)
-                       // Log.d("BookingSuccess", "Reserva realizada com sucesso. PlaceID: $placeID, Date: $date")
-
-                        Handler(Looper.getMainLooper()).postDelayed({
-                            startActivity(intent)
-                            finish()
-                        }, 3000)*/
                 }
-            }
-        } else {
-            val intent = Intent(this@PlaceInfoActivity, ConfirmActivity::class.java)
-            startActivity(intent)
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, "Erro ao carregar dados do usuário.", Toast.LENGTH_LONG)
+                        .show()
+                    Log.e("Erro", "Erro ao carregar dados do usuário: ", e)
+                }
         }
 
 
-        Log.d("TESTEADAPTER", schedule)
+        Log.d(TAG2, scheduleDatetime)
     }
+
+
+//    private fun addSchedule() {
+//        auth = FirebaseAuth.getInstance()
+//
+//        val authID = auth.currentUser
+//        Log.d(TAG2,"$scheduleDate")
+//        Log.d(TAG2,"$scheduleTime")
+//        val schedule = "${scheduleDate.slice(0..9)}T$scheduleTime:00Z"
+//
+//        if (place.type == "reserva"){
+//            if (authID != null) {
+//                bookingHelper = BookingHelper()
+//                bookingHelper.requestBooking(
+//                    this, authID.uid, placeID, schedule, 1, "reserva",
+//                    onSuccess = {
+//                            list ->
+//                        // Log.d("BookingSuccess", "Reserva realizada com sucesso. PlaceID: $placeID, Date: $date")
+//                        showLoading(true)
+//                        Handler(Looper.getMainLooper()).postDelayed({
+//                            val intent = Intent(this@PlaceInfoActivity, MainScreenActivity::class.java)
+//                            startActivity(intent)
+//                            Toast.makeText(this, "Agendamento registrado na sua sessão de 'Reservas'", Toast.LENGTH_LONG).show()
+//                            finish()
+//                        }, 3000)
+//                    }
+//                ) {
+//                    list ->
+//
+//                    val intent = Intent(this@PlaceInfoActivity, MainScreenActivity::class.java)
+//                    Log.d("BookingError", " Falha ao realizar reserva.")
+//                    Toast.makeText(this, "falha ao registrar agendamento na sua sessão de 'Reservas'", Toast.LENGTH_LONG).show()
+//                    showLoading(true)
+//                    Handler(Looper.getMainLooper()).postDelayed({
+//                        startActivity(intent)
+//                        finish()
+//                    }, 3000)
+///*
+//                        //val intent = Intent(this@PlaceInfoActivity, MainScreenActivity::class.java)
+//                       // Log.d("BookingSuccess", "Reserva realizada com sucesso. PlaceID: $placeID, Date: $date")
+//
+//                        Handler(Looper.getMainLooper()).postDelayed({
+//                            startActivity(intent)
+//                            finish()
+//                        }, 3000)*/
+//                }
+//            }
+//        } else {
+//            val intent = Intent(this@PlaceInfoActivity, ConfirmActivity::class.java)
+//            startActivity(intent)
+//        }
+//
+//
+//        Log.d(TAG2, schedule)
+//    }
 
     private fun updateButtonState() {
         binding.btnSchedule.isEnabled =
@@ -191,13 +253,13 @@ class PlaceInfoActivity : AppCompatActivity() {
                 }
 
                 binding.card.btnBuy.setOnClickListener {
-                   // addSchedule()
+                    // addSchedule()
                     val intent = Intent(this@PlaceInfoActivity, QrCodeActivity::class.java)
                     //intent.putExtra("placeName", place.name)
                     intent.putExtra("placeID", placeID)
                     intent.putExtra("date", scheduling)
                     intent.putExtra("amount", quantity)
-                    intent.putExtra("price",totalPrice)
+                    intent.putExtra("price", totalPrice)
                     startActivity(intent)
                 }
 

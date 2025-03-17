@@ -24,6 +24,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -181,7 +182,7 @@ class ScheduleActivity : AppCompatActivity() {
                 binding.recyclerviewSchedules.visibility = View.VISIBLE
             }
         }
-        Log.d(TAG, "$sortedSchedule")
+        Log.d(TAG, "loadschedule by date - $sortedSchedule")
         return sortedSchedule
     }
 
@@ -211,8 +212,10 @@ class ScheduleActivity : AppCompatActivity() {
                 val user = documents.firstOrNull()
                 if (user != null) {
                     schedulesList = extractScheduleData(user)
+                    Log.d(TAG,"schedulelist = $schedulesList")
                     schedulesList.forEach { schedule ->
                         val (scheduleDate, _) = schedule.datetime.split("T")
+                        Log.d(TAG,"scheduleDate: $scheduleDate")
                         if (!schedulesByDay.containsKey(scheduleDate)) {
                             schedulesByDay[scheduleDate] = mutableListOf()
                         }
@@ -234,7 +237,7 @@ class ScheduleActivity : AppCompatActivity() {
                         binding.recyclerviewSchedules.visibility =
                             if (todaySchedule.isEmpty()) View.GONE else View.VISIBLE
                     }
-                    Log.d(TAG, "$schedulesList")
+                    //Log.d(TAG, "load user schedule $schedulesList")
                 } else {
                     Log.d(TAG, "Document does not exist")
                 }
@@ -248,27 +251,31 @@ class ScheduleActivity : AppCompatActivity() {
         val schedulesList =
             document.get("schedule") as? List<Map<String, Any>> ?: return emptyList()
 
-        // Formato de saída (ISO 8601)
-        val outputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
-        outputFormat.timeZone = TimeZone.getTimeZone("UTC") // Garante UTC no formato de saída
+        val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
+        inputFormat.timeZone = TimeZone.getTimeZone("UTC")
 
         val ret = schedulesList.map { scheduleMap ->
             val placeID = (scheduleMap["placeID"]) as? String ?: ""
-            val amount = scheduleMap["amount"]?.toString()?.toIntOrNull() ?: 0
+            val amount = (scheduleMap["amount"] as? Number)?.toInt() ?: 0
             val price = (scheduleMap["price"] as? Number)?.toDouble() ?: 0.0
 
-            // Conversão do Timestamp para o formato ISO 8601
-            val datetimeTimestamp = scheduleMap["datetime"] as? Timestamp
-            val datetime = datetimeTimestamp?.toDate()?.let { outputFormat.format(it) } ?: ""
+            val datetimeString = scheduleMap["datetime"] as? String ?: ""
+            val datetime = try {
+                val date = inputFormat.parse(datetimeString)
+                date?.let { SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(it) } ?: ""
+            } catch (e: ParseException) {
+                ""
+            }
 
-            Schedule(placeID, amount, price, datetime)
+            Schedule(placeID, 1, 1.0, datetime)
         }
 
-        // Log dos dados extraídos
-        ret.forEach { schedule ->
-            Log.d(TAG, "Schedule datetime: ${schedule.datetime}")
-        }
+//        // Log dos dados extraídos
+//        ret.forEach { schedule ->
+//            Log.d(TAG, "Schedule datetime: ${schedule.datetime}")
+//        }
 
         return ret
     }
+
 }
