@@ -46,6 +46,8 @@ class ScheduleAdapter(private val schedules: MutableList<Schedule>) :
             holder.tvSchedulePrice.text = "R$ ${String.format(" %.2f", schedule.price).replace(".", ",")}"
         }
 
+        holder.tvScheduleQuantity.text = ""
+        holder.tvSchedulePrice.text = ""
 
         loadPlaceNameFromFirestore(schedule.placeID) { ret ->
 
