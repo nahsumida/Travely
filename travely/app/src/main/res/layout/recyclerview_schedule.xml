@@ -102,7 +102,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
-            android:text="R$ 40,00"
             android:textColor="@color/grey"
             app:layout_constraintBottom_toBottomOf="@id/iv_clock"
             app:layout_constraintEnd_toEndOf="parent"
