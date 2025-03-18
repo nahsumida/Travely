@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/navigation_local"
+        android:icon="@drawable/icon_local"
+        android:title="Mapa"
+        app:itemIconTint="@color/onSurface"
+        app:itemTextColor="@color/onSurface" />
+    <item
+        android:id="@+id/navigation_home"
+        android:icon="@drawable/icon_home"
+        android:title="Home"
+        app:itemIconTint="@color/onSurface"
+        app:itemTextColor="@color/onSurface" />
+    <item
+        android:id="@+id/navigation_profile"
+        android:icon="@drawable/icon_profile"
+        android:title="Perfil"
+        app:itemIconTint="@color/onSurface"
+        app:itemTextColor="@color/onSurface" />
+</menu>

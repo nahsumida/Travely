@@ -1,15 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-    <color name="lime_green">#9BB550</color>
-    <color name="purple_haze">#9168A0</color>
-    <color name="yellow_mimosa">#ECC030</color>
-    <color name="red">#F44336</color>
-    <color name="grey">#545454</color>
-    <color name="light_grey">#868686</color>
+    <color name="primaryColor">#8435A1</color>
+    <color name="primaryColorVariant">#8435A1</color>
 
-    <color name="purple_haze_enabled">#869168A0</color>
-    <color name="purple_haze_pressed">#8435A1</color>
-    <color name="grey_transparent">#7A868686</color>
+    <color name="secondaryColor">#9BB550</color>
+    <color name="secondaryColorVariant">#ECC030</color>
+
+    <color name="backgroundColor">#F5F5F5</color>
+    <color name="surfaceColor">#FFFFFF</color>
+
+    <color name="onPrimary">#FFFFFF</color>
+    <color name="onSecondary">#000000</color>
+
+    <color name="onBackground">#000000</color>
+    <color name="onSurface">#545454</color>
+
+    <color name="errorColor">#B00020</color>
+    <color name="onError">#FFFFFF</color>
 </resources>
