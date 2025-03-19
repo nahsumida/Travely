@@ -29,7 +29,7 @@ class UserDao : IUserDao {
                         email = firstDocument.getString("email") ?: "",
                         password = firstDocument.getString("password") ?: "",
                         authID = firstDocument.getString("authID") ?: "",
-                        schedule = null, // Se precisar, converta manualmente
+                        schedule = null,
                         profile = firstDocument.getString("profile") ?: ""
                     )
 
