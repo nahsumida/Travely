@@ -1,18 +1,18 @@
 package com.isabellatressino.travely.dao
 
 import android.util.Log
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.isabellatressino.travely.interfaces.IUserDao
 import com.isabellatressino.travely.models.User
 
-class UserDao : IUserDao {
+class UserDao {
 
-
-    // Busca um usuário pelo authID
     private val db = FirebaseFirestore.getInstance()
     private val usersCollection = db.collection("users")
+    val auth = FirebaseAuth.getInstance()
 
-    override fun getUserByAuthId(
+    // Função para pegar um usuário pelo authID
+    fun getUserByAuthId(
         authId: String,
         onSuccess: (User?) -> Unit,
         onFailure: (Exception) -> Unit
@@ -46,79 +46,39 @@ class UserDao : IUserDao {
             }
     }
 
-
-    // Inserir usuário
-    override fun insertUser(user: User, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-        usersCollection.document(user.authID)
-            .set(user)
-            .addOnSuccessListener {
-                // Sucesso
-                onSuccess()
-            }
-            .addOnFailureListener { exception ->
-                // Falha
-                onFailure(exception)
-            }
-    }
-
-    // Atualizar usuário
-    override fun updateUser(user: User, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-        usersCollection.document(user.authID)
-            .set(user)  // Podemos usar .set() para sobrescrever o documento ou .update() para atualizar campos específicos
-            .addOnSuccessListener {
-                // Sucesso
-                onSuccess()
-            }
-            .addOnFailureListener { exception ->
-                // Falha
-                onFailure(exception)
-            }
-    }
-
-    // Deletar usuário
-    override fun deleteUser(userId: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-        usersCollection.document(userId)
-            .delete()
-            .addOnSuccessListener {
-                // Sucesso
-                onSuccess()
-            }
-            .addOnFailureListener { exception ->
-                // Falha
-                onFailure(exception)
-            }
-    }
-
-    // Obter usuário pelo ID
-    override fun getUserById(
-        userId: String,
-        onSuccess: (User?) -> Unit,
-        onFailure: (Exception) -> Unit
+    // Função de login
+    fun signInWithEmailAndPassword(
+        email: String,
+        password: String,
+        onSuccess: (String) -> Unit,
+        onFailure: (String) -> Unit
     ) {
-        usersCollection.document(userId)
-            .get()
-            .addOnSuccessListener { documentSnapshot ->
-                // Sucesso
-                val user = documentSnapshot.toObject(User::class.java)
-                onSuccess(user)
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnSuccessListener { authResult ->
+                val user = authResult.user
+                if (user != null) {
+                    if (user.isEmailVerified) {
+                        onSuccess(user.uid)
+                    } else {
+                        onFailure("Email não verificado. Verifique seu email para ativar a conta.")
+                    }
+                }
             }
             .addOnFailureListener { exception ->
-                // Falha
-                onFailure(exception)
+                onFailure(exception.message ?: "Erro desconhecido")
             }
     }
 
-    // Obter todos os usuários
-    override fun getAllUsers(onSuccess: (List<User>) -> Unit, onFailure: (Exception) -> Unit) {
-        usersCollection.get()
-            .addOnSuccessListener { querySnapshot ->
-                // Sucesso
-                val users = querySnapshot.documents.mapNotNull { it.toObject(User::class.java) }
-                onSuccess(users)
-            }
-            .addOnFailureListener { exception ->
-                // Falha
-                onFailure(exception)
+    // Função para enviar email de recuperação de senha
+    fun sendPasswordResetEmail(email: String, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
+        auth.sendPasswordResetEmail(email)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    onSuccess()
+                } else {
+                    onFailure("Falha ao enviar email de recuperação.")
+                }
             }
     }
+
 }

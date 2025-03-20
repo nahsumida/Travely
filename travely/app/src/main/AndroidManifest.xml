@@ -22,10 +22,10 @@
             android:name=".SingUpActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".MainScreenActivity"
             android:exported="false" />
         <activity
-            android:name=".MainScreenActivity"
+            android:name=".LoginActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
