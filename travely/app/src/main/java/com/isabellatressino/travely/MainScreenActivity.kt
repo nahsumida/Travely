@@ -6,7 +6,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.isabellatressino.travely.databinding.ActivityMainScreenBinding
 import com.isabellatressino.travely.fragments.HomeFragment
-import com.isabellatressino.travely.fragments.MapFragment
+import com.isabellatressino.travely.fragments.ScheduleFragment
 import com.isabellatressino.travely.fragments.ProfileFragment
 
 class MainScreenActivity : AppCompatActivity() {
@@ -30,7 +30,7 @@ class MainScreenActivity : AppCompatActivity() {
                 }
 
                 R.id.navigation_local -> {
-                    loadFragment(MapFragment())
+                    loadFragment(ScheduleFragment())
                     true
                 }
 

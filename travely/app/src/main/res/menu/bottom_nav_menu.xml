@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/navigation_local"
-        android:icon="@drawable/icon_local"
-        android:title="Mapa"
+        android:icon="@drawable/icon_calendar"
+        android:title="Agenda"
         app:itemIconTint="@color/onSurface"
         app:itemTextColor="@color/onSurface" />
     <item
