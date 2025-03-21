@@ -17,6 +17,9 @@ class MainScreenActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+        loadFragment(HomeFragment())
+        binding.bottomNavigation.selectedItemId = R.id.navigation_home
+
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_home -> {
@@ -37,8 +40,6 @@ class MainScreenActivity : AppCompatActivity() {
                 else -> false
             }
         }
-
-        loadFragment(HomeFragment())
 
     }
 

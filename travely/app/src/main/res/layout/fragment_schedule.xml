@@ -14,6 +14,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/text_no_schedules"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Nenhum agendamento para o dia selecionado"
+        android:textColor="@color/primaryColor"
+        android:textSize="16sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/recyclerview_schedules"
+        app:layout_constraintEnd_toEndOf="@+id/recyclerview_schedules"
+        app:layout_constraintStart_toStartOf="@+id/recyclerview_schedules"
+        app:layout_constraintTop_toBottomOf="@+id/recyclerview_days"
+        app:layout_constraintVertical_bias=".1" />
+
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"

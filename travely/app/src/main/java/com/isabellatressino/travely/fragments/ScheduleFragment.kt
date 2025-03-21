@@ -118,14 +118,13 @@ class ScheduleFragment : Fragment() {
 
         val today = Calendar.getInstance()
         val currentDay = today.get(Calendar.DAY_OF_MONTH)
-        val currentMonth = today.get(Calendar.MONTH) + 1 // Os meses começam do zero
+        val currentMonth = today.get(Calendar.MONTH) + 1
 
-        val daysToDisplay = mutableListOf<Pair<Int, String>>() // Para armazenar o dia do mês e o dia da semana
+        val daysToDisplay = mutableListOf<Pair<Int, String>>()
 
         if (selectedMonth == currentMonth) {
             selectedDay = currentDay
 
-            // Adiciona dias anteriores ao dia atual, se necessário
             when {
                 currentDay > 2 -> {
                     daysToDisplay.add(Pair(currentDay - 2, getDayOfWeek(currentDay - 2)))
@@ -137,23 +136,19 @@ class ScheduleFragment : Fragment() {
                 }
             }
 
-            // Adiciona os dias restantes a partir do dia atual até o final do mês
             val remainingDays = (currentDay..daysInMonth).toList()
             remainingDays.forEach { day ->
                 daysToDisplay.add(Pair(day, getDayOfWeek(day)))
             }
         } else {
-            // Se não for o mês atual, simplesmente carrega todos os dias do mês selecionado
             for (day in 1..daysInMonth) {
                 daysToDisplay.add(Pair(day, getDayOfWeek(day)))
             }
             selectedDay = 1
         }
 
-        // Atualiza os dias no adaptador, incluindo o dia da semana
         daysAdapter.updateDays(daysToDisplay)
 
-        // Seleciona o dia correto
         daysAdapter.selectDay(selectedDay)
         loadSchedules()
     }
@@ -176,8 +171,6 @@ class ScheduleFragment : Fragment() {
         }
     }
 
-
-
     private fun setupRecyclerViewSchedules() {
         scheduleAdapter = ScheduleAdapter(mutableListOf())
         binding.recyclerviewSchedules.layoutManager =
@@ -192,31 +185,16 @@ class ScheduleFragment : Fragment() {
             scheduleDao.getSchedulesByUser(
                 authID,
                 onSuccess = { schedules ->
-
-                    Log.d(
-                        "ScheduleDebug",
-                        "Mês selecionado: ${
-                            selectedMonth.toString().padStart(2, '0')
-                        } | Dia selecionado: ${selectedDay.toString().padStart(2, '0')}"
-                    )
-
                     val schedulesWithPlaces = mutableListOf<Map<String, Any>>()
 
                     schedules.forEach { schedule ->
                         val scheduleMonth = schedule.extractMonth(schedule.datetime)
                         val scheduleDay = schedule.extractDay(schedule.datetime)
 
-                        Log.d(
-                            "ScheduleDebug",
-                            "Mês da reserva: $scheduleMonth | Dia da reserva: $scheduleDay"
-                        )
-
                         if (scheduleMonth == selectedMonth.toString().padStart(2, '0') &&
                             scheduleDay == selectedDay.toString().padStart(2, '0')
                         ) {
-                            Log.d("ScheduleDebug", "Agendamento corresponde à data selecionada")
 
-                            // Buscar o lugar e associar à agenda
                             placeDao.getPlaceById(
                                 schedule.placeID,
                                 onSuccess = { place ->
@@ -229,14 +207,25 @@ class ScheduleFragment : Fragment() {
                                     schedulesWithPlaces.add(scheduleMap)
 
                                     scheduleAdapter.updateSchedules(schedulesWithPlaces)
+
+                                    binding.tvNoSchedules.visibility = View.GONE
                                 },
-                                onFailure = { Log.e("ScheduleDebug", "Erro ao buscar lugar") }
+                                onFailure = {
+                                    Log.e("ScheduleDebug", "Erro ao buscar lugar")
+                                }
                             )
                         }
+                    }
+
+                    if (schedulesWithPlaces.isEmpty()) {
+                        binding.textNoSchedules.visibility = View.VISIBLE
+                    } else {
+                        binding.textNoSchedules.visibility = View.GONE
                     }
                 },
                 onFailure = { exception ->
                     Log.e("ScheduleDebug", "Erro ao buscar agendamentos", exception)
+                    binding.textNoSchedules.visibility = View.VISIBLE
                 }
             )
         }

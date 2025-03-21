@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.isabellatressino.travely.R
 
 class DaysAdapter(
-    private var days: List<Pair<Int, String>>,  // Mudamos para uma lista de pares (Int, String)
+    private var days: List<Pair<Int, String>>,
     private val onDaySelected: (Int) -> Unit
 ) : RecyclerView.Adapter<DaysAdapter.DayViewHolder>() {
 
@@ -31,10 +31,9 @@ class DaysAdapter(
     override fun onBindViewHolder(holder: DayViewHolder, position: Int) {
         val (day, dayOfWeek) = days[position]  // Desestruturando o par (dia, dia da semana)
 
-        holder.txtDay.text = day.toString()  // Exibe o número do dia
-        holder.txtDayOfWeek.text = dayOfWeek  // Exibe o nome do dia da semana (Seg, Ter, etc.)
+        holder.txtDay.text = day.toString()
+        holder.txtDayOfWeek.text = dayOfWeek
 
-        // Verifica se é o dia selecionado e altera a aparência
         if (day == selectedDay) {
             holder.cardView.setCardBackgroundColor(
                 ContextCompat.getColor(holder.itemView.context, R.color.primaryColor)
