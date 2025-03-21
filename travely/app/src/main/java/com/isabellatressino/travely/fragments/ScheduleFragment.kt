@@ -31,8 +31,6 @@ class ScheduleFragment : Fragment() {
     private var selectedMonth = Calendar.getInstance().get(Calendar.MONTH) + 1
     private var selectedDay = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
 
-    private var lastSelectedDay = -1
-
     private val calendar by lazy { Calendar.getInstance() }
 
     override fun onCreateView(
@@ -64,23 +62,19 @@ class ScheduleFragment : Fragment() {
     }
 
     private fun setupMonthSpinner() {
-        // Cria uma lista de meses do ano
         val allMonths = listOf(
             "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
             "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
         )
 
-        // Obtemos o mês atual
         val currentMonth = Calendar.getInstance().get(Calendar.MONTH)
 
-        // Criamos uma lista apenas com o mês atual e os próximos 3 meses
         val monthsToDisplay = mutableListOf<String>()
         for (i in 0..3) {
             val monthIndex = (currentMonth + i) % 12
             monthsToDisplay.add(allMonths[monthIndex])
         }
 
-        // Agora, adaptamos o spinner para mostrar apenas esses 4 meses
         val adapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_spinner_dropdown_item,
@@ -88,8 +82,7 @@ class ScheduleFragment : Fragment() {
         )
         binding.spinner.adapter = adapter
 
-        // Definimos o mês selecionado inicialmente como o mês atual
-        binding.spinner.setSelection(0)  // O mês atual será o primeiro item
+        binding.spinner.setSelection(0)
 
         binding.spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
@@ -98,9 +91,8 @@ class ScheduleFragment : Fragment() {
                 position: Int,
                 id: Long
             ) {
-                // Quando um mês for selecionado, definimos o mês atual e carregamos os dias
                 selectedMonth =
-                    currentMonth + position + 1 // Ajusta o mês selecionado de acordo com a posição
+                    currentMonth + position + 1
                 loadDaysOfMonth()
             }
 
@@ -121,7 +113,6 @@ class ScheduleFragment : Fragment() {
 
 
     private fun loadDaysOfMonth() {
-        // Configura o mês no calendário
         calendar.set(Calendar.MONTH, selectedMonth - 1)
         val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
 
@@ -129,47 +120,62 @@ class ScheduleFragment : Fragment() {
         val currentDay = today.get(Calendar.DAY_OF_MONTH)
         val currentMonth = today.get(Calendar.MONTH) + 1 // Os meses começam do zero
 
-        // Verifica se o mês selecionado é o mês atual
+        val daysToDisplay = mutableListOf<Pair<Int, String>>() // Para armazenar o dia do mês e o dia da semana
+
         if (selectedMonth == currentMonth) {
-            // Se for o mês atual, usa o dia atual como o dia selecionado
             selectedDay = currentDay
 
-            val daysToDisplay = mutableListOf<Int>()
-
-            // Adiciona os dias anteriores ao dia atual, se necessário
+            // Adiciona dias anteriores ao dia atual, se necessário
             when {
                 currentDay > 2 -> {
-                    daysToDisplay.add(currentDay - 2)
-                    daysToDisplay.add(currentDay - 1)
+                    daysToDisplay.add(Pair(currentDay - 2, getDayOfWeek(currentDay - 2)))
+                    daysToDisplay.add(Pair(currentDay - 1, getDayOfWeek(currentDay - 1)))
                 }
 
                 currentDay == 2 -> {
-                    daysToDisplay.add(currentDay - 1)
+                    daysToDisplay.add(Pair(currentDay - 1, getDayOfWeek(currentDay - 1)))
                 }
             }
 
-            // Adiciona os dias a partir do dia atual até o final do mês
+            // Adiciona os dias restantes a partir do dia atual até o final do mês
             val remainingDays = (currentDay..daysInMonth).toList()
-            daysToDisplay.addAll(remainingDays)
-
-            // Atualiza os dias no adaptador
-            daysAdapter.updateDays(daysToDisplay)
-
-            // Marca o dia selecionado corretamente (seleciona o dia atual)
-            daysAdapter.selectDay(selectedDay)
+            remainingDays.forEach { day ->
+                daysToDisplay.add(Pair(day, getDayOfWeek(day)))
+            }
         } else {
             // Se não for o mês atual, simplesmente carrega todos os dias do mês selecionado
-            val days = (1..daysInMonth).toList()
-            daysAdapter.updateDays(days)
-
-            // Seleciona o primeiro dia por padrão (ou qualquer outro valor desejado)
+            for (day in 1..daysInMonth) {
+                daysToDisplay.add(Pair(day, getDayOfWeek(day)))
+            }
             selectedDay = 1
-            daysAdapter.selectDay(selectedDay)
         }
 
-        // Carrega as agendas para o dia selecionado
+        // Atualiza os dias no adaptador, incluindo o dia da semana
+        daysAdapter.updateDays(daysToDisplay)
+
+        // Seleciona o dia correto
+        daysAdapter.selectDay(selectedDay)
         loadSchedules()
     }
+
+    private fun getDayOfWeek(day: Int): String {
+        val calendar = Calendar.getInstance()
+        calendar.set(Calendar.MONTH, selectedMonth - 1)
+        calendar.set(Calendar.DAY_OF_MONTH, day)
+        val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+
+        return when (dayOfWeek) {
+            Calendar.SUNDAY -> "Dom"
+            Calendar.MONDAY -> "Seg"
+            Calendar.TUESDAY -> "Ter"
+            Calendar.WEDNESDAY -> "Qua"
+            Calendar.THURSDAY -> "Qui"
+            Calendar.FRIDAY -> "Sex"
+            Calendar.SATURDAY -> "Sab"
+            else -> ""
+        }
+    }
+
 
 
     private fun setupRecyclerViewSchedules() {

@@ -2,11 +2,8 @@ package com.isabellatressino.travely.dao
 
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.GeoPoint
 import com.isabellatressino.travely.models.Place
 import com.isabellatressino.travely.models.Schedule
-import com.isabellatressino.travely.models.User
-import kotlinx.coroutines.tasks.await
 
 class PlaceDao {
 

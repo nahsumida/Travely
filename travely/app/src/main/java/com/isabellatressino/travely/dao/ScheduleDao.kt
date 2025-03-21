@@ -1,16 +1,8 @@
 package com.isabellatressino.travely.dao
 
 import android.util.Log
-import com.google.firebase.Timestamp
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.isabellatressino.travely.models.Schedule
-import com.isabellatressino.travely.models.User
-import kotlinx.coroutines.tasks.await
-import java.text.SimpleDateFormat
-import java.util.Locale
-import java.util.TimeZone
 
 class ScheduleDao {
 
