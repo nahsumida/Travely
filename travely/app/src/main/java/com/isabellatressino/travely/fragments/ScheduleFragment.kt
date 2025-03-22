@@ -28,10 +28,11 @@ class ScheduleFragment : Fragment() {
     private lateinit var scheduleAdapter: ScheduleAdapter
     private lateinit var daysAdapter: DaysAdapter
 
-    private var selectedMonth = Calendar.getInstance().get(Calendar.MONTH) + 1
-    private var selectedDay = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
-
     private val calendar by lazy { Calendar.getInstance() }
+
+    private var selectedMonth = calendar.get(Calendar.MONTH) + 1
+    private var selectedDay = calendar.get(Calendar.DAY_OF_MONTH)
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -230,7 +231,6 @@ class ScheduleFragment : Fragment() {
             )
         }
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()

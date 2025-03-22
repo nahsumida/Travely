@@ -9,4 +9,17 @@ class User(
     var authID: String,
     var schedule: List<Schedule>?,
     var profile: String,
-) {}
+) {
+    // Método que retorna uma descrição com base no perfil armazenado
+    fun getProfileDescription(): String {
+        return when (profile) {
+            "cultural" -> "Turista cultural"
+            "compras" -> "Turista de compras"
+            "gastronomico" -> "Turista gastronômico"
+            "aventureiro" -> "Turista aventureiro"
+            "negocios" -> "Turista de negócios"
+            "descanso" -> "Turista de descanso"
+            else -> "Perfil desconhecido"
+        }
+    }
+}

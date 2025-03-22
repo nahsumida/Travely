@@ -81,4 +81,55 @@ class UserDao {
             }
     }
 
+    // Função que adiciona uma reserva no banco
+    fun addSchedule(
+        authID: String,
+        placeID: String,
+        scheduleDateTime: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        if (authID.isNotEmpty()) {
+            usersCollection.whereEqualTo("authID", authID)
+                .get()
+                .addOnSuccessListener { querySnapshot ->
+                    if (!querySnapshot.isEmpty) {
+                        val documentSnapshot = querySnapshot.documents.first()
+
+                        // Criar novo agendamento
+                        val newSchedule = mapOf(
+                            "placeID" to placeID,
+                            "amount" to 1,
+                            "price" to 1,
+                            "datetime" to scheduleDateTime
+                        )
+
+                        val currentSchedules =
+                            documentSnapshot.get("schedule") as? MutableList<Map<String, Any>>
+                                ?: mutableListOf()
+
+                        currentSchedules.add(newSchedule)
+
+                        documentSnapshot.reference.update("schedule", currentSchedules)
+                            .addOnSuccessListener {
+                                onSuccess()
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e("Firestore", "Erro ao salvar agendamento", e)
+                                onFailure(e)
+                            }
+                    } else {
+                        onFailure(Exception("Usuário não encontrado"))
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Log.e("Firestore", "Erro ao carregar dados do usuário", e)
+                    onFailure(e)
+                }
+        } else {
+            onFailure(Exception("ID do usuário inválido"))
+        }
+    }
+
+
 }

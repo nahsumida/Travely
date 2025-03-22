@@ -1,13 +1,16 @@
 package com.isabellatressino.travely.fragments
 
+import android.content.Intent
 import com.isabellatressino.travely.viewmodel.UserViewModel
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.firebase.auth.FirebaseAuth
+import com.isabellatressino.travely.MapActivity
 import com.isabellatressino.travely.databinding.FragmentHomeBinding
 
 class HomeFragment : Fragment() {
@@ -29,6 +32,11 @@ class HomeFragment : Fragment() {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: "9agkbQSGtkTnmPXHQ39oVj9nQu42"
         userViewModel.fetchUser(uid, requireContext())
 
+        binding.cardViewMap.setOnClickListener {
+            val intent = Intent(requireContext(), MapActivity::class.java)
+            startActivity(intent)
+        }
+
         return binding.root
     }
 
@@ -36,7 +44,7 @@ class HomeFragment : Fragment() {
         userViewModel.user.observe(viewLifecycleOwner) { user ->
             if (user != null) {
                 binding.tvName.text = user.name
-                binding.tvProfile.text = user.profile
+                binding.tvProfile.text = user.getProfileDescription()
             }
         }
     }
