@@ -27,9 +27,9 @@ class TimeAdapter(private var times: MutableList<String>) :
 
         // Cores de seleção armazenadas
         val selectedColor = ContextCompat.getColor(itemView.context, R.color.primaryColor)
-        val unselectedColor = ContextCompat.getColor(itemView.context, R.color.onPrimary)
+        val unselectedColor = ContextCompat.getColor(itemView.context, R.color.surfaceColor)
         val selectedTextColor = ContextCompat.getColor(itemView.context, R.color.onPrimary)
-        val unselectedTextColor = ContextCompat.getColor(itemView.context, R.color.onSecondary)
+        val unselectedTextColor = ContextCompat.getColor(itemView.context, R.color.onSurface)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TimeItemViewHolder {
@@ -46,7 +46,6 @@ class TimeAdapter(private var times: MutableList<String>) :
         val time = times[position]
         holder.textView.text = time
 
-        // Verificação para destacar o item selecionado
         if (position == selectedPosition && time !in INVALID_TIMES) {
             holder.cardView.setCardBackgroundColor(holder.selectedColor)
             holder.textView.setTextColor(holder.selectedTextColor)

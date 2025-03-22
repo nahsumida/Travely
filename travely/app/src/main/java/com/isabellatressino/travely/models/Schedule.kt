@@ -4,6 +4,7 @@ import android.util.Log
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
@@ -17,10 +18,9 @@ class Schedule(
         return "Schedule(placeID='$placeID', availability='$availability', price=$price, datetime='$datetime')"
     }
 
-    private fun parseDate(datetime: String): java.util.Date? {
+    private fun parseDate(datetime: String): Date? {
         return try {
             val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
-            inputFormat.timeZone = TimeZone.getTimeZone("UTC")
             inputFormat.parse(datetime)
         } catch (e: Exception) {
             Log.e("DateParsing", "Erro ao converter data: ${e.message}")
