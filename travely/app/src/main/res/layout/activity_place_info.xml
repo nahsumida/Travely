@@ -216,7 +216,6 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_schedule"
                 style="@style/Button"
-                android:layout_marginVertical="40dp"
                 android:padding="10dp"
                 android:text="Agendar"
                 app:layout_constraintBottom_toBottomOf="parent"
