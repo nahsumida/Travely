@@ -73,19 +73,21 @@ class PlaceInfoActivity : AppCompatActivity() {
 
     private fun addSchedule() {
         if (selectedTime != "") {
+            FirebaseAuth.getInstance().currentUser?.uid?.let { authID ->
 
-            FirebaseAuth.getInstance().currentUser?.uid?.let {
+                val scheduleDateTime = "$year-$selectedMonth-${selectedDay}T$selectedTime:00Z"
+
                 userDao.addSchedule(
-                    authID = it,
+                    authID = authID,
                     placeID = placeID,
-                    scheduleDateTime = "$year-$selectedMonth-${selectedDay}T$selectedTime:00Z",
+                    placeName = place.name,
+                    scheduleDateTime = scheduleDateTime,
                     onSuccess = {
                         Toast.makeText(
                             this,
                             "Agendamento realizado com sucesso!",
                             Toast.LENGTH_SHORT
-                        )
-                            .show()
+                        ).show()
                         finish()
                     },
                     onFailure = { exception ->
@@ -98,9 +100,9 @@ class PlaceInfoActivity : AppCompatActivity() {
                     }
                 )
             }
-
         }
     }
+
 
     private fun loadPlaceById(idPlace: String) {
         placeDao.getPlaceById(

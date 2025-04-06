@@ -37,7 +37,7 @@ class ScheduleAdapter(private var schedules: List<Map<String, Any>>) :
 
         holder.placeNameTextView.text = placeName
         holder.placeAddressTextView.text = placeAddress
-        holder.scheduleTime.text = schedule.extractHour(schedule.datetime)
+        holder.scheduleTime.text = schedule.extractHour()
     }
 
     fun updateSchedules(newSchedules: List<Map<String, Any>>) {

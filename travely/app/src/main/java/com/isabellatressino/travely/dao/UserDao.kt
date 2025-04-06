@@ -4,6 +4,9 @@ import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.isabellatressino.travely.models.User
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.UUID
 
 class UserDao {
 
@@ -85,6 +88,7 @@ class UserDao {
     fun addSchedule(
         authID: String,
         placeID: String,
+        placeName: String,
         scheduleDateTime: String,
         onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
@@ -96,12 +100,28 @@ class UserDao {
                     if (!querySnapshot.isEmpty) {
                         val documentSnapshot = querySnapshot.documents.first()
 
-                        // Criar novo agendamento
+                        // Gerar UUID
+                        val id = UUID.randomUUID().toString()
+
+                        // Extrair data (yyyy-MM-dd) da string datetime
+                        val date = try {
+                            val inputFormat =
+                                SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
+                            val outputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                            val parsedDate = inputFormat.parse(scheduleDateTime)
+                            outputFormat.format(parsedDate!!)
+                        } catch (e: Exception) {
+                            Log.e("ScheduleParsing", "Erro ao extrair date: ${e.message}")
+                            scheduleDateTime
+                        }
+
                         val newSchedule = mapOf(
+                            "id" to id,
+                            "date" to scheduleDateTime,
                             "placeID" to placeID,
+                            "placeName" to placeName,
+                            "price" to 1.0,
                             "amount" to 1,
-                            "price" to 1,
-                            "datetime" to scheduleDateTime
                         )
 
                         val currentSchedules =
@@ -111,9 +131,7 @@ class UserDao {
                         currentSchedules.add(newSchedule)
 
                         documentSnapshot.reference.update("schedule", currentSchedules)
-                            .addOnSuccessListener {
-                                onSuccess()
-                            }
+                            .addOnSuccessListener { onSuccess() }
                             .addOnFailureListener { e ->
                                 Log.e("Firestore", "Erro ao salvar agendamento", e)
                                 onFailure(e)

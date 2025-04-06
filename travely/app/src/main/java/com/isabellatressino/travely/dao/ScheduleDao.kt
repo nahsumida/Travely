@@ -25,10 +25,12 @@ class ScheduleDao {
 
                     schedulesArray?.forEach { scheduleData ->
                         val schedule = Schedule(
+                            id = scheduleData["uuid"] as? String ?: "",
+                            date = scheduleData["date"] as? String ?: "",
                             placeID = scheduleData["placeID"] as? String ?: "",
-                            availability = scheduleData["amount"] as? Int ?: 0,
+                            placeName = scheduleData["placeName"] as? String ?: "",
                             price = (scheduleData["price"] as? Number)?.toDouble() ?: 0.0,
-                            datetime = scheduleData["datetime"] as? String ?: ""
+                            amount = (scheduleData["amount"] as? Number)?.toInt() ?: 0
                         )
                         schedulesList.add(schedule)
                     }
@@ -43,5 +45,6 @@ class ScheduleDao {
                 onFailure(exception)
             }
     }
+
 
 }

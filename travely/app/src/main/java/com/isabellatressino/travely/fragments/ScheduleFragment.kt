@@ -189,8 +189,8 @@ class ScheduleFragment : Fragment() {
                     val schedulesWithPlaces = mutableListOf<Map<String, Any>>()
 
                     schedules.forEach { schedule ->
-                        val scheduleMonth = schedule.extractMonth(schedule.datetime)
-                        val scheduleDay = schedule.extractDay(schedule.datetime)
+                        val scheduleMonth = schedule.extractMonth()
+                        val scheduleDay = schedule.extractDay()
 
                         if (scheduleMonth == selectedMonth.toString().padStart(2, '0') &&
                             scheduleDay == selectedDay.toString().padStart(2, '0')
