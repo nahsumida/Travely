@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SingUpActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Logo -->
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/top_image"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:contentDescription="Imagem no topo"
+                android:maxHeight="100dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/logo"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/img_dots"
+                android:layout_width="wrap_content"
+                android:layout_height="10dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:contentDescription="Imagem no topo"
+                android:scaleType="fitCenter"
+                android:src="@drawable/image_dots"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/top_image" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/text_name"
+                style="@style/TextInputLabel"
+                android:layout_marginTop="30dp"
+                android:text="Nome"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/img_dots" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/input_name"
+                style="@style/TextInputLayout"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_name">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_name"
+                    style="@style/TextInputEditText"
+                    android:hint="Digite seu nome"
+                    android:inputType="textCapWords" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/text_cpf"
+                style="@style/TextInputLabel"
+                android:text="CPF"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/input_name" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/input_cpf"
+                style="@style/TextInputLayout"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_cpf">
+
+                <com.santalu.maskara.widget.MaskEditText
+                    android:id="@+id/edit_cpf"
+                    style="@style/TextInputEditText"
+                    android:hint="Digite seu CPF"
+                    android:inputType="number"
+                    app:mask="___.___.___-__"
+                    app:maskCharacter="_"
+                    app:maskStyle="normal" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/text_phone"
+                style="@style/TextInputLabel"
+                android:text="Telefone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/input_cpf" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/input_phone"
+                style="@style/TextInputLayout"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_phone">
+
+                <com.santalu.maskara.widget.MaskEditText
+                    android:id="@+id/edit_phone"
+                    style="@style/TextInputEditText"
+                    android:hint="Digite seu número de telefone"
+                    android:inputType="number"
+                    app:mask="(__) _____ ____"
+                    app:maskCharacter="_"
+                    app:maskStyle="normal" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/text_email"
+                style="@style/TextInputLabel"
+                android:text="Email"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/input_phone" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/input_email"
+                style="@style/TextInputLayout"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_email">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_email"
+                    style="@style/TextInputEditText"
+                    android:hint="Digite seu email"
+                    android:inputType="textEmailAddress" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/text_password"
+                style="@style/TextInputLabel"
+                android:text="Senha"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/input_email" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/input_password"
+                style="@style/TextInputLayout"
+                app:endIconMode="password_toggle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_password">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_password"
+                    style="@style/TextInputEditText"
+                    android:hint="Defina uma senha"
+                    android:inputType="textPassword" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/text_confirm_password"
+                style="@style/TextInputLabel"
+                android:text="Confirmação de senha"
+                app:endIconMode="password_toggle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/input_password" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/input_confirm_password"
+                style="@style/TextInputLayout"
+                app:endIconMode="password_toggle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_confirm_password">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_confirm_password"
+                    style="@style/TextInputEditText"
+                    android:hint="Digite sua senha novamente"
+                    android:inputType="textPassword" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_register"
+                style="@style/Button"
+                android:layout_marginTop="30dp"
+                android:layout_marginBottom="50dp"
+                android:text="Cadastrar"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/input_confirm_password" />
+
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

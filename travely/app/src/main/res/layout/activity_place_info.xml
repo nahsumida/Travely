@@ -5,14 +5,12 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context=".activity.PlaceInfoActivity">
+    tools:context=".PlaceInfoActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_progressbar"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@color/white"
         android:elevation="10dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -25,7 +23,7 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:elevation="20dp"
-            android:indeterminateTint="@color/purple_haze"
+            android:indeterminateTint="@color/primaryColor"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -38,7 +36,7 @@
             android:layout_marginTop="10dp"
             android:elevation="10dp"
             android:text="Por favor, aguarde..."
-            android:textColor="@color/purple_haze"
+            android:textColor="@color/primaryColor"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="@id/progressBar"
             app:layout_constraintStart_toStartOf="@id/progressBar"
@@ -54,7 +52,7 @@
         android:layout_marginTop="20dp"
         android:background="@null"
         android:elevation="10dp"
-        android:src="@drawable/icon_back"
+        android:src="@drawable/icon_arrow_back"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -70,8 +68,6 @@
             android:id="@+id/img_place"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/rounded"
-            android:backgroundTint="@color/white"
             android:scaleType="centerCrop" />
 
     </androidx.cardview.widget.CardView>
@@ -80,7 +76,6 @@
         android:id="@+id/cv_infos"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/white"
         android:elevation="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -89,7 +84,6 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/white"
             android:paddingBottom="10dp">
 
             <ImageView
@@ -110,7 +104,7 @@
                 android:layout_marginTop="25dp"
                 android:elevation="5dp"
                 android:text="nome do lugar"
-                android:textColor="@color/black"
+                android:textColor="@color/onBackground"
                 android:textSize="18sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/img_type"
@@ -121,7 +115,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="dushdiuasdasddsdasdasdas"
-                android:textColor="@color/grey"
                 app:layout_constraintEnd_toEndOf="@+id/tv_name"
                 app:layout_constraintStart_toStartOf="@+id/tv_name"
                 app:layout_constraintTop_toBottomOf="@+id/tv_name" />
@@ -133,7 +126,7 @@
                 android:layout_marginTop="8dp"
                 android:elevation="5dp"
                 android:text="3.4"
-                android:textColor="@color/yellow_mimosa"
+                android:textColor="@color/secondaryColorVariant"
                 android:textSize="12sp"
                 app:layout_constraintStart_toStartOf="@+id/tv_name"
                 app:layout_constraintTop_toBottomOf="@+id/tv_address" />
@@ -156,7 +149,6 @@
                 android:layout_marginTop="10dp"
                 android:elevation="5dp"
                 android:text="dsdssdfdfsdfsdf"
-                android:textColor="@color/grey"
                 app:layout_constraintEnd_toEndOf="@+id/tv_name"
                 app:layout_constraintStart_toStartOf="@+id/tv_name"
                 app:layout_constraintTop_toBottomOf="@+id/tv_rating" />
@@ -186,8 +178,7 @@
                 android:layout_weight="1"
                 app:layout_constraintEnd_toStartOf="@+id/guideline4"
                 app:layout_constraintStart_toStartOf="@+id/recyclerview_days"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:listitem="@layout/list_item" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerview_days"
@@ -199,7 +190,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/spinner"
                 tools:itemCount="1"
-                tools:listitem="@layout/recycler_view_dates" />
+                tools:listitem="@layout/recyclerview_days" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerview_time"
@@ -207,8 +198,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="10dp"
-                android:background="@drawable/shape_recyclerview_time"
-                android:backgroundTint="@color/light_grey"
                 android:padding="10dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -226,34 +215,13 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_schedule"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="30dp"
-                android:layout_marginVertical="40dp"
-                android:background="@drawable/rounded"
-                android:visibility="gone"
-                android:clickable="true"
-                app:backgroundTint="@color/button_color_states"
+                style="@style/Button"
                 android:padding="10dp"
                 android:text="Agendar"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/recyclerview_time" />
-
-            <include
-                android:id="@+id/card"
-                layout="@layout/card_ticket_purchase"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:elevation="10dp"
-                android:layout_marginHorizontal="30dp"
-                android:layout_marginVertical="40dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/recyclerview_time"
-                 />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

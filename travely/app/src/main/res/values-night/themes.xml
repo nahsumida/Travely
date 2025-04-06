@@ -1,22 +1,26 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.Travely" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/purple_haze</item>
-        <item name="colorSecondary">@color/lime_green</item>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
 
-        <item name="android:colorBackground">@color/white</item>
-        <item name="colorSurface">@color/white</item>
-        <item name="colorError">@color/red</item>
+    <style name="Base.Theme.Travely" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/primaryColor</item>
+        <item name="colorPrimaryVariant">@color/primaryColorVariant</item>
 
-        <item name="colorOnPrimary">@color/white</item>
-        <item name="colorOnSecondary">@color/white</item>
-        <item name="colorOnBackground">@color/white</item>
-        <item name="colorOnSurface">@color/white</item>
-        <item name="colorOnError">@color/white</item>
+        <item name="colorSecondary">@color/secondaryColor</item>
+        <item name="colorSecondaryVariant">@color/secondaryColorVariant</item>
 
-        <item name="android:statusBarColor">@color/purple_haze</item>
+        <item name="android:colorBackground">@color/backgroundColor</item>
+        <item name="colorSurface">@color/surfaceColor</item>
+        <item name="colorError">@color/errorColor</item>
+
+        <item name="colorOnPrimary">@color/onPrimary</item>
+        <item name="colorOnSecondary">@color/onSecondary</item>
+        <item name="colorOnBackground">@color/onBackground</item>
+        <item name="colorOnSurface">@color/onSurface</item>
+        <item name="colorOnError">@color/onError</item>
+
+        <item name="android:statusBarColor">@color/surfaceColor</item>
         <item name="android:windowLightStatusBar">true</item>
-    </style>
 
-    <style name="Theme.Travely" parent="Base.Theme.Travely" />
+        <item name="android:textSize">16sp</item>
+    </style>
 </resources>
