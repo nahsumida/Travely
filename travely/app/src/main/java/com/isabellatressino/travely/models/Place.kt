@@ -91,17 +91,24 @@ class Place(
         return ""
     }
 
-
     // Função para obter o dia da semana atual em formato abreviado
-    public fun getCurrentDayOfWeek(): String {
+    fun getCurrentDayOfWeek(): String {
         val calendar = Calendar.getInstance()
         return SimpleDateFormat("EEE").format(calendar.time).lowercase()
             .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }
     }
 
     // Função para obter o horário atual no formato HH:mm
-    public fun getCurrentTime(): String {
+    fun getCurrentTime(): String {
         val calendar = Calendar.getInstance()
         return SimpleDateFormat("HH:mm").format(calendar.time)
     }
+
+    override fun toString(): String {
+        return """
+            Place( name = '$name')
+        """.trimIndent()
+    }
+
+
 }

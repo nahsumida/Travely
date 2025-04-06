@@ -54,8 +54,16 @@ class PlaceDao {
             description = this.getString("description") ?: "",
             type = this.getString("type") ?: "",
             rate = this.getDouble("rating") ?: 0.0,
-            businessHours = (this.get("businessHours") as? Map<String, List<String>>)
-                ?.mapValues { it.value.toTypedArray() } ?: emptyMap(),
+            businessHours = (this.get("businessHours") as? Map<*, *>)?.mapNotNull { entry ->
+                val day = entry.key as? String ?: return@mapNotNull null
+                val hoursList = when (val value = entry.value) {
+                    is List<*> -> value.filterIsInstance<String>()
+                    is Map<*, *> -> value.values.filterIsInstance<String>()
+                    else -> emptyList()
+                }
+                day to hoursList.toTypedArray()
+            }?.toMap() ?: emptyMap(),
+
             geopoint = geopoint,
             profiles = (this.get("profiles") as? List<String>)?.toTypedArray() ?: emptyArray(),
             picture = this.getString("picture") ?: "",
