@@ -82,11 +82,14 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/text_cpf">
 
-                <com.google.android.material.textfield.TextInputEditText
+                <com.santalu.maskara.widget.MaskEditText
                     android:id="@+id/edit_cpf"
                     style="@style/TextInputEditText"
                     android:hint="Digite seu CPF"
-                    android:inputType="number" />
+                    android:inputType="number"
+                    app:mask="___.___.___-__"
+                    app:maskCharacter="_"
+                    app:maskStyle="normal" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -104,11 +107,14 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/text_phone">
 
-                <com.google.android.material.textfield.TextInputEditText
+                <com.santalu.maskara.widget.MaskEditText
                     android:id="@+id/edit_phone"
                     style="@style/TextInputEditText"
                     android:hint="Digite seu número de telefone"
-                    android:inputType="number" />
+                    android:inputType="number"
+                    app:mask="(__) _____ ____"
+                    app:maskCharacter="_"
+                    app:maskStyle="normal" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -180,7 +186,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_login"
+                android:id="@+id/button_register"
                 style="@style/Button"
                 android:layout_marginTop="30dp"
                 android:layout_marginBottom="50dp"
@@ -189,6 +195,28 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/input_confirm_password" />
+
+
+            <!--             <com.santalu.maskara.widget.MaskEditText
+                    android:id="@+id/et_expiration_date"
+                    style="@style/Inputs"
+                    android:layout_marginHorizontal="40dp"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginEnd="15dp"
+                    android:hint="MM/AA"
+                    android:inputType="number"
+                    android:textColor="@color/grey"
+                    android:textColorHint="@color/light_grey"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toStartOf="@id/guideline3"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_label_expiration_date"
+                    app:mask="__/__"
+                    app:maskCharacter="_"
+                    app:maskStyle="normal" />
+
+
+                -->
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

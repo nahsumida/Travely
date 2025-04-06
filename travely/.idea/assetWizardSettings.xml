@@ -33,8 +33,9 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="outputName" value="icon_arrow_back" />
-                            <entry key="sourceFile" value="C:\Users\Izabelle\Downloads\QRCode_Fácil.svg" />
+                            <entry key="assetSourceType" value="FILE" />
+                            <entry key="outputName" value="icon_young" />
+                            <entry key="sourceFile" value="C:\Users\55199\Downloads\icon_young.svg" />
                           </map>
                         </option>
                       </PersistentState>

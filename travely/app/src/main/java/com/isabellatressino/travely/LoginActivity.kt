@@ -73,13 +73,12 @@ class LoginActivity : AppCompatActivity() {
                 )
             }
 
-        }
-//
-//        textSingUp.setOnClickListener {
-//            val iRegister = Intent(this@LoginActivity, RegisterActivity::class.java)
-//            startActivity(iRegister)
-//        }
+            buttonSignUp.setOnClickListener {
+                val iRegister = Intent(this@LoginActivity, SingUpActivity::class.java)
+                startActivity(iRegister)
+            }
 
+        }
 
     }
 
@@ -129,20 +128,6 @@ class LoginActivity : AppCompatActivity() {
                 }
             }
         )
-    }
-
-    private fun showDefaultAlertDialog() {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("Atenção")
-            .setMessage("Deseja continuar com esta ação?")
-            .setPositiveButton("Sim") { dialog, _ ->
-                dialog.dismiss() // Fecha o diálogo ao clicar em "Sim"
-            }
-            .setNegativeButton("Cancelar") { dialog, _ ->
-                dialog.dismiss()
-            }
-            .setIcon(android.R.drawable.ic_dialog_alert) // Ícone padrão de alerta
-            .show()
     }
 
     private fun showAlertMessage(type: String, message: String) {

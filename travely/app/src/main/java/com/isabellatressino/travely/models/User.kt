@@ -1,11 +1,14 @@
 package com.isabellatressino.travely.models
 
+import com.google.type.DateTime
+
 class User(
     var name: String,
     var cpf: String,
     var phone: String,
     var email: String,
     var password: String,
+//    var birthDate: DateTime,
     var authID: String,
     var schedule: List<Schedule>?,
     var profile: String,
