@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.isabellatressino.travely.adapters.DaysAdapter
 import com.isabellatressino.travely.adapters.TimeAdapter
@@ -22,10 +23,11 @@ import com.isabellatressino.travely.models.Place
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Calendar
 import java.util.Locale
+import java.util.TimeZone
+
 
 class PlaceInfoActivity : AppCompatActivity() {
     private val binding by lazy { ActivityPlaceInfoBinding.inflate(layoutInflater) }
@@ -77,11 +79,20 @@ class PlaceInfoActivity : AppCompatActivity() {
 
                 val scheduleDateTime = "$year-$selectedMonth-${selectedDay}T$selectedTime:00Z"
 
+                // Conversão correta para Timestamp
+                val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
+                inputFormat.timeZone = TimeZone.getDefault()
+                val parsedDate = inputFormat.parse(scheduleDateTime)
+                val timestamp = Timestamp(parsedDate!!)
+
+                Log.d("TESTETIMES", "$scheduleDateTime")
+                Log.d("TESTETIMES", timestamp.toString())
+
                 userDao.addSchedule(
                     authID = authID,
                     placeID = placeID,
                     placeName = place.name,
-                    scheduleDateTime = scheduleDateTime,
+                    scheduleDateTime = timestamp,
                     onSuccess = {
                         Toast.makeText(
                             this,

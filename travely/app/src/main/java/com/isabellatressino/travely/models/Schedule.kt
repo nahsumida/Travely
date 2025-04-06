@@ -1,14 +1,14 @@
 package com.isabellatressino.travely.models
 
 import android.util.Log
+import com.google.firebase.Timestamp
 import java.io.Serializable
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 
 class Schedule(
     val id: String,
-    val date: String, // formato: "2025-04-05T14:30:00Z" - TODO: transformar em timestamp ou datetime
+    val date: Timestamp,
     val placeID: String,
     val placeName: String,
     val price: Double,
@@ -16,42 +16,39 @@ class Schedule(
 ) : Serializable {
 
     override fun toString(): String {
-        return "Schedule(uuid='$id', placeID='$placeID', placeName='$placeName', price=$price, amount=$amount, date='$date')"
+        return "Schedule(id='$id', placeID='$placeID', placeName='$placeName', price=$price, amount=$amount, date=$date)"
     }
 
-    private fun parseDate(): Date? {
+    private fun parseDate(): java.util.Date? {
         return try {
-            val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
-            inputFormat.timeZone = java.util.TimeZone.getTimeZone("UTC")
-            inputFormat.parse(date)
+            date.toDate()
         } catch (e: Exception) {
-            Log.e("DateParsing", "Erro ao converter data: ${e.message}")
+            Log.e("DateParsing", "Erro ao converter Timestamp: ${e.message}")
             null
         }
     }
 
     fun extractDay(): String {
-        val date = parseDate()
-        val outputFormat = SimpleDateFormat("dd", Locale.getDefault())
-        return date?.let { outputFormat.format(it) } ?: ""
+        val parsed = parseDate()
+        val format = SimpleDateFormat("dd", Locale.getDefault())
+        return parsed?.let { format.format(it) } ?: ""
     }
 
     fun extractMonth(): String {
-        val date = parseDate()
-        val outputFormat = SimpleDateFormat("MM", Locale.getDefault())
-        return date?.let { outputFormat.format(it) } ?: ""
+        val parsed = parseDate()
+        val format = SimpleDateFormat("MM", Locale.getDefault())
+        return parsed?.let { format.format(it) } ?: ""
     }
 
     fun extractYear(): String {
-        val date = parseDate()
-        val outputFormat = SimpleDateFormat("yyyy", Locale.getDefault())
-        return date?.let { outputFormat.format(it) } ?: ""
+        val parsed = parseDate()
+        val format = SimpleDateFormat("yyyy", Locale.getDefault())
+        return parsed?.let { format.format(it) } ?: ""
     }
 
     fun extractHour(): String {
-        val date = parseDate()
-        val outputFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-        return date?.let { outputFormat.format(it) } ?: ""
+        val parsed = parseDate()
+        val format = SimpleDateFormat("HH:mm", Locale.getDefault())
+        return parsed?.let { format.format(it) } ?: ""
     }
-
 }

@@ -76,27 +76,6 @@ class PlaceDao {
         )
     }
 
-    private fun extractScheduleData(document: DocumentSnapshot): List<Schedule> {
-        val schedulesList = document.get("schedule") as? List<Map<String, Any>> ?: emptyList()
-
-        return schedulesList.mapNotNull { scheduleMap ->
-            try {
-                Schedule(
-                    id = scheduleMap["uuid"] as? String ?: "",
-                    date = scheduleMap["date"] as? String ?: "",
-                    placeID = scheduleMap["placeID"] as? String ?: "",
-                    placeName = scheduleMap["placeName"] as? String ?: "",
-                    price = (scheduleMap["price"] as? Double) ?: 0.0,
-                    amount = (scheduleMap["amount"] as? Long)?.toInt() ?: 0
-                )
-            } catch (e: Exception) {
-                Log.e("PlaceDao", "Erro ao converter schedule: ${e.message}")
-                null
-            }
-        }
-    }
-
-
     // Função para carregar a URL da imagem
     fun getImageUrl(imageUrl: String, onSuccess: (String) -> Unit, onFailure: (Exception) -> Unit) {
         val storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(imageUrl)

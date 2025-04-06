@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.isabellatressino.travely.models.User
+import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.UUID
@@ -89,7 +90,7 @@ class UserDao {
         authID: String,
         placeID: String,
         placeName: String,
-        scheduleDateTime: String,
+        scheduleDateTime: Timestamp,
         onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     ) {
@@ -100,28 +101,13 @@ class UserDao {
                     if (!querySnapshot.isEmpty) {
                         val documentSnapshot = querySnapshot.documents.first()
 
-                        // Gerar UUID
-                        val id = UUID.randomUUID().toString()
-
-                        // Extrair data (yyyy-MM-dd) da string datetime
-                        val date = try {
-                            val inputFormat =
-                                SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
-                            val outputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                            val parsedDate = inputFormat.parse(scheduleDateTime)
-                            outputFormat.format(parsedDate!!)
-                        } catch (e: Exception) {
-                            Log.e("ScheduleParsing", "Erro ao extrair date: ${e.message}")
-                            scheduleDateTime
-                        }
-
                         val newSchedule = mapOf(
-                            "id" to id,
-                            "date" to scheduleDateTime,
+                            "id" to UUID.randomUUID().toString(),
                             "placeID" to placeID,
                             "placeName" to placeName,
-                            "price" to 1.0,
                             "amount" to 1,
+                            "price" to 1.0,
+                            "date" to scheduleDateTime // salva como Timestamp
                         )
 
                         val currentSchedules =
@@ -148,6 +134,7 @@ class UserDao {
             onFailure(Exception("ID do usuário inválido"))
         }
     }
+
 
     // Registrar usuário no firebase
     fun registerUser(
