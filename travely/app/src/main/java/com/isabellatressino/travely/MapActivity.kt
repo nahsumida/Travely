@@ -256,6 +256,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         placeDao.getPlaces(
             onSuccess = { places ->
                 getUserInfo { profile ->
+                    Log.d("TESTEE", "$places, $profile")
+                    Log.d("TESTEE", "$profile")
+
                     addMarkers(places, profile)
                 }
             },
@@ -277,31 +280,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun addMarkers(places: List<Place>, userProfile: String) {
         places.forEach { place ->
             val marker = place.geopoint.let { geoPoint ->
-                val iconResource = if (place.profiles.isNotEmpty()) {
-                    if (place.profiles.contains(userProfile)) {
-                        when (userProfile) {
-                            "compras" -> R.drawable.pin_buy_star
-                            "gastronomico" -> R.drawable.pin_food_star
-                            "cultural" -> R.drawable.pin_culture_star
-                            "aventureiro" -> R.drawable.pin_adventure_star
-                            "negocios" -> R.drawable.pin_business_star
-                            "descanso" -> R.drawable.pin_relax_star
-                            else -> 0
-                        }
-                    } else {
-                        when (place.profiles[0]) {
-                            "compras" -> R.drawable.pin_buy
-                            "gastronomico" -> R.drawable.pin_food
-                            "cultural" -> R.drawable.pin_culture
-                            "aventureiro" -> R.drawable.pin_adventure
-                            "negocios" -> R.drawable.pin_business
-                            "descanso" -> R.drawable.pin_relax
-                            else -> 0
-                        }
-                    }
-                } else {
-                    R.drawable.pin_location
-                }
+                val iconResource = R.drawable.pin_location
                 val markerOptions = MarkerOptions()
                     .title(place.name)
                     .snippet(place.address)
@@ -332,6 +311,71 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             true
         }
     }
+
+    /**
+     * Antiga função que adicinava os markers de acordo com o tipo do lugar e usuário
+     * Adiciona os marcadores no mapa
+     *
+     * @param places The list of places to display.
+     */
+//    private fun addMarkers(places: List<Place>, userProfile: String) {
+//        places.forEach { place ->
+//            val marker = place.geopoint.let { geoPoint ->
+//                val iconResource = if (place.subtypes.isNotEmpty()) {
+//                    if (place.subtypes.contains(userProfile)) {
+//                        when (userProfile) {
+//                            "compras" -> R.drawable.pin_buy_star
+//                            "gastronomico" -> R.drawable.pin_food_star
+//                            "cultural" -> R.drawable.pin_culture_star
+//                            "aventureiro" -> R.drawable.pin_adventure_star
+//                            "negocios" -> R.drawable.pin_business_star
+//                            "descanso" -> R.drawable.pin_relax_star
+//                            else -> 0
+//                        }
+//                    } else {
+//                        when (place.subtypes[0]) {
+//                            "compras" -> R.drawable.pin_buy
+//                            "gastronomico" -> R.drawable.pin_food
+//                            "cultural" -> R.drawable.pin_culture
+//                            "aventureiro" -> R.drawable.pin_adventure
+//                            "negocios" -> R.drawable.pin_business
+//                            "descanso" -> R.drawable.pin_relax
+//                            else -> 0
+//                        }
+//                    }
+//                } else {
+//                    R.drawable.pin_location
+//                }
+//                val markerOptions = MarkerOptions()
+//                    .title(place.name)
+//                    .snippet(place.address)
+//                    .position(LatLng(geoPoint.latitude, geoPoint.longitude))
+//                    .icon(
+//                        BitmapHelper.vectorToBitmap(
+//                            this, iconResource,
+//                            ContextCompat.getColor(this, R.color.primaryColor)
+//                        )
+//                    )
+//                val addedMarker = googleMap.addMarker(markerOptions)
+//                addedMarker?.tag = place
+//            }
+//        }
+//
+//        googleMap.setOnMarkerClickListener { marker ->
+//            googleMap.animateCamera(
+//                CameraUpdateFactory.newLatLng(marker.position),
+//                500,
+//                null
+//            )
+//
+//            val place = marker.tag as? Place
+//            place?.let {
+//                showPlaceInfo(it)
+//            }
+//
+//            true
+//        }
+//    }
 
     private fun setStars(rating: Double, maxStars: Int = 5) {
         val starLayout = binding.starLayout
@@ -377,9 +421,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
      * @param place O local a ser exibido as informações
      */
     private fun showPlaceInfo(place: Place) {
+        Log.d("PlaceInfoDebug", "businessHours: ${place.businessHours}")
         binding.tvName.text = place.name
-        binding.tvRating.text = place.rate.toString()
-        setStars(place.rate)
+        binding.tvRating.text = place.rating.toString()
+        setStars(place.rating)
         binding.tvDescription.text = place.description
 
         binding.btnSeeMore.setOnClickListener {

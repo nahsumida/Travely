@@ -127,8 +127,8 @@ class PlaceInfoActivity : AppCompatActivity() {
         with(binding) {
             tvName.text = place.name
             tvAddress.text = place.address
-            tvRating.text = place.rate.toString()
-            setStars(place.rate)
+            tvRating.text = place.rating.toString()
+            setStars(place.rating)
             tvDescription.text = place.description
         }
 
@@ -136,7 +136,7 @@ class PlaceInfoActivity : AppCompatActivity() {
     }
 
     private fun setPlaceImage(place: Place) {
-        val iconResource = getProfileIconResource(place.profiles)
+        val iconResource = getProfileIconResource(place.subtypes)
         binding.imgType.setImageResource(iconResource)
 
         if (place.picture.isNotEmpty()) {
@@ -146,7 +146,7 @@ class PlaceInfoActivity : AppCompatActivity() {
         }
     }
 
-    private fun getProfileIconResource(profiles: Array<String>): Int {
+    private fun getProfileIconResource(profiles: List<String>): Int {
         return if (profiles.isNotEmpty()) {
             when (profiles[0]) {
                 "compras" -> R.drawable.profileshopp
@@ -306,18 +306,19 @@ class PlaceInfoActivity : AppCompatActivity() {
 
     private fun loadAvailableTimes(): List<String> {
         val dayOfWeekMap = mapOf(
-            "Seg" to "Mon", "Ter" to "Tue", "Qua" to "Wed",
-            "Qui" to "Thu", "Sex" to "Fri", "Sab" to "Sat", "Dom" to "Sun",
-            "seg." to "Mon", "ter." to "Tue", "qua." to "Wed",
-            "qui." to "Thu", "sex." to "Fri", "sáb." to "Sat", "dom." to "Sun"
+            "Seg" to "monday", "Ter" to "tuesday", "Qua" to "wednesday",
+            "Qui" to "thursday", "Sex" to "friday", "Sab" to "saturday", "Dom" to "sunday",
+            "seg." to "monday", "ter." to "tuesday", "qua." to "wednesday",
+            "qui." to "thursday", "sex." to "friday", "sáb." to "saturday", "dom." to "sunday"
         )
 
         val businessDay = dayOfWeekMap[selectedDayOfWeek]
 
-        val businessHours = place.businessHours[businessDay]
+        val hours = place.businessHours[businessDay]
+        val openingTime = hours?.get("open")
+        val closingTime = hours?.get("close")
 
-        if (businessHours != null) {
-            val (openingTime, closingTime) = businessHours
+        if (openingTime != null && closingTime != null) {
             val availableTimes = mutableListOf<String>()
 
             val selectedDate = LocalDate.of(year, selectedMonth.toInt(), selectedDay.toInt())

@@ -11,7 +11,7 @@ import com.isabellatressino.travely.models.Schedule
 class PlaceDao {
 
     private val db = FirebaseFirestore.getInstance()
-    private val placesCollection = db.collection("places")
+    private val placesCollection = db.collection("places-v2")
 
     fun getPlaceById(
         placeId: String,
@@ -46,30 +46,36 @@ class PlaceDao {
     }
 
     private fun DocumentSnapshot.toPlace(): Place? {
-        val geopoint = this.getGeoPoint("geopoint") ?: return null
+        val geoPoint = this.getGeoPoint("geopoint") ?: return null
+
+        val businessHoursRaw = this.get("businessHours") as? Map<*, *>
+        val businessHoursParsed = businessHoursRaw?.mapNotNull { entry ->
+            val day = entry.key as? String ?: return@mapNotNull null
+            val hours = entry.value as? Map<*, *>
+            val open = hours?.get("open") as? String
+            val close = hours?.get("close") as? String
+
+            if (open != null && close != null) {
+                day to mapOf("open" to open, "close" to close)
+            } else {
+                null
+            }
+        }?.toMap() ?: emptyMap()
+
         return Place(
             id = this.getString("id") ?: "",
             name = this.getString("name") ?: "",
             address = this.getString("address") ?: "",
             description = this.getString("description") ?: "",
-            type = this.getString("type") ?: "",
-            rate = this.getDouble("rating") ?: 0.0,
-            businessHours = (this.get("businessHours") as? Map<*, *>)?.mapNotNull { entry ->
-                val day = entry.key as? String ?: return@mapNotNull null
-                val hoursList = when (val value = entry.value) {
-                    is List<*> -> value.filterIsInstance<String>()
-                    is Map<*, *> -> value.values.filterIsInstance<String>()
-                    else -> emptyList()
-                }
-                day to hoursList.toTypedArray()
-            }?.toMap() ?: emptyMap(),
-
-            geopoint = geopoint,
-            profiles = (this.get("profiles") as? List<String>)?.toTypedArray() ?: emptyArray(),
-            picture = this.getString("picture") ?: "",
-            schedule = extractScheduleData(this)
+            rating = this.getDouble("rating") ?: 0.0,
+            businessHours = businessHoursParsed,
+            geopoint = geoPoint,
+            keyWords = this.get("keyWords") as? List<String> ?: emptyList(),
+            subtypes = (this.get("subtypes") as? List<String>) ?: emptyList(),
+            picture = this.getString("picture") ?: ""
         )
     }
+
 
     private fun extractScheduleData(document: DocumentSnapshot): List<Schedule> {
         val schedulesList = document.get("schedule") as? List<Map<String, Any>> ?: emptyList()

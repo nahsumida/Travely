@@ -10,6 +10,12 @@ import java.util.Locale
 import java.util.TimeZone
 
 class Schedule(
+//    val uuid: String,
+//    val date: String,
+//    val placeID: String,
+//    val placeName: String,
+//    val price: Double,
+//    val amount: Int
     var placeID: String,
     var availability: Int,
     var price: Double,
