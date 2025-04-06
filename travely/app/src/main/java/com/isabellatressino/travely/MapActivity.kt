@@ -227,35 +227,25 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
      * Função que recupera os dados do usuário e os atribui ao layout
      */
     private fun getUserInfo(callback: (String) -> Unit) {
-        val sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE)
-        val profile = sharedPreferences.getString("user_profile", "") ?: ""
 
-        if (profile.isNotEmpty()) {
-            callback(profile)
-        } else {
-            Log.w("getUserInfo", "Perfil não encontrado no SharedPreferences")
-
-            FirebaseAuth.getInstance().currentUser?.uid?.let { authId ->
-                userDao.getUserByAuthId(
-                    authId,
-                    onSuccess = { user ->
-                        if (user != null) {
-                            callback(user.profile)
-                        } else {
-                            callback("")
-                        }
-                    },
-                    onFailure = {
-                        Toast.makeText(
-                            this, "Falha ao buscar usuário",
-                            Toast.LENGTH_SHORT
-                        ).show()
+        FirebaseAuth.getInstance().currentUser?.uid?.let { authId ->
+            userDao.getUserByAuthId(
+                authId,
+                onSuccess = { user ->
+                    if (user != null) {
+                        callback(user.profile)
+                    } else {
                         callback("")
                     }
-                )
-            } ?: run {
-                callback("")
-            }
+                },
+                onFailure = {
+                    Toast.makeText(
+                        this, "Falha ao buscar usuário",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    callback("")
+                }
+            )
         }
     }
 
@@ -463,7 +453,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
             // Caso o Google Maps não esteja instalado, abrir no navegador
-            val webUri = "https://www.google.com/maps/dir/?api=1&destination=$latitude,$longitude"
+            val webUri =
+                "https://www.google.com/maps/dir/?api=1&destination=$latitude,$longitude"
             val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(webUri))
             startActivity(webIntent)
         }
@@ -478,7 +469,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 startLocationUpdates()
             } else {
-                Toast.makeText(this, "Permissão de localização negada", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Permissão de localização negada", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
     }

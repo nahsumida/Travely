@@ -174,6 +174,7 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/input_confirm_password"
                 style="@style/TextInputLayout"
+                app:endIconMode="password_toggle"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/text_confirm_password">
@@ -196,27 +197,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/input_confirm_password" />
 
-
-            <!--             <com.santalu.maskara.widget.MaskEditText
-                    android:id="@+id/et_expiration_date"
-                    style="@style/Inputs"
-                    android:layout_marginHorizontal="40dp"
-                    android:layout_marginStart="40dp"
-                    android:layout_marginEnd="15dp"
-                    android:hint="MM/AA"
-                    android:inputType="number"
-                    android:textColor="@color/grey"
-                    android:textColorHint="@color/light_grey"
-                    android:textSize="14sp"
-                    app:layout_constraintEnd_toStartOf="@id/guideline3"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tv_label_expiration_date"
-                    app:mask="__/__"
-                    app:maskCharacter="_"
-                    app:maskStyle="normal" />
-
-
-                -->
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

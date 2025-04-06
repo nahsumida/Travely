@@ -1,5 +1,6 @@
 package com.isabellatressino.travely.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -8,11 +9,15 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
+import com.isabellatressino.travely.LoginActivity
+import com.isabellatressino.travely.MainScreenActivity
 import com.isabellatressino.travely.R
 import com.isabellatressino.travely.adapters.OptionAdapter
+import com.isabellatressino.travely.dao.UserDao
 import com.isabellatressino.travely.databinding.FragmentQuestionsBinding
 import com.isabellatressino.travely.models.Option
 import com.isabellatressino.travely.models.Question
+import com.isabellatressino.travely.models.User
 
 
 class QuestionsFragment : Fragment() {
@@ -20,6 +25,11 @@ class QuestionsFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var optionAdapter: OptionAdapter
+    private var user: User? = null
+    private val userDao by lazy { UserDao() }
+
+    private var currentQuestionIndex = 0
+    private val answers = mutableListOf<String>()
 
     private val questions = listOf(
         Question(
@@ -62,8 +72,27 @@ class QuestionsFragment : Fragment() {
         )
     )
 
-    private var currentQuestionIndex = 0
-    private val answers = mutableListOf<String>()
+    companion object {
+        fun newInstance(user: User): QuestionsFragment {
+            val fragment = QuestionsFragment()
+            val bundle = Bundle().apply {
+                putSerializable("user", user)
+            }
+            fragment.arguments = bundle
+            return fragment
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        user = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            arguments?.getSerializable("user", User::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            arguments?.getSerializable("user") as? User
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -82,6 +111,7 @@ class QuestionsFragment : Fragment() {
                 answers.add(selectedOption.label)
                 goToNextQuestion()
             } else {
+                // TODO: transformar em dialog
                 Toast.makeText(
                     requireContext(),
                     "Selecione uma opção para continuar",
@@ -98,20 +128,6 @@ class QuestionsFragment : Fragment() {
         optionAdapter = OptionAdapter(question.options)
         binding.optionsRecyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.optionsRecyclerView.adapter = optionAdapter
-
-        binding.buttonNext.setOnClickListener {
-            val selectedOption = optionAdapter.getSelectedOption()
-            if (selectedOption != null) {
-                answers.add(selectedOption.label)
-                goToNextQuestion()
-            } else {
-                Toast.makeText(
-                    requireContext(),
-                    "Selecione uma opção para continuar",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
     }
 
     private fun goToNextQuestion() {
@@ -119,13 +135,51 @@ class QuestionsFragment : Fragment() {
         if (currentQuestionIndex < questions.size) {
             showCurrentQuestion()
         } else {
-            // Fim das perguntas, prossiga para próxima tela ou salve os dados
-            Toast.makeText(requireContext(), "Mapeamento concluído!", Toast.LENGTH_SHORT).show()
-            // Exemplo: startActivity(Intent(requireContext(), HomeActivity::class.java))
-            Log.d("UserAnswer", "Respostas finais do usuário:")
-            answers.forEach { q ->
-                Log.d("UserAnswer", q)
+            //user?.answers = answers
+            user?.profile = classifyUserProfile(answers)
+
+            Log.d("UserTest", "$user")
+
+            user?.let {
+                binding.buttonNext.isEnabled = false
+
+                userDao.registerUser(
+                    it,
+                    onSuccess = {
+                        // TODO: transformar em dialog
+                        Toast.makeText(
+                            requireContext(),
+                            "Cadastro realizado com sucesso! Verifique seu e-mail.",
+                            Toast.LENGTH_LONG
+                        ).show()
+
+                        val intent = Intent(requireContext(), LoginActivity::class.java)
+                        startActivity(intent)
+                        requireActivity().finish()
+                    },
+                    onFailure = { errorMessage ->
+                        binding.buttonNext.isEnabled = true
+                        Toast.makeText(
+                            requireContext(),
+                            "Erro ao salvar usuário: $errorMessage",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        Log.e("UserSaveError", "Erro ao salvar usuário: $errorMessage")
+                    }
+                )
             }
+        }
+    }
+
+    private fun classifyUserProfile(answers: List<String>): String {
+        return when {
+            answers.contains("Experiência Cultural") -> "cultural"
+            answers.contains("Compras") -> "compras"
+            answers.contains("Gastronomia") -> "gastronomico"
+            answers.contains("Aventura") -> "aventureiro"
+            answers.contains("Negócios") -> "negocios"
+            answers.contains("Lazer e descanço") -> "descanso"
+            else -> "desconhecido"
         }
     }
 

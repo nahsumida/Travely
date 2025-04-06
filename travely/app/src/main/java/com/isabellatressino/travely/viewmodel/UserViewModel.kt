@@ -20,11 +20,13 @@ class UserViewModel : ViewModel() {
 
         val savedName = sharedPreferences.getString("user_name", null)
         val savedProfile = sharedPreferences.getString("user_profile", null)
-        val savedEmail = sharedPreferences.getString("user_email",null)
+        val savedEmail = sharedPreferences.getString("user_email", null)
 
         if (savedName != null && savedProfile != null && savedEmail != null) {
+            // Recupera do cache local
             _user.value = User(savedName, "", "", savedEmail, "", uid, null, savedProfile)
         } else {
+            // Busca no Firestore
             userDao.getUserByAuthId(
                 uid,
                 onSuccess = { user ->
@@ -42,13 +44,20 @@ class UserViewModel : ViewModel() {
         }
     }
 
-    // Função para salvar o usuário no SharedPreferences
     private fun saveUserToPreferences(user: User, context: Context) {
         val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
-        sharedPreferences.edit() {
+        sharedPreferences.edit {
             putString("user_name", user.name)
             putString("user_profile", user.profile)
             putString("user_email", user.email)
         }
+    }
+
+    fun clearUserPreferences(context: Context) {
+        val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+        sharedPreferences.edit {
+            clear()
+        }
+        _user.value = null
     }
 }

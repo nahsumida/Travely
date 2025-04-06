@@ -30,8 +30,10 @@ class ProfileFragment : Fragment() {
 
         observeUserData()
 
-        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: "9agkbQSGtkTnmPXHQ39oVj9nQu42"
-        userViewModel.fetchUser(uid, requireContext())
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
+        if (uid != null) {
+            userViewModel.fetchUser(uid, requireContext())
+        }
 
         // Logout
         binding.btnLogout.setOnClickListener {
@@ -39,6 +41,10 @@ class ProfileFragment : Fragment() {
             val intent = Intent(requireContext(), LoginActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
+            userViewModel.clearUserPreferences(requireContext())
+            if (uid != null) {
+                userViewModel.fetchUser(uid, requireContext())
+            }
             activity?.finish()
         }
 

@@ -1,6 +1,7 @@
 package com.isabellatressino.travely.models
 
 import android.util.Log
+import java.io.Serializable
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -13,7 +14,7 @@ class Schedule(
     var availability: Int,
     var price: Double,
     var datetime: String
-) {
+) : Serializable {
     override fun toString(): String {
         return "Schedule(placeID='$placeID', availability='$availability', price=$price, datetime='$datetime')"
     }

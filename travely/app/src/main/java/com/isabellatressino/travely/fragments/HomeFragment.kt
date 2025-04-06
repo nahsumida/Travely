@@ -28,8 +28,10 @@ class HomeFragment : Fragment() {
 
         observeUserData()
 
-        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: "9agkbQSGtkTnmPXHQ39oVj9nQu42"
-        userViewModel.fetchUser(uid, requireContext())
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
+        if (uid != null) {
+            userViewModel.fetchUser(uid, requireContext())
+        }
 
         binding.cardViewMap.setOnClickListener {
             val intent = Intent(requireContext(), MapActivity::class.java)

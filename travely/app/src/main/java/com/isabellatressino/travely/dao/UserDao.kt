@@ -131,5 +131,57 @@ class UserDao {
         }
     }
 
+    // Registrar usuário no firebase
+    fun registerUser(
+        user: User,
+        onSuccess: () -> Unit,
+        onFailure: (String) -> Unit
+    ) {
+        auth.createUserWithEmailAndPassword(user.email, user.password)
+            .addOnSuccessListener { authResult ->
+                val firebaseUser = authResult.user
+
+                if (firebaseUser != null) {
+                    // Envia o e-mail de verificação
+                    firebaseUser.sendEmailVerification()
+                        .addOnSuccessListener {
+                            // Prepara o mapa de dados
+                            val userMap = hashMapOf(
+                                "name" to user.name,
+                                "cpf" to user.cpf,
+                                "phone" to user.phone,
+                                "email" to user.email,
+                                "authID" to firebaseUser.uid,
+                                "schedule" to emptyList<Map<String, Any>>(),
+                                "profile" to user.profile,
+                                //"answers" to user.answers
+                            )
+
+                            // Salva o usuário no Firestore
+                            usersCollection.add(userMap)
+                                .addOnSuccessListener {
+                                    Log.d("UserDao", "Usuário salvo no Firestore com sucesso.")
+                                    auth.signOut()
+                                    onSuccess()
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.e("Firestore", "Erro ao salvar usuário no Firestore", e)
+                                    onFailure("Erro ao salvar dados do usuário: ${e.message}")
+                                }
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("Auth", "Erro ao enviar e-mail de verificação", e)
+                            onFailure("Erro ao enviar e-mail de verificação: ${e.message}")
+                        }
+                } else {
+                    onFailure("Erro inesperado: usuário Firebase nulo.")
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("Auth", "Erro ao criar usuário", exception)
+                onFailure("Erro ao criar usuário: ${exception.message}")
+            }
+    }
+
 
 }

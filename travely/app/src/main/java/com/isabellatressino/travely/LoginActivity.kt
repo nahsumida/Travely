@@ -9,16 +9,20 @@ import android.view.LayoutInflater
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.isabellatressino.travely.dao.UserDao
 import com.isabellatressino.travely.databinding.ActivityLoginBinding
+import com.isabellatressino.travely.viewmodel.UserViewModel
+
 
 class LoginActivity : AppCompatActivity() {
 
     private val binding by lazy { ActivityLoginBinding.inflate(layoutInflater) }
 
     private val userDao by lazy { UserDao() }
+    private val userViewModel: UserViewModel by viewModels()
 
     override fun onStart() {
         super.onStart()
@@ -34,6 +38,8 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+        userViewModel.clearUserPreferences(this)
 
         with(binding) {
             buttonLogin.setOnClickListener {
@@ -97,6 +103,9 @@ class LoginActivity : AppCompatActivity() {
                 userDao.getUserByAuthId(
                     uid,
                     onSuccess = { user ->
+                        userViewModel.clearUserPreferences(this)
+                        userViewModel.fetchUser(uid, this)
+
                         val intent = Intent(this, MainScreenActivity::class.java)
                         startActivity(intent)
                         finish()
@@ -119,6 +128,18 @@ class LoginActivity : AppCompatActivity() {
 
                         "no user record" in exceptionMessage.lowercase() ->
                             "Usuário não encontrado. Verifique o email digitado."
+
+                        "no user record" in exceptionMessage.lowercase() ->
+                            "Usuário não encontrado. Verifique o email digitado ou cadastre-se."
+
+                        exceptionMessage.contains("Email não verificado", ignoreCase = true) ->
+                            "Verifique seu e-mail antes de fazer login."
+
+
+                        "email has not been verified" in exceptionMessage.lowercase() ||
+                                "email not verified" in exceptionMessage.lowercase() ||
+                                "email address is not verified" in exceptionMessage.lowercase() ->
+                            "Verifique seu e-mail antes de fazer login."
 
                         else ->
                             "Usuário e/ou senha inválidos"
