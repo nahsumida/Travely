@@ -18,6 +18,7 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -33,10 +34,16 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.firestore.GeoPoint
 import com.isabellatressino.travely.databinding.ActivityMapBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.isabellatressino.travely.audit.service.EventLogger
+import com.isabellatressino.travely.audit.service.MapAuditLogger
 import com.isabellatressino.travely.dao.PlaceDao
 import com.isabellatressino.travely.dao.UserDao
 import com.isabellatressino.travely.models.Place
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var googleMap: GoogleMap
@@ -51,6 +58,16 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private val placeDao by lazy { PlaceDao() }
     private val userDao by lazy { UserDao() }
+
+    @Inject
+    lateinit var eventLogger: EventLogger
+
+    private val mapAuditLogger by lazy {
+        MapAuditLogger(
+            eventLogger = eventLogger,
+            userId = FirebaseAuth.getInstance().currentUser?.uid.toString()
+        )
+    }
 
     private val binding by lazy { ActivityMapBinding.inflate(layoutInflater) }
 
@@ -72,6 +89,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             loadPlaces()
             setupLocationUpdates()
             setupMapClickListeners()
+            setupMarkerClickListeners()
         }
 
         with(binding) {
@@ -296,20 +314,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
 
-        googleMap.setOnMarkerClickListener { marker ->
-            googleMap.animateCamera(
-                CameraUpdateFactory.newLatLng(marker.position),
-                500,
-                null
-            )
 
-            val place = marker.tag as? Place
-            place?.let {
-                showPlaceInfo(it)
-            }
-
-            true
-        }
     }
 
     /**
@@ -466,7 +471,29 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             hideInfoView()
         }
     }
+    private fun setupMarkerClickListeners(){
+        googleMap.setOnMarkerClickListener { marker ->
+            googleMap.animateCamera(
+                CameraUpdateFactory.newLatLng(marker.position),
+                500,
+                null
+            )
 
+            val place = marker.tag as? Place
+            place?.let {
+                lifecycleScope.launch {
+                    showPlaceInfo(it)
+                    with(mapAuditLogger) {
+                        logMarkerClick(
+                            it.id, it.name, it.geopoint, it.subtypes
+                        )
+                    }
+                }
+            }
+
+            true
+        }
+    }
     /**
      * Esconde o card de informações do local
      */

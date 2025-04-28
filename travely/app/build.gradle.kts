@@ -3,7 +3,8 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.googleGmsGoogleServices)
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
-}
+    id("dagger.hilt.android.plugin")
+    id("kotlin-kapt")}
 
 android {
     namespace = "com.isabellatressino.travely"
@@ -90,6 +91,8 @@ dependencies {
     implementation("com.github.santalu:maskara:1.0.0")
 
     //implementation(libs.gson)
-
-
+    // Hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+    implementation(libs.androidx.work.runtime.ktx)
 }

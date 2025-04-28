@@ -8,6 +8,10 @@ import com.isabellatressino.travely.databinding.ActivityMainScreenBinding
 import com.isabellatressino.travely.fragments.HomeFragment
 import com.isabellatressino.travely.fragments.ScheduleFragment
 import com.isabellatressino.travely.fragments.ProfileFragment
+import androidx.work.*
+import java.util.concurrent.TimeUnit
+import android.content.Context
+import com.isabellatressino.travely.audit.SyncEventsWorker
 
 class MainScreenActivity : AppCompatActivity() {
 
@@ -16,6 +20,7 @@ class MainScreenActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        scheduleSyncWorker(applicationContext)
 
         loadFragment(HomeFragment())
         binding.bottomNavigation.selectedItemId = R.id.navigation_home
@@ -50,4 +55,24 @@ class MainScreenActivity : AppCompatActivity() {
         transaction.commit()
     }
 
+    /*
+    Starts or syncronizes Event worker for sending audit to db *only if there is internet connection
+     */
+    fun scheduleSyncWorker(context: Context) {
+        val syncRequest = PeriodicWorkRequestBuilder<SyncEventsWorker>(
+            5, TimeUnit.MINUTES
+        )
+            .setConstraints(
+                Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build()
+            )
+            .build()
+
+        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+            "SyncEventsWorker",
+            ExistingPeriodicWorkPolicy.KEEP,
+            syncRequest
+        )
+    }
 }
