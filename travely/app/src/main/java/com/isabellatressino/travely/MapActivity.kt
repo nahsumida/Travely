@@ -433,11 +433,25 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         binding.tvDescription.text = place.description
 
         binding.btnSeeMore.setOnClickListener {
-            val intent = Intent(this, PlaceInfoActivity::class.java)
-            intent.putExtra("PLACE_ID", place.id)
-            startActivity(intent)
-            Log.d("TESTETESTE", "${place.id}")
+            lifecycleScope.launch {
+                try {
+                    mapAuditLogger.logViewDetails(
+                        placeId = place.id,
+                        placeName = place.name,
+                        geoPoint = place.geopoint,
+                        subtypes = place.subtypes ?: emptyList()
+                    )
+                    Log.d("AuditLog", "Evento view_details registrado com sucesso")
+                } catch (e: Exception) {
+                    Log.e("AuditLog", "Erro ao registrar view_details", e)
+                }
+
+                val intent = Intent(this@MapActivity, PlaceInfoActivity::class.java)
+                intent.putExtra("PLACE_ID", place.id)
+                startActivity(intent)
+            }
         }
+
 
         binding.btnGo.setOnClickListener {
             openGoogleMaps(place.geopoint)
