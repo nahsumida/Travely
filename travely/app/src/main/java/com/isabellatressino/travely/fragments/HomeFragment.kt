@@ -65,9 +65,6 @@ class HomeFragment : Fragment() {
             return
         }
 
-        Log.e("testeeeioio", "ajksncoasnciacsi")
-
-
         val recyclerView = binding.carouselRecyclerView
         recyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
 
@@ -83,16 +80,20 @@ class HomeFragment : Fragment() {
             "http://10.0.2.2:8000/recomendar/",
             jsonBody,
             { response ->
+                Log.e("testeeeioio", "cheguei na response")
                 try {
                     Log.e("testeeeioio", "cheguei na response")
                     Log.e("testeeeioio", response.toString())
 
                     val recommendations = mutableListOf<RecommendationItem>()
-                    for (i in 0 until response.length()) {
-                        val obj = response.getJSONObject(i.toString())
-                        val subtypes = List(obj.getJSONArray("subtypes").length()) { j ->
-                            obj.getJSONArray("subtypes").getString(j)
+                    val dataArray = response.getJSONArray("data")
+                    for (i in 0 until dataArray.length()) {
+                        val obj = dataArray.getJSONObject(i)
+                        val subtypesArray = obj.getJSONArray("subtypes")
+                        val subtypes = List(subtypesArray.length()) { j ->
+                            subtypesArray.getString(j)
                         }
+
                         recommendations.add(
                             RecommendationItem(
                                 id = obj.getString("id"),
@@ -102,13 +103,19 @@ class HomeFragment : Fragment() {
                             )
                         )
                     }
+                    Log.e("testeeeioio", "Recomendações recebidas: ${recommendations.size}")
+
                     binding.carouselRecyclerView.adapter = CarouselAdapter(recommendations)
                 } catch (e: Exception) {
-                    e.printStackTrace()
+                    Log.e("setupCarousel", "Erro ao processar resposta: ${e.message}", e)
                 }
             },
             { error ->
-                error.printStackTrace()
+                Log.e("setupCarousel", "Erro na requisição: ${error.message}", error)
+                if (error.networkResponse != null) {
+                    Log.e("setupCarousel", "Código HTTP: ${error.networkResponse.statusCode}")
+                    Log.e("setupCarousel", "Corpo do erro: ${String(error.networkResponse.data)}")
+                }
             }
         ) {
             override fun getHeaders(): MutableMap<String, String> {
@@ -118,7 +125,9 @@ class HomeFragment : Fragment() {
             }
         }
 
+        Log.d("setupCarousel", "Adicionando request na fila...")
         Volley.newRequestQueue(requireContext()).add(request)
+        Log.d("setupCarousel", "Request adicionada.")
     }
 
     override fun onDestroyView() {

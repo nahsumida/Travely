@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.isabellatressino.travely.R
 
 class CarouselAdapter(private val items: List<RecommendationItem>) :
-RecyclerView.Adapter<CarouselAdapter.CarouselViewHolder>() {
+    RecyclerView.Adapter<CarouselAdapter.CarouselViewHolder>() {
 
     class CarouselViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val name: TextView = itemView.findViewById(R.id.placeName)
@@ -20,8 +20,7 @@ RecyclerView.Adapter<CarouselAdapter.CarouselViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CarouselViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_place_card, parent, false)
-        Log.e("testeeeioio", "cheguei no adapter")
-
+        Log.d("CarouselAdapter", "ViewHolder criado")
         return CarouselViewHolder(view)
     }
 
@@ -29,9 +28,11 @@ RecyclerView.Adapter<CarouselAdapter.CarouselViewHolder>() {
         val item = items[position]
         holder.name.text = item.name
         holder.subtypes.text = item.subtypes.joinToString(", ")
-        Log.e("testeeeioio", "cheguei no adapter")
-
+        Log.d("CarouselAdapter", "Item ${item.name} vinculado")
     }
 
-    override fun getItemCount(): Int = items.size
+    override fun getItemCount(): Int {
+        Log.d("CarouselAdapter", "Total de itens: ${items.size}")
+        return items.size
+    }
 }
