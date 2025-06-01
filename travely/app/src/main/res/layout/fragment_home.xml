@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -185,6 +186,19 @@
                 app:layout_constraintStart_toStartOf="@id/card_view_infos"
                 app:layout_constraintTop_toBottomOf="@id/card_view_map" />
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/carouselRecyclerView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:clipToPadding="false"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:orientation="horizontal"
+                tools:listitem="@layout/item_place_card"
+                app:layout_constraintTop_toBottomOf="@id/tv_based"
+                app:layout_constraintStart_toStartOf="@id/card_view_infos"
+                app:layout_constraintEnd_toEndOf="@id/card_view_infos" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

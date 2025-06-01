@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.NFC" />
 
     <application
+        android:usesCleartextTraffic="true"
         android:name=".TravelyApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -47,7 +48,7 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="${GOOGLE_MAPS_API_KEY}" />
+            android:value="AIzaSyDwB6k82kOvNNEMXKPb_Wc2RSy4rxHD-RU" />
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
