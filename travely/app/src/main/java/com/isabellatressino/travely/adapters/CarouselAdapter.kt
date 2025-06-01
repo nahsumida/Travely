@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.isabellatressino.travely.R
+import com.isabellatressino.travely.dao.PlaceDao
 
 class CarouselAdapter(private val items: List<RecommendationItem>) :
     RecyclerView.Adapter<CarouselAdapter.CarouselViewHolder>() {
@@ -25,11 +26,32 @@ class CarouselAdapter(private val items: List<RecommendationItem>) :
     }
 
     override fun onBindViewHolder(holder: CarouselViewHolder, position: Int) {
-        val item = items[position]
-        holder.name.text = item.name
-        holder.subtypes.text = item.subtypes.joinToString(", ")
-        Log.d("CarouselAdapter", "Item ${item.name} vinculado")
+        val recommendation = items[position]
+
+        // Buscar informações completas do lugar pelo id
+        PlaceDao().getPlaces(
+            onSuccess = { allPlaces ->
+                val place = allPlaces.find { it.id == recommendation.id }
+
+                if (place != null) {
+                    holder.name.text = place.name
+                    holder.subtypes.text = place.subtypes.joinToString(", ")
+                    Log.d("CarouselAdapter", "Place ${place.name} carregado do Firestore")
+                } else {
+                    holder.name.text = recommendation.name
+                    holder.subtypes.text = recommendation.subtypes.joinToString(", ")
+                    Log.w("CarouselAdapter", "Place com id ${recommendation.id} não encontrado no Firestore")
+                }
+            },
+            onFailure = { e ->
+                Log.e("CarouselAdapter", "Erro ao buscar dados do lugar: ${e.message}", e)
+                // Fallback para os dados da API caso falhe
+                holder.name.text = recommendation.name
+                holder.subtypes.text = recommendation.subtypes.joinToString(", ")
+            }
+        )
     }
+
 
     override fun getItemCount(): Int {
         Log.d("CarouselAdapter", "Total de itens: ${items.size}")
