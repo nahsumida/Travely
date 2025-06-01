@@ -100,6 +100,7 @@ class HomeFragment : Fragment() {
                     }
 
                     Log.d("setupCarousel", "Itens recomendados: ${recommendations.size}")
+                    Log.d("setupCarousel", "Itens recomendados: ${recommendations.toString()}")
                     recyclerView.adapter = CarouselAdapter(recommendations)
                 } catch (e: Exception) {
                     Log.e("setupCarousel", "Erro ao processar resposta: ${e.message}", e)

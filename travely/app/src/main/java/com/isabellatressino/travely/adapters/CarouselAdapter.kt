@@ -28,26 +28,26 @@ class CarouselAdapter(private val items: List<RecommendationItem>) :
     override fun onBindViewHolder(holder: CarouselViewHolder, position: Int) {
         val recommendation = items[position]
 
-        // Buscar informações completas do lugar pelo id
-        PlaceDao().getPlaces(
-            onSuccess = { allPlaces ->
-                val place = allPlaces.find { it.id == recommendation.id }
-
+        // Buscar o Place completo pelo ID usando o DAO
+        PlaceDao().getPlaceById(
+            placeId = recommendation.id,
+            onSuccess = { place ->
                 if (place != null) {
                     holder.name.text = place.name
                     holder.subtypes.text = place.subtypes.joinToString(", ")
                     Log.d("CarouselAdapter", "Place ${place.name} carregado do Firestore")
                 } else {
+                    // Fallback para os dados da recomendação se o place não for encontrado
                     holder.name.text = recommendation.name
                     holder.subtypes.text = recommendation.subtypes.joinToString(", ")
-                    Log.w("CarouselAdapter", "Place com id ${recommendation.id} não encontrado no Firestore")
+                    Log.w("CarouselAdapter", "Place com id ${recommendation.id} não encontrado")
                 }
             },
             onFailure = { e ->
-                Log.e("CarouselAdapter", "Erro ao buscar dados do lugar: ${e.message}", e)
-                // Fallback para os dados da API caso falhe
+                // Fallback em caso de erro
                 holder.name.text = recommendation.name
                 holder.subtypes.text = recommendation.subtypes.joinToString(", ")
+                Log.e("CarouselAdapter", "Erro ao buscar place: ${e.message}", e)
             }
         )
     }
