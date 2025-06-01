@@ -73,27 +73,22 @@ class HomeFragment : Fragment() {
             put("profile", profile)
         }
 
-        Log.e("testeeeioio", jsonBody.toString())
-
         val request = object : JsonObjectRequest(
             Method.POST,
             "http://10.0.2.2:8000/recomendar/",
             jsonBody,
             { response ->
-                Log.e("testeeeioio", "cheguei na response")
                 try {
-                    Log.e("testeeeioio", "cheguei na response")
-                    Log.e("testeeeioio", response.toString())
-
                     val recommendations = mutableListOf<RecommendationItem>()
-                    val dataArray = response.getJSONArray("data")
-                    for (i in 0 until dataArray.length()) {
-                        val obj = dataArray.getJSONObject(i)
-                        val subtypesArray = obj.getJSONArray("subtypes")
-                        val subtypes = List(subtypesArray.length()) { j ->
-                            subtypesArray.getString(j)
-                        }
 
+                    // Pega o array "recomendacoes" dentro do objeto response
+                    val recArray = response.getJSONArray("recomendacoes")
+
+                    for (i in 0 until recArray.length()) {
+                        val obj = recArray.getJSONObject(i)
+                        val subtypes = List(obj.getJSONArray("subtypes").length()) { j ->
+                            obj.getJSONArray("subtypes").getString(j)
+                        }
                         recommendations.add(
                             RecommendationItem(
                                 id = obj.getString("id"),
@@ -103,9 +98,9 @@ class HomeFragment : Fragment() {
                             )
                         )
                     }
-                    Log.e("testeeeioio", "Recomendações recebidas: ${recommendations.size}")
 
-                    binding.carouselRecyclerView.adapter = CarouselAdapter(recommendations)
+                    Log.d("setupCarousel", "Itens recomendados: ${recommendations.size}")
+                    recyclerView.adapter = CarouselAdapter(recommendations)
                 } catch (e: Exception) {
                     Log.e("setupCarousel", "Erro ao processar resposta: ${e.message}", e)
                 }
@@ -119,15 +114,11 @@ class HomeFragment : Fragment() {
             }
         ) {
             override fun getHeaders(): MutableMap<String, String> {
-                val headers = HashMap<String, String>()
-                headers["Content-Type"] = "application/json"
-                return headers
+                return hashMapOf("Content-Type" to "application/json")
             }
         }
 
-        Log.d("setupCarousel", "Adicionando request na fila...")
         Volley.newRequestQueue(requireContext()).add(request)
-        Log.d("setupCarousel", "Request adicionada.")
     }
 
     override fun onDestroyView() {
