@@ -3,7 +3,8 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.googleGmsGoogleServices)
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
-}
+    id("dagger.hilt.android.plugin")
+    id("kotlin-kapt")}
 
 android {
     namespace = "com.isabellatressino.travely"
@@ -74,5 +75,24 @@ dependencies {
     implementation("com.github.santalu:maskara:1.0.0")
     implementation(libs.gson)
 
+    // ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
 
+    // LiveData
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
+
+    // Coroutines (caso use no ViewModel)
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
+    // Fragment KTX
+    implementation("androidx.fragment:fragment-ktx:1.6.2")
+
+    // https://github.com/santalu/maskara - biblioteca mascaras
+    implementation("com.github.santalu:maskara:1.0.0")
+
+    //implementation(libs.gson)
+    // Hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+    implementation(libs.androidx.work.runtime.ktx)
 }

@@ -1,107 +1,111 @@
 package com.isabellatressino.travely.models
 
-import android.os.Parcelable
 import com.google.firebase.firestore.GeoPoint
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import android.util.Log
 
 class Place(
-    val id: String,
-    val name: String,
     val address: String,
+    val businessHours: Map<String, Map<String, String>>,
     val description: String,
-    val type: String,
-    val rate: Double,
-    val businessHours: Map<String, Array<String>>,
     val geopoint: GeoPoint,
-    val profiles: Array<String>,
-    val picture: String,
-    val schedule: List<Schedule>
+    val id: String,
+    val keyWords: List<String>,
+    val name: String,
+    val rating: Double,
+    val subtypes: List<String>,
+    val picture: String
 ) {
 
-    // Função para verificar se o local está aberto no momento
     fun isOpen(): Boolean {
-        val currentDay = getCurrentDayOfWeek() // Sun
-        val currentTime = getCurrentTime() // 11:24
+        val currentDay = getCurrentDayOfWeek()
+        val currentTime = getCurrentTime()
 
         val todayHours = businessHours[currentDay]
+        Log.d("PlaceModelTest", "currentDay: $currentDay")
+        Log.d("PlaceModelTest", "businessHours keys: ${businessHours.keys}")
+
+        Log.d("PlaceModelTest", "${todayHours}")
 
         return if (!todayHours.isNullOrEmpty()) {
-            if (todayHours[0] == "closed") {
-                false
+            val openTime = todayHours["open"]
+            val closeTime = todayHours["close"]
+
+            if (!openTime.isNullOrEmpty() && !closeTime.isNullOrEmpty()) {
+                currentTime >= openTime && currentTime <= closeTime
             } else {
-                val openTime = todayHours[0]
-                val closeTime = todayHours[1]
-                currentTime in openTime..closeTime
+                false
             }
         } else {
             false
         }
     }
 
-    // Função para obter o horário de fechamento do local no dia atual
     fun getCloseTime(): String? {
         val currentDay = getCurrentDayOfWeek()
-        val todayHours = businessHours[currentDay]
-
-        return if (!todayHours.isNullOrEmpty() && todayHours[0] != "closed") {
-            todayHours[1]
-        } else {
-            null
-        }
+        return businessHours[currentDay]?.get("close")
     }
 
-    // Função para obter o próximo horário de abertura
     fun getNextOpenTime(): String {
-        val currentDay = getCurrentDayOfWeek() // Ex: Sun
-        val currentTime = getCurrentTime() // Ex: 13:00
-        val daysOfWeek = listOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
+        val currentDay = getCurrentDayOfWeek()
+        val currentTime = getCurrentTime()
+
+        val daysOfWeek = listOf(
+            "sunday", "monday", "tuesday", "wednesday",
+            "thursday", "friday", "saturday"
+        )
+
         val daysInPortuguese = mapOf(
-            "Sun" to "Domingo",
-            "Mon" to "Segunda-feira",
-            "Tue" to "Terça-feira",
-            "Wed" to "Quarta-feira",
-            "Thu" to "Quinta-feira",
-            "Fri" to "Sexta-feira",
-            "Sat" to "Sábado"
+            "sunday" to "Domingo",
+            "monday" to "Segunda-feira",
+            "tuesday" to "Terça-feira",
+            "wednesday" to "Quarta-feira",
+            "thursday" to "Quinta-feira",
+            "friday" to "Sexta-feira",
+            "saturday" to "Sábado"
         )
 
         val currentIndex = daysOfWeek.indexOf(currentDay)
 
-        // Verifica os horários de hoje primeiro
+        // Verifica se ainda abre hoje
         val todayHours = businessHours[currentDay]
-        if (!todayHours.isNullOrEmpty() && todayHours[0] != "closed") {
-            val openTime = todayHours[0]
-
-            if (currentTime < openTime) return "Hoje às $openTime"
+        val openTimeToday = todayHours?.get("open")
+        if (!openTimeToday.isNullOrEmpty() && currentTime < openTimeToday) {
+            return "Hoje às $openTimeToday"
         }
 
-        // Se o local não abre mais hoje, percorre os próximos dias
+        // Verifica próximos dias
         for (i in 1..7) {
             val nextIndex = (currentIndex + i) % 7
             val nextDay = daysOfWeek[nextIndex]
             val nextHours = businessHours[nextDay]
+            val nextOpenTime = nextHours?.get("open")
 
-            if (!nextHours.isNullOrEmpty() && nextHours[0] != "closed") {
+            if (!nextOpenTime.isNullOrEmpty()) {
                 val nextDayInPortuguese = daysInPortuguese[nextDay] ?: nextDay
-                return "$nextDayInPortuguese às ${nextHours[0]}"
+                return "$nextDayInPortuguese às $nextOpenTime"
             }
         }
-        return ""
+
+        return "Horário de funcionamento indisponível"
     }
 
-
-    // Função para obter o dia da semana atual em formato abreviado
-    public fun getCurrentDayOfWeek(): String {
+    private fun getCurrentDayOfWeek(): String {
         val calendar = Calendar.getInstance()
-        return SimpleDateFormat("EEE").format(calendar.time).lowercase()
-            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }
+        val format = SimpleDateFormat("EEEE", Locale.US)
+        Log.d("PlaceModelTest", "${format.format(calendar.time).lowercase()}")
+        return format.format(calendar.time).lowercase()
     }
 
-    // Função para obter o horário atual no formato HH:mm
-    public fun getCurrentTime(): String {
+    private fun getCurrentTime(): String {
         val calendar = Calendar.getInstance()
-        return SimpleDateFormat("HH:mm").format(calendar.time)
+        Log.d("PlaceModelTest", "${SimpleDateFormat("HH:mm", Locale.US).format(calendar.time)}")
+        return SimpleDateFormat("HH:mm", Locale.US).format(calendar.time)
+    }
+
+    override fun toString(): String {
+        return "Place(name='$name')"
     }
 }

@@ -1,6 +1,5 @@
 package com.isabellatressino.travely.adapters
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,10 +15,21 @@ class TimeAdapter(private var times: MutableList<String>) :
     private var selectedPosition = -1
     var onTimeSelected: ((String) -> Unit)? = null
 
+    // Constantes para horários inválidos
+    companion object {
+        private val INVALID_TIMES =
+            setOf("Nenhum horário disponível", "Fechado", "Informação indisponível")
+    }
 
     inner class TimeItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val textView: TextView = itemView.findViewById(R.id.tv_time)
         val cardView: CardView = itemView.findViewById(R.id.cv_time)
+
+        // Cores de seleção armazenadas
+        val selectedColor = ContextCompat.getColor(itemView.context, R.color.primaryColor)
+        val unselectedColor = ContextCompat.getColor(itemView.context, R.color.surfaceColor)
+        val selectedTextColor = ContextCompat.getColor(itemView.context, R.color.onPrimary)
+        val unselectedTextColor = ContextCompat.getColor(itemView.context, R.color.onSurface)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TimeItemViewHolder {
@@ -36,31 +46,16 @@ class TimeAdapter(private var times: MutableList<String>) :
         val time = times[position]
         holder.textView.text = time
 
-        if (position == selectedPosition && time != "Nenhum horário disponível" && time != "Fechado" && time != "Informação indisponível") {
-            holder.cardView.setCardBackgroundColor(
-                ContextCompat.getColor(holder.itemView.context, R.color.purple_haze)
-            )
-            holder.textView.setTextColor(
-                ContextCompat.getColor(
-                    holder.itemView.context,
-                    R.color.white
-                )
-            )
+        if (position == selectedPosition && time !in INVALID_TIMES) {
+            holder.cardView.setCardBackgroundColor(holder.selectedColor)
+            holder.textView.setTextColor(holder.selectedTextColor)
         } else {
-            holder.cardView.setCardBackgroundColor(
-                ContextCompat.getColor(holder.itemView.context, R.color.white)
-            )
-            holder.textView.setTextColor(
-                ContextCompat.getColor(
-                    holder.itemView.context,
-                    R.color.black
-                )
-            )
+            holder.cardView.setCardBackgroundColor(holder.unselectedColor)
+            holder.textView.setTextColor(holder.unselectedTextColor)
         }
 
-
         holder.itemView.setOnClickListener {
-            if (time != "Nenhum horário disponível" && time != "Fechado" && time != "Informação indisponível"){
+            if (time !in INVALID_TIMES) {
                 val previousPosition = selectedPosition
                 selectedPosition = holder.adapterPosition
 
@@ -70,19 +65,21 @@ class TimeAdapter(private var times: MutableList<String>) :
                 onTimeSelected?.invoke(time)
             }
         }
-
-
     }
 
+    // Reseta a seleção
     fun resetSelection() {
         selectedPosition = -1
         notifyDataSetChanged()
     }
 
+    // Atualiza a lista de horários
     fun updateTimeList(newTimeList: List<String>) {
         times.clear()
         times.addAll(newTimeList)
+        resetSelection()
         notifyDataSetChanged()
     }
 
 }
+

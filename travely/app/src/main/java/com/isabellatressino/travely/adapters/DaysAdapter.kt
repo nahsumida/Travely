@@ -1,6 +1,5 @@
 package com.isabellatressino.travely.adapters
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,133 +8,72 @@ import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.isabellatressino.travely.R
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
 
 class DaysAdapter(
-    private var days: MutableList<String>,
-) : RecyclerView.Adapter<DaysAdapter.DaysItemViewHolder>() {
+    private var days: List<Pair<Int, String>>,
+    private val onDaySelected: (Int) -> Unit
+) : RecyclerView.Adapter<DaysAdapter.DayViewHolder>() {
 
-    private var selectedPosition = -1
-    var onDaySelected: ((String) -> Unit)? = null
+    private var selectedDay: Int? = null
 
-    inner class DaysItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val dayTextView: TextView = itemView.findViewById(R.id.tv_day)
-        val dayOfWeekTextView: TextView = itemView.findViewById(R.id.tv_day_of_week)
+    inner class DayViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val txtDay: TextView = itemView.findViewById(R.id.tv_day)
         val cardView: CardView = itemView.findViewById(R.id.cardViewDate)
+        val txtDayOfWeek: TextView = itemView.findViewById(R.id.tv_day_of_week)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DaysItemViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        val itemView = inflater.inflate(R.layout.recycler_view_dates, parent, false)
-        return DaysItemViewHolder(itemView)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DayViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.recyclerview_days, parent, false)
+        return DayViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: DaysItemViewHolder, position: Int) {
-        val dayWithWeekday = days[position]
-        val (day, weekDay, month,year) = dayWithWeekday.split("-")
-        val dayWithMonth = getCurrentDayAndMonth()
-        val (currentDay, currentMonth) = dayWithMonth.split("-")
+    override fun onBindViewHolder(holder: DayViewHolder, position: Int) {
+        val (day, dayOfWeek) = days[position]  // Desestruturando o par (dia, dia da semana)
 
-        holder.dayTextView.text = day
-        holder.dayOfWeekTextView.text = weekDay.replace(".", "")
+        holder.txtDay.text = day.toString()
+        holder.txtDayOfWeek.text = dayOfWeek
 
-        // Define a cor do item baseado na seleção ou se é o dia atual
-        if (position == selectedPosition) {
+        if (day == selectedDay) {
             holder.cardView.setCardBackgroundColor(
-                ContextCompat.getColor(holder.itemView.context, R.color.purple_haze)
+                ContextCompat.getColor(holder.itemView.context, R.color.primaryColor)
             )
-            holder.dayTextView.setTextColor(
-                ContextCompat.getColor(
-                    holder.itemView.context,
-                    R.color.white
-                )
+            holder.txtDay.setTextColor(
+                ContextCompat.getColor(holder.itemView.context, R.color.onPrimary)
             )
-            holder.dayOfWeekTextView.setTextColor(
-                ContextCompat.getColor(
-                    holder.itemView.context,
-                    R.color.white
-                )
-            )
-        } else if (day == currentDay && month == currentMonth) {
-            holder.cardView.setCardBackgroundColor(
-                ContextCompat.getColor(holder.itemView.context, R.color.lime_green)
-            )
-            holder.dayTextView.setTextColor(
-                ContextCompat.getColor(
-                    holder.itemView.context,
-                    R.color.white
-                )
-            )
-            holder.dayOfWeekTextView.setTextColor(
-                ContextCompat.getColor(
-                    holder.itemView.context,
-                    R.color.white
-                )
+            holder.txtDayOfWeek.setTextColor(
+                ContextCompat.getColor(holder.itemView.context, R.color.onPrimary)
             )
         } else {
             holder.cardView.setCardBackgroundColor(
-                ContextCompat.getColor(holder.itemView.context, R.color.white)
+                ContextCompat.getColor(holder.itemView.context, R.color.surfaceColor)
             )
-            holder.dayTextView.setTextColor(
-                ContextCompat.getColor(
-                    holder.itemView.context,
-                    R.color.black
-                )
+            holder.txtDay.setTextColor(
+                ContextCompat.getColor(holder.itemView.context, R.color.onSurface)
             )
-            holder.dayOfWeekTextView.setTextColor(
-                ContextCompat.getColor(
-                    holder.itemView.context,
-                    R.color.black
-                )
+            holder.txtDayOfWeek.setTextColor(
+                ContextCompat.getColor(holder.itemView.context, R.color.onSurface)
             )
         }
 
         holder.itemView.setOnClickListener {
-            // Atualiza a posição do item selecionado
-            val previousPosition = selectedPosition
-            selectedPosition = holder.adapterPosition
-
-            // Notifica apenas os itens afetados
-            notifyItemChanged(previousPosition)
-            notifyItemChanged(selectedPosition)
-
-            // Chama o callback onDaySelected para enviar o dia da semana selecionado
-            //onDaySelected?.invoke("$day-$weekDay-$month-$year")
-            onDaySelected?.invoke("$year-$month-$day-$weekDay")
+            selectedDay = day
+            notifyDataSetChanged()
+            onDaySelected(day)
         }
-
     }
 
     override fun getItemCount(): Int = days.size
 
-    // Método para atualizar os dias
-    fun updateDays(newDays: List<String>) {
-        days.clear()
-        days.addAll(newDays)
+    // Atualiza os dias exibidos na RecyclerView
+    fun updateDays(newDays: List<Pair<Int, String>>) {
+        days = newDays
         notifyDataSetChanged()
     }
 
-    // Seleciona o dia atual
-    fun selectDay(date: String) {
-        val index = days.indexOfFirst { days.contains(date) }
-        if (index != -1) {
-            selectedPosition = index
-            notifyDataSetChanged()
-            onDaySelected?.invoke(days[index])
-        }
-    }
-
-    fun resetSelection() {
-        selectedPosition = -1
-        notifyDataSetChanged()
-    }
-
-
-    // Pega o dia e o mes atual
-    private fun getCurrentDayAndMonth(): String {
-        val calendar = Calendar.getInstance()
-        return SimpleDateFormat("dd-MM", Locale.getDefault()).format(calendar.time)
+    // Define o dia selecionado
+    fun selectDay(day: Int) {
+        selectedDay = day
+        notifyDataSetChanged()  // Atualiza a RecyclerView
     }
 }

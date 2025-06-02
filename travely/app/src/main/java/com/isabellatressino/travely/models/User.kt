@@ -1,41 +1,46 @@
 package com.isabellatressino.travely.models
 
-import android.util.Patterns
+import com.google.type.DateTime
+import java.io.Serializable
 
-class User (var name: String,
-              var cpf: String,
-              var phone:String,
-              var email: String,
-              var password: String,
-              var authID: String,
-              var schedule: List<Schedule>?,
-              var profile: String,){
-
-    public fun isNameValid(): Boolean {
-        val regex = Regex("^[^0-9@#$%^&+=]*\$")
-        return regex.matches(name)
-    }
-
-    public fun isCpfValid(): Boolean {
-        val regex = Regex("^[0-9]{11}\$")
-        return regex.matches(cpf)
-    }
-
-    public fun isPhoneValid(): Boolean {
-        val regex = Regex("^[0-9]{11}\$")
-        return regex.matches(phone)
-    }
-
-    public fun isPasswordValid(): Boolean {
-        if (!password.contains(" ")){
-            if (password.length >= 6){
-                return true
-            }
+class User(
+    var name: String,
+    var cpf: String,
+    var phone: String,
+    var email: String,
+    var password: String,
+    // var birthDate: DateTime,
+    var authID: String,
+    var schedule: List<Schedule>?,
+    var profile: String,
+    //   var answers: List<String> = emptyList()
+) : Serializable {
+    // Método que retorna uma descrição com base no perfil armazenado
+    fun getProfileDescription(): String {
+        return when (profile) {
+            "cultural" -> "Turista cultural"
+            "compras" -> "Turista de compras"
+            "gastronomico" -> "Turista gastronômico"
+            "aventureiro" -> "Turista aventureiro"
+            "negocios" -> "Turista de negócios"
+            "descanso" -> "Turista de lazer"
+            else -> "Perfil desconhecido"
         }
-        return false
     }
 
-    public fun isEmailValid(): Boolean {
-        return !email.contains(" ") || Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    override fun toString(): String {
+        return """
+            User(
+                name='$name',
+                cpf='$cpf',
+                phone='$phone',
+                email='$email',
+                password='$password',
+                authID='$authID',
+                schedule=${schedule?.joinToString { it.toString() } ?: "[]"},
+                profile='$profile',
+            )
+        """.trimIndent()
     }
+
 }
