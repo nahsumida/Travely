@@ -19,8 +19,8 @@ firebaseAuth = "23.0.0"
 playServicesLocation = "21.3.0"
 cardview = "1.0.0"
 gson = "2.10.1"
-volley = "1.2.1"
 workmanager = "2.9.0"
+volley = "1.2.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }

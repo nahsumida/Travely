@@ -19,6 +19,10 @@ import com.isabellatressino.travely.databinding.FragmentHomeBinding
 import com.isabellatressino.travely.viewmodel.UserViewModel
 import org.json.JSONObject
 
+// Importe suas classes RecommendationItem e CarouselAdapter aqui
+// import com.isabellatressino.travely.model.RecommendationItem
+// import com.isabellatressino.travely.adapter.CarouselAdapter
+
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
@@ -32,33 +36,41 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
-        setupUserInfo()
-        setupListeners()
-        return binding.root
-    }
 
-    private fun setupUserInfo() {
+        observeUserData()
+
         val uid = FirebaseAuth.getInstance().currentUser?.uid
         if (uid != null) {
             userViewModel.fetchUser(uid, requireContext())
         }
 
-        // Observa os dados e carrega o carrossel quando disponíveis
+        binding.cardViewMap.setOnClickListener {
+            val intent = Intent(requireContext(), MapActivity::class.java)
+            startActivity(intent)
+        }
+
+        return binding.root
+    }
+
+    private fun observeUserData() {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
+        if (uid != null) {
+            userViewModel.fetchUser(uid, requireContext())
+        }
+
         userViewModel.user.observe(viewLifecycleOwner) { user ->
-            user?.let {
-                binding.tvName.text = it.name
-                binding.tvProfile.text = it.getProfileDescription()
-                setupCarousel(uid = FirebaseAuth.getInstance().currentUser?.uid, profile = it.profile)
+            if (user != null) {
+                binding.tvName.text = user.name
+                binding.tvProfile.text = user.getProfileDescription()
+
+
+                // ATENÇÃO: adapte os campos de acordo com o seu modelo de usuário
+                setupCarousel(uid = FirebaseAuth.getInstance().currentUser?.uid, profile = user.profile)
             }
         }
     }
 
-    private fun setupListeners() {
-        binding.cardViewMap.setOnClickListener {
-            startActivity(Intent(requireContext(), MapActivity::class.java))
-        }
-    }
-
+    // Função para configurar o carrossel de recomendações
     private fun setupCarousel(uid: String?, profile: String?) {
         if (uid == null || profile == null) {
             Log.e("setupCarousel", "UID ou perfil ausente")
@@ -80,10 +92,7 @@ class HomeFragment : Fragment() {
             { response ->
                 try {
                     val recommendations = mutableListOf<RecommendationItem>()
-
-                    // Pega o array "recomendacoes" dentro do objeto response
                     val recArray = response.getJSONArray("recomendacoes")
-
                     for (i in 0 until recArray.length()) {
                         val obj = recArray.getJSONObject(i)
                         val subtypes = List(obj.getJSONArray("subtypes").length()) { j ->
@@ -98,7 +107,6 @@ class HomeFragment : Fragment() {
                             )
                         )
                     }
-
                     Log.d("setupCarousel", "Itens recomendados: ${recommendations.size}")
                     Log.d("setupCarousel", "Itens recomendados: ${recommendations.toString()}")
                     recyclerView.adapter = CarouselAdapter(recommendations)

@@ -10,16 +10,23 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.isabellatressino.travely.adapters.DaysAdapter
 import com.isabellatressino.travely.adapters.TimeAdapter
+import com.isabellatressino.travely.audit.infrastructure.FirebaseEventLogger
+import com.isabellatressino.travely.audit.service.EventLogger
+import com.isabellatressino.travely.audit.service.MapAuditLogger
 import com.isabellatressino.travely.dao.PlaceDao
 import com.isabellatressino.travely.dao.UserDao
 import com.isabellatressino.travely.databinding.ActivityPlaceInfoBinding
 import com.isabellatressino.travely.models.Place
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalTime
@@ -27,8 +34,9 @@ import java.time.format.TextStyle
 import java.util.Calendar
 import java.util.Locale
 import java.util.TimeZone
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class PlaceInfoActivity : AppCompatActivity() {
     private val binding by lazy { ActivityPlaceInfoBinding.inflate(layoutInflater) }
     private val placeDao by lazy { PlaceDao() }
@@ -48,6 +56,15 @@ class PlaceInfoActivity : AppCompatActivity() {
     private var selectedDayOfWeek =
         LocalDate.now().dayOfWeek.getDisplayName(TextStyle.SHORT, Locale("pt", "BR"))
 
+    @Inject
+    lateinit var eventLogger: EventLogger
+
+    private val mapAuditLogger by lazy {
+        MapAuditLogger(
+            eventLogger = eventLogger,
+            userId = FirebaseAuth.getInstance().currentUser?.uid.toString()
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,25 +111,34 @@ class PlaceInfoActivity : AppCompatActivity() {
                     placeName = place.name,
                     scheduleDateTime = timestamp,
                     onSuccess = {
-                        Toast.makeText(
-                            this,
-                            "Agendamento realizado com sucesso!",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        finish()
+                        Toast.makeText(this, "Agendamento realizado com sucesso!", Toast.LENGTH_SHORT).show()
+
+                        // Log de auditoria do salvamento
+                        lifecycleScope.launch {
+                            try {
+                                mapAuditLogger.logPlaceSaved(
+                                    placeId = placeID,
+                                    placeName = place.name,
+                                    geoPoint = place.geopoint,
+                                    subtypes = place.subtypes ?: emptyList()
+                                )
+                                Log.d("AuditLog", "Evento place_saved registrado com sucesso")
+                            } catch (e: Exception) {
+                                Log.e("AuditLog", "Erro ao registrar place_saved", e)
+                            }
+                            finish()
+                        }
+
                     },
                     onFailure = { exception ->
-                        Toast.makeText(
-                            this,
-                            "Erro ao agendar: ${exception.message}",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Toast.makeText(this, "Erro ao agendar: ${exception.message}", Toast.LENGTH_SHORT).show()
                         Log.e("ScheduleError", "Erro ao adicionar agendamento", exception)
                     }
                 )
             }
         }
     }
+
 
 
     private fun loadPlaceById(idPlace: String) {

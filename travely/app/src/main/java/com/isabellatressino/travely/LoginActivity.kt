@@ -15,7 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.isabellatressino.travely.dao.UserDao
 import com.isabellatressino.travely.databinding.ActivityLoginBinding
 import com.isabellatressino.travely.viewmodel.UserViewModel
-
+import android.view.View
 
 class LoginActivity : AppCompatActivity() {
 
@@ -95,6 +95,7 @@ class LoginActivity : AppCompatActivity() {
             return
         }
 
+        showLoading(true)
         binding.buttonLogin.isEnabled = false
 
         userDao.signInWithEmailAndPassword(
@@ -106,12 +107,15 @@ class LoginActivity : AppCompatActivity() {
                         userViewModel.clearUserPreferences(this)
                         userViewModel.fetchUser(uid, this)
 
+                        showLoading(false)
                         val intent = Intent(this, MainScreenActivity::class.java)
                         startActivity(intent)
                         finish()
                     },
                     onFailure = {
                         runOnUiThread {
+                            showLoading(false)
+                            binding.buttonLogin.isEnabled = true
                             showAlertMessage("Erro", "Usuário não encontrado.")
                         }
                     }
@@ -119,6 +123,9 @@ class LoginActivity : AppCompatActivity() {
             },
             onFailure = { exceptionMessage ->
                 runOnUiThread {
+                    showLoading(false)
+                    binding.buttonLogin.isEnabled = true
+
                     val errorMessage = when {
                         "badly formatted" in exceptionMessage.lowercase() ->
                             "Endereço de email inválido, por favor digite novamente"
@@ -132,17 +139,13 @@ class LoginActivity : AppCompatActivity() {
                         "no user record" in exceptionMessage.lowercase() ->
                             "Usuário não encontrado. Verifique o email digitado ou cadastre-se."
 
-                        exceptionMessage.contains("Email não verificado", ignoreCase = true) ->
-                            "Verifique seu e-mail antes de fazer login."
-
-
-                        "email has not been verified" in exceptionMessage.lowercase() ||
+                        exceptionMessage.contains("Email não verificado", ignoreCase = true) ||
+                                "email has not been verified" in exceptionMessage.lowercase() ||
                                 "email not verified" in exceptionMessage.lowercase() ||
                                 "email address is not verified" in exceptionMessage.lowercase() ->
                             "Verifique seu e-mail antes de fazer login."
 
-                        else ->
-                            "Usuário e/ou senha inválidos"
+                        else -> "Usuário e/ou senha inválidos"
                     }
 
                     showAlertMessage("Erro", errorMessage)
@@ -177,7 +180,7 @@ class LoginActivity : AppCompatActivity() {
         alertDialog.show()
     }
 
-//    private fun showLoading(isLoading: Boolean) {
-//        binding.layoutProgressbar.visibility = if (isLoading) View.VISIBLE else View.GONE
-//    }
+    private fun showLoading(isLoading: Boolean) {
+        binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+    }
 }

@@ -180,52 +180,74 @@ class ScheduleFragment : Fragment() {
     }
 
     private fun loadSchedules() {
+        binding.textNoSchedules.visibility = View.GONE
         scheduleAdapter.updateSchedules(emptyList())
+        binding.recyclerviewSchedules.visibility = View.GONE
+        showLoading(true)
 
         FirebaseAuth.getInstance().currentUser?.uid?.let { authID ->
             scheduleDao.getSchedulesByUser(
                 authID,
                 onSuccess = { schedules ->
                     val schedulesWithPlaces = mutableListOf<Map<String, Any>>()
-
-                    schedules.forEach { schedule ->
+                    val filteredSchedules = schedules.filter { schedule ->
                         val scheduleMonth = schedule.extractMonth()
                         val scheduleDay = schedule.extractDay()
-
-                        if (scheduleMonth == selectedMonth.toString().padStart(2, '0') &&
-                            scheduleDay == selectedDay.toString().padStart(2, '0')
-                        ) {
-
-                            placeDao.getPlaceById(
-                                schedule.placeID,
-                                onSuccess = { place ->
-                                    val scheduleMap = mapOf(
-                                        "schedule" to schedule,
-                                        "placeName" to (place?.name ?: "Nome indisponível"),
-                                        "placeAddress" to (place?.address
-                                            ?: "Endereço indisponível")
-                                    )
-                                    schedulesWithPlaces.add(scheduleMap)
-
-                                    scheduleAdapter.updateSchedules(schedulesWithPlaces)
-
-                                    binding.tvNoSchedules.visibility = View.GONE
-                                },
-                                onFailure = {
-                                    Log.e("ScheduleDebug", "Erro ao buscar lugar")
-                                }
-                            )
-                        }
+                        scheduleMonth == selectedMonth.toString().padStart(2, '0') &&
+                                scheduleDay == selectedDay.toString().padStart(2, '0')
                     }
 
-                    if (schedulesWithPlaces.isEmpty()) {
+                    if (filteredSchedules.isEmpty()) {
+                        showLoading(false)
                         binding.textNoSchedules.visibility = View.VISIBLE
-                    } else {
-                        binding.textNoSchedules.visibility = View.GONE
+                        return@getSchedulesByUser
+                    }
+
+                    var loadedCount = 0
+
+                    filteredSchedules.forEach { schedule ->
+                        placeDao.getPlaceById(
+                            schedule.placeID,
+                            onSuccess = { place ->
+                                val scheduleMap = mapOf(
+                                    "schedule" to schedule,
+                                    "placeName" to (place?.name ?: "Nome indisponível"),
+                                    "placeAddress" to (place?.address ?: "Endereço indisponível")
+                                )
+                                schedulesWithPlaces.add(scheduleMap)
+                                loadedCount++
+
+                                if (loadedCount == filteredSchedules.size) {
+                                    showLoading(false)
+                                    if (schedulesWithPlaces.isEmpty()) {
+                                        binding.textNoSchedules.visibility = View.VISIBLE
+                                    } else {
+                                        binding.textNoSchedules.visibility = View.GONE
+                                        binding.recyclerviewSchedules.visibility = View.VISIBLE
+                                        scheduleAdapter.updateSchedules(schedulesWithPlaces)
+                                    }
+                                }
+                            },
+                            onFailure = {
+                                Log.e("ScheduleDebug", "Erro ao buscar lugar")
+                                loadedCount++
+                                if (loadedCount == filteredSchedules.size) {
+                                    showLoading(false)
+                                    if (schedulesWithPlaces.isEmpty()) {
+                                        binding.textNoSchedules.visibility = View.VISIBLE
+                                    } else {
+                                        binding.textNoSchedules.visibility = View.GONE
+                                        binding.recyclerviewSchedules.visibility = View.VISIBLE
+                                        scheduleAdapter.updateSchedules(schedulesWithPlaces)
+                                    }
+                                }
+                            }
+                        )
                     }
                 },
                 onFailure = { exception ->
                     Log.e("ScheduleDebug", "Erro ao buscar agendamentos", exception)
+                    showLoading(false)
                     binding.textNoSchedules.visibility = View.VISIBLE
                 }
             )
@@ -236,4 +258,10 @@ class ScheduleFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
+    private fun showLoading(isLoading: Boolean) {
+        binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+        binding.recyclerviewSchedules.visibility = if (isLoading) View.GONE else View.VISIBLE
+    }
+
 }
